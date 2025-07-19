@@ -1,0 +1,6 @@
+@VC.AG.WebAPI_HostAddress = http://localhost:5021
+
+GET {{VC.AG.WebAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
