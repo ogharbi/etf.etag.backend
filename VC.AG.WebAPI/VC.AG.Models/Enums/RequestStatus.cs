@@ -1,11 +1,20 @@
-﻿namespace VC.AG.Models.Enums
+﻿using Microsoft.AspNetCore.Http;
+
+namespace VC.AG.Models.Enums
 {
     public enum RequestStatus
     {
         None = 1,
-        Draft = 2,
+        NotStarted = 2,
         InProgress = 3,
-        Validated = 4,
-        Rejected = 5
+        Completed = 4
+
+    }
+    public class RequestStatusStr
+    {
+        public const string None = "None";
+        public const string NotStarted = "Non démarré";
+        public const string InProgress = "En cours";
+        public const string Completed = "Terminé";
     }
 }

@@ -12,8 +12,8 @@ namespace VC.AG.WebAPI.Models
         public string? Site { get; set; }
         public string? ListName { get; set; }
         public string? ParentId { get; set; }
-        public string? FormType { get; set; }
-        public string? Type { get; set; }
+        public string? Code { get; set; }
+        public string? Comment { get; set; }
       
         public DBFile? ToDBFile(IFormFile? file, IUserContract userSvc)
         {
@@ -27,10 +27,10 @@ namespace VC.AG.WebAPI.Models
 
                 var properties = new Dictionary<string, object>
                         {
-                            { "Title", string.Format("EEF-{0}", name) },
+                            { "Title", string.Format("VC-{0}", name) },
                             { AppConstants.AppKeys.ParentId, $"{ParentId}" },
-                            { AppKeys.Code, $"{Type}" },
-                            { AppConstants.AppKeys.FormType, $"{FormType}" },
+                            { AppKeys.Code, $"{Code}" },
+                            { AppConstants.AppKeys.Comment, $"{Comment}" },
                             { $"{AppConstants.AppKeys.Lk_Request}LookupId", $"{ParentId}" },
 
                         };
@@ -48,7 +48,7 @@ namespace VC.AG.WebAPI.Models
                 {
                     Content = binaryReader.ReadBytes((int)file.Length),
                     Created = DateTime.Now,
-                    Name = $"EEF-{Site}-{FormType}-{ParentId}-{name}",
+                    Name = $"VC-{Site}-{Code}-{ParentId}-{name}",
                     Values = properties,
                     Site = Site,
                     ListName = ListName

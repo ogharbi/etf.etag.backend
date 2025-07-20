@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using  VC.AG.Models.ValuesObject;
 using  VC.AG.Models.Enums;
 using  VC.AG.Models.Entities;
+using VC.AG.Models.ValuesObject.SPContext;
 
 namespace  VC.AG.WebAPI.Controllers
 {
@@ -91,6 +92,16 @@ namespace  VC.AG.WebAPI.Controllers
             var result = stream?.SerializeStream();
             return stream != null ? Ok(result) : Ok(null);
         }
-       
+        [HttpPost("sharedlink")]
+        [ProducesResponseType<string>(StatusCodes.Status200OK)]
+        [Produces("application/json")]
+        public IActionResult GetSharedLink(WfUpdate wfUpdate)
+        {
+            var d = wfUpdate.ToDBUpdate();
+            var result = formSvc.GenerateSharedLink(d, $"{wfUpdate.Comment}").Result;
+            return Ok(result);
+        }
+      
+
     }
 }

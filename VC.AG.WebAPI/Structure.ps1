@@ -458,6 +458,7 @@ function AttachmentFields() {
     $fields = @(
         "Col_E_Code"
         "Col_ParentId"
+        "Col_Comment"
         "Col_Author"
         "Col_Editor"
     )
@@ -496,6 +497,7 @@ function InterviewFields() {
         "Col_BlAigComment"
         "Col_BlFlComment"
         "Col_Lesson"
+        "Col_Guid"
         "Col_Author"
         "Col_Editor"
     )
@@ -592,6 +594,11 @@ function InterviewList($web) {
     $l = GetListByUrl $web "$url"
     AddCTToListV2 $l.Id $ct
     UpdateListView -List $l.Id -Fields $fields
+    AddFieldIndex  $l.Id "AgUser"
+    AddFieldIndex  $l.Id "Col_Status"
+    AddFieldIndex  $l.Id "Author"
+    AddFieldIndex  $l.Id "Editor"
+
 }
 function ParentFields(){
     $fields = @(
@@ -616,6 +623,9 @@ function RelatedInterviewList($web,$addSiteFields) {
     AddFieldIndex  $l.Id "Created"
     AddFieldIndex  $l.Id "Modified"
     AddFieldIndex  $l.Id "Title"
+    AddFieldIndex  $l.Id "Author"
+    AddFieldIndex  $l.Id "Editor"
+
 }
 function QuartlyInterviewList($web,$addSiteFields) {
     $url = "Lists/vc_quartlyinterview"

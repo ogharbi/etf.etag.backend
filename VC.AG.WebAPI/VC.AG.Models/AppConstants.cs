@@ -99,13 +99,13 @@ namespace VC.AG.Models
             public const string ListId = "Col_WF_ListId";
             public const string FileLeaf = "FileLeafRef";
 
-            public const string FormType = "Col_WF_FormType";
             public const string WfTarget = "Col_WF_Target";
 
             public const string WfUrl = "Col_UrlR";
             public const string Author = "Col_Author";
             public const string Editor = "Col_Editor";
             public const string Code = "Col_E_Code";
+            public const string Comment = "Col_Comment";
             public const string ParentCode = "Col_E_ParentCode";
             public const string Locale = "Col_E_Locale";
             public const string Name = "Col_E_Name";
@@ -176,7 +176,8 @@ namespace VC.AG.Models
         }
         public static class RequestKeys
         {
-            public const string WfStatus = "Col_S_WfStatus";
+            public const string WfStatus = "Col_Status";
+            public const string Aiguilleur = "Col_AgUser";
         }
        
     }

@@ -2,9 +2,9 @@
 {
     public enum RequestScope
     {
-        None,
-        MyTasks,
-        MyRequests,
-        MyScope
+        None=1,
+        AllRequests=2,
+        MyRequests=3,
+        MyTasks = 4
     }
 }

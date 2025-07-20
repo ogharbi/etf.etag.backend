@@ -77,7 +77,6 @@ namespace VC.AG.ServiceLayer.Services
                 if (string.IsNullOrEmpty(query.Filter) && query.InlineQuery != true)
                     query.Filter = query.GetQuery(user);
                 result = await uow.DBRepo.GetStream(q);
-                result = result?.CheckAccess($"{delegation}", user);
             }
             return result;
         }
@@ -119,7 +118,6 @@ namespace VC.AG.ServiceLayer.Services
         public async Task<DBStream?> Ressources(FormQuery query, string? delegation = "")
         {
             DBStream? result = null;
-            if (!ListNameKeys.Comment.EqualsNotNull(query?.ListName) && !ListNameKeys.RequestAttachments.EqualsNotNull(query?.ListName)) throw new InvalidOperationException($"Quering {query?.ListName} not authorized");
             var site = await siteSvc.Get(delegation) ?? throw new InvalidOperationException($"Unable to find the site : {delegation}");
             if (query != null)
             {
@@ -127,7 +125,7 @@ namespace VC.AG.ServiceLayer.Services
                 {
                     SiteUrl = site.SiteUrl,
                     ListName = ListNameKeys.Request,
-                    Filter = $"<Where><And><Eq><FieldRef Name='ID'/><Value Type='Number'>{query.ItemId}</Value></Eq><Eq><FieldRef Name='{AppKeys.FormType}'/><Value Type='Text'>{query.FormType}</Value></Eq></And></Where>"
+                    Filter = $"<Where><Eq><FieldRef Name='ID'/><Value Type='Number'>{query.ItemId}</Value></Eq></Where>"
                 };
                 var wfRequest = await Get(qRequest, delegation);
                 if (wfRequest != null)
@@ -145,17 +143,11 @@ namespace VC.AG.ServiceLayer.Services
       
         public async Task<string?> GenerateSharedLink(DBUpdate item, string fileUrl)
         {
-            string? result = null;
-            var dbQuery = item.ToDBQuery();
-            var wfRequest = await Get(dbQuery, item.Site);
-            if (wfRequest != null)
-            {
-                var site = await siteSvc.Get($"{item.Site}") ?? throw new InvalidOperationException($"Unable to find the site : {item.Site}");
-                var ctx = spoContext.GetClientContext($"{site.SiteUrl}");
-                var r = Microsoft.SharePoint.Client.Web.CreateOrganizationSharingLink(ctx, fileUrl, true);
-                await ctx.ExecuteQueryAsync();
-                result = r.Value;
-            }
+            var site = await siteSvc.Get($"{item.Site}") ?? throw new InvalidOperationException($"Unable to find the site : {item.Site}");
+            var ctx = spoContext.GetClientContext($"{site.SiteUrl}");
+            var r = Microsoft.SharePoint.Client.Web.CreateOrganizationSharingLink(ctx, fileUrl, true);
+            await ctx.ExecuteQueryAsync();
+            var result = r.Value;
             return result;
         }
 
@@ -186,6 +178,7 @@ namespace VC.AG.ServiceLayer.Services
             }
             return items;
         }
+       
 
 
     }

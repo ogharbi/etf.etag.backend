@@ -46,7 +46,7 @@ namespace VC.AG.Models.Extensions
                 {
                     var values = rows[i];
 
-                 
+
                     var isAdmin = user?.IsSiteAdmin == true || user?.Access?.FirstOrDefault(a => a.Site?.EqualsNotNull(site) == true && string.IsNullOrEmpty(a.Code) && a.Role.EqualsNotNull(UserRole.Admin.ToString())) != null;
                     hasAccess = isAdmin;
                     if (values != null && hasAccess)
@@ -62,7 +62,7 @@ namespace VC.AG.Models.Extensions
             return stream;
 
         }
-      
+
         public static WfRequest? ToWfRequest(this DBStream stream, string? site)
         {
             WfRequest? result = null;
@@ -75,7 +75,7 @@ namespace VC.AG.Models.Extensions
                 {
                     Values = values,
                     Id = values?.GetStringValue2("ID"),
-                  
+
                 };
             }
             return result;
@@ -116,7 +116,7 @@ namespace VC.AG.Models.Extensions
         {
             string? result;
             var scope = query.Scope;
-            if (scope == RequestScope.None) scope = Enums.RequestScope.MyRequests;
+            if (scope == RequestScope.None) scope = Enums.RequestScope.AllRequests;
             var orderby = string.Empty;
             var orderbyAsc = string.Empty;
             if (!string.IsNullOrEmpty(query.OrderBy))
@@ -142,7 +142,7 @@ namespace VC.AG.Models.Extensions
             string op;
             if (status != Enums.RequestStatus.None)
             {
-                op = $"<Eq><FieldRef Name='{AppConstants.RequestKeys.WfStatus}'/><Value Type='Text'>{status}</Value></Eq>";
+                op = $"<Eq><FieldRef Name='{AppConstants.RequestKeys.WfStatus}'/><Value Type='Text'>{GetRequestStatus(status)}</Value></Eq>";
                 ops.Add(op);
             }
             if (!string.IsNullOrEmpty(contentTypeId))
@@ -158,9 +158,16 @@ namespace VC.AG.Models.Extensions
             switch (scope)
             {
                 case Enums.RequestScope.MyTasks:
-                 
-                case Enums.RequestScope.MyScope:
-                  
+                    op = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.RequestKeys.Aiguilleur}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
+                    ops.Add(op);
+                    break;
+                case Enums.RequestScope.AllRequests:
+                    if (!isAdmin)
+                    {
+                        var op1 = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.RequestKeys.Aiguilleur}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
+                        var op2 = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
+                        op = $"<Or>{op1}{op2}</Or>";
+                    }
                     break;
                 case Enums.RequestScope.MyRequests:
                     op = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
@@ -173,8 +180,29 @@ namespace VC.AG.Models.Extensions
                 op = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
                 ops.Add(op);
             }
+            static string GetRequestStatus(RequestStatus? status)
+            {
+                var r = RequestStatusStr.None;
+                if (status.HasValue)
+                {
+                    switch (status)
+                    {
+                        case RequestStatus.NotStarted:
+                            r = RequestStatusStr.NotStarted;
+                            break;
+                        case RequestStatus.InProgress:
+                            r = RequestStatusStr.InProgress;
+                            break;
+                        case RequestStatus.Completed:
+                            r = RequestStatusStr.Completed;
+                            break;
+                    
+                    }
+                }
+                return r;
+            }
         }
-     
-       
+
+
     }
 }

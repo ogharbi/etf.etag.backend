@@ -21,7 +21,8 @@ namespace VC.AG.ServiceLayer.Contracts
         Task<DBItem?> Put(DBUpdate item);
         Task<string> Delete(DBUpdate item);
         Task<DBStream?> Ressources(FormQuery query, string? delegation = "");
-    
-      
+        Task<string?> GenerateSharedLink(DBUpdate item, string fileUrl);
+
+
     }
 }

@@ -67,6 +67,9 @@ namespace VC.AG.ServiceLayer.Services
                         var q1 = new DBQuery() { SiteId = site.Id, SiteUrl = site.SiteUrl, ListId = listId, CatchError = true };
                         result = await uow.DBRepo.GetListViews(q1);
                         break;
+                    case Ressource.SiteLinks:
+                        result = site.SiteLinks;
+                        break;
                     case Ressource.ContentTypes:
                         var q2 = new DBQuery() { SiteId = site.Id, SiteUrl = site.SiteUrl, ListId = listId, CatchError = true };
                         result = await uow.DBRepo.GetListContentTypes(q2);
