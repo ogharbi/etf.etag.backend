@@ -60,7 +60,7 @@ namespace VC.AG.WebAPI.Controllers
         public IActionResult Get([FromBody] ReqQuery req)
         {
             var query = req.ToDGQuery();
-            if (req.ListName.EqualsNotNull(ListNameKeys.Request)) throw new UnauthorizedAccessException($"{req.ListName} is secured");
+            if (req.ListName.EqualsNotNull(ListNameKeys.Interview)) throw new UnauthorizedAccessException($"{req.ListName} is secured");
             var stream = appSvc.GetAll(query, req.Site).Result;
             var result = stream?.SerializeStream();
             return stream != null ? (IActionResult)Ok(result) : Ok(null);

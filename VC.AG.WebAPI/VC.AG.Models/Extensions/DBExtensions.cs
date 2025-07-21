@@ -34,34 +34,7 @@ namespace VC.AG.Models.Extensions
             var r = System.Text.Json.JsonSerializer.Serialize(result);
             return r;
         }
-        public static DBStream CheckAccess(this DBStream stream, string site, UserEntity? user, bool? throwException = false)
-        {
-            var hasAccess = false;
-            var rows = stream.Row;
-            var email = $"{user?.Email?.Split('@')[0]}".ToLower();
-            var allowedRows = new List<Dictionary<string, object>>();
-            if (rows != null)
-            {
-                for (var i = 0; i < rows.Count; i++)
-                {
-                    var values = rows[i];
-
-
-                    var isAdmin = user?.IsSiteAdmin == true || user?.Access?.FirstOrDefault(a => a.Site?.EqualsNotNull(site) == true && string.IsNullOrEmpty(a.Code) && a.Role.EqualsNotNull(UserRole.Admin.ToString())) != null;
-                    hasAccess = isAdmin;
-                    if (values != null && hasAccess)
-                    {
-                        allowedRows.Add(values);
-                    }
-                }
-            }
-            if (allowedRows.Count == 0 && throwException == true)
-                throw new UnauthorizedAccessException(AppConstants.Commun.UnauthorizedOp);
-            stream.Row = allowedRows;
-
-            return stream;
-
-        }
+       
 
         public static WfRequest? ToWfRequest(this DBStream stream, string? site)
         {
@@ -136,18 +109,11 @@ namespace VC.AG.Models.Extensions
         }
         static void UpdateQuery(ref List<string> ops, FormQuery query, Enums.RequestScope? scope, UserEntity? currentUser, bool isAdmin)
         {
-            var taskTarget = query.TaskTarget;
             var status = query.Status;
-            var contentTypeId = query.ContentTypeId;
             string op;
             if (status != Enums.RequestStatus.None)
             {
                 op = $"<Eq><FieldRef Name='{AppConstants.RequestKeys.WfStatus}'/><Value Type='Text'>{GetRequestStatus(status)}</Value></Eq>";
-                ops.Add(op);
-            }
-            if (!string.IsNullOrEmpty(contentTypeId))
-            {
-                op = $"<Eq><FieldRef Name='ContentTypeId'/><Value Type='Text'>{contentTypeId}</Value></Eq>";
                 ops.Add(op);
             }
             if (!string.IsNullOrEmpty(query.ItemId))
@@ -158,15 +124,33 @@ namespace VC.AG.Models.Extensions
             switch (scope)
             {
                 case Enums.RequestScope.MyTasks:
-                    op = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.RequestKeys.Aiguilleur}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
-                    ops.Add(op);
+                    if (query.Mode == DashMode.QInterview)
+                    {
+                        op = $"<Eq><FieldRef Name='{query.Data}'/><Value Type='Number'>{currentUser?.SPId}</Value></Eq>";
+                        ops.Add(op);
+                    }
+                    else
+                    {
+                        op = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.RequestKeys.Aiguilleur}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
+                        ops.Add(op);
+                    }
+
                     break;
                 case Enums.RequestScope.AllRequests:
                     if (!isAdmin)
                     {
-                        var op1 = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.RequestKeys.Aiguilleur}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
-                        var op2 = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
-                        op = $"<Or>{op1}{op2}</Or>";
+                        if (query.Mode == DashMode.QInterview)
+                        {
+                            var op1 = $"<Eq><FieldRef Name='{query.Data}'/><Value Type='Number'>{currentUser?.SPId}</Value></Eq>";
+                            var op2 = $"<Eq><FieldRef Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
+                            op = $"<Or>{op1}{op2}</Or>";
+                        }
+                        else
+                        {
+                            var op1 = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.RequestKeys.Aiguilleur}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
+                            var op2 = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
+                            op = $"<Or>{op1}{op2}</Or>";
+                        }
                     }
                     break;
                 case Enums.RequestScope.MyRequests:
@@ -196,7 +180,7 @@ namespace VC.AG.Models.Extensions
                         case RequestStatus.Completed:
                             r = RequestStatusStr.Completed;
                             break;
-                    
+
                     }
                 }
                 return r;

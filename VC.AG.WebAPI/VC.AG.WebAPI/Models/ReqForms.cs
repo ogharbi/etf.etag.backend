@@ -8,9 +8,9 @@ namespace VC.AG.WebAPI.Models
     {
         public RequestStatus? Status { get; set; }
         public RequestScope? Scope { get; set; }
-        public TaskTarget? TaskTarget { get; set; }
-        public string? ContentTypeId { get; set; }
-        public string? FormType { get; set; }
+        public DashMode? Mode { get; set; }
+        public string? AigField { get; set; }
+        public string? Data { get; set; }
         public bool? InlineQuery { get; set; }
         public FormQuery ToFormQuery(UserEntity? user)
         {
@@ -30,11 +30,11 @@ namespace VC.AG.WebAPI.Models
                 AppendQuery = AppendQuery,
                 Status=Status,
                 Scope=Scope,
-                TaskTarget=TaskTarget,
-                ContentTypeId= ContentTypeId,
-                FormType=FormType,
+                Data=Data,
+                AigField = AigField,
                 NextHref = string.IsNullOrEmpty(NextHref) ? null : NextHref[1..],
-                User=user
+                User=user,
+                Mode=Mode
             };
             return q;
         }

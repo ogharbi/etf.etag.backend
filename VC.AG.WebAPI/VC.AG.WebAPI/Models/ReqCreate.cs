@@ -14,7 +14,7 @@ namespace VC.AG.WebAPI.Models
         {
             dynamic? d1 = JsonConvert.DeserializeObject<dynamic>($"{Data}");
             dynamic d2 = new { fields = d1?["fields"] };
-            var enabledAuthorLists = new string[] {  AppConstants.ListNameKeys.Request, AppConstants.ListNameKeys.RequestAttachments, AppConstants.ListNameKeys.Comment };
+            var enabledAuthorLists = new string[] { AppConstants.ListNameKeys.Interview, AppConstants.ListNameKeys.QInterview, AppConstants.ListNameKeys.Actions, AppConstants.ListNameKeys.RequestAttachments, AppConstants.ListNameKeys.Comment };
             if (enabledAuthorLists.Contains(List?.ToLower()))
             {
                 var user = userSvc.GetMe().Result;

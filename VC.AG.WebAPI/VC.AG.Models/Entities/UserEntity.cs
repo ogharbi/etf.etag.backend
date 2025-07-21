@@ -32,7 +32,7 @@ namespace VC.AG.Models.Entities
             if (Groups.Count > 0)
             {
                 var isLocalAdmin = Groups.Exists(a => a.Equals(SiteGroups.Admins, StringComparison.InvariantCultureIgnoreCase));
-                IsSiteAdmin = IsSiteAdmin.Value || isLocalAdmin;
+                IsSiteAdmin = isLocalAdmin;
             }
         }
 

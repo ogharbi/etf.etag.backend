@@ -40,7 +40,7 @@ namespace VC.AG.Models.ValuesObject
             var q = new DBQuery()
             {
                 SiteUrl = siteUrl,
-                ListName = ListNameKeys.Request,
+                ListName = ListNameKeys.Interview,
                 Filter = $"<Where><Eq><FieldRef Name='ID'/><Value Type='Number'>{pid}</Value></Eq></Where>"
             };
             return q;

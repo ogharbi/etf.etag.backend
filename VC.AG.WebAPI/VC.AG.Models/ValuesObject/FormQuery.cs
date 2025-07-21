@@ -10,11 +10,13 @@ namespace VC.AG.Models.ValuesObject
     public class FormQuery : DBQuery
     {
         public string? Site { get; set; }
+        public DashMode? Mode { get; set; }
         public RequestStatus? Status { get; set; }
         public RequestScope? Scope { get; set; }
-        public TaskTarget? TaskTarget { get; set; }
+        public string? Data { get; set; }
         public string? ContentTypeId { get; set; }
-        public string? FormType { get; set; }
+        public string? AigField { get; set; }
         public bool? InlineQuery { get; set; }
+       
     }
 }

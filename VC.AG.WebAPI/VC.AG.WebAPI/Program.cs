@@ -1,6 +1,7 @@
 using System.Net;
 using VC.AG.WebAPI.Extensions;
 using VC.AG.WebAPI.Middlewares;
+
 var builder = WebApplication.CreateBuilder(args);
 IConfiguration configuration = builder.Configuration;
 

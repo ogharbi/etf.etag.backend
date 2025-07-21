@@ -23,6 +23,8 @@ namespace VC.AG.ServiceLayer.Helpers
             site.MailTemplates = await uow.DBRepo.GetAll(q);
             q = new DBQuery() { SiteId = site.Id, ListId = site.Lists?.GetStringValue2(ListNameKeys.Bus), Expand = fields, Select = SettingsKeys.SelectFields, CatchError = true };
             site.Bus = await uow.DBRepo.GetAll(q);
+            q = new DBQuery() { SiteId = site.Id, ListId = site.Lists?.GetStringValue2(ListNameKeys.SiteLinks), Expand = fields, Select = SettingsKeys.SelectFields, CatchError = true };
+            site.SiteLinks = await uow.DBRepo.GetAll(q);
 
             return site;
         }
@@ -34,6 +36,8 @@ namespace VC.AG.ServiceLayer.Helpers
             site.MailTemplates = await uow.DBRepo.GetAll(q);
             q = new DBQuery() { SiteId = site.Id, ListId = site.Lists?.GetStringValue2(ListNameKeys.Bus), Expand = fields, Select = SettingsKeys.SelectFields, CatchError = true };
             site.Bus = await uow.DBRepo.GetAll(q);
+            q = new DBQuery() { SiteId = site.Id, ListId = site.Lists?.GetStringValue2(ListNameKeys.SiteLinks), Expand = fields, Select = SettingsKeys.SelectFields, CatchError = true };
+            site.SiteLinks = await uow.DBRepo.GetAll(q);
 
             return site;
         }
@@ -59,7 +63,7 @@ namespace VC.AG.ServiceLayer.Helpers
         
             var selectedLists = new List<string>
                         {
-                            ListNameKeys.Request
+                            ListNameKeys.Interview
                         };
             foreach (var listName in selectedLists)
             {

@@ -291,11 +291,11 @@ function RemoveElementCtFromList($list) {
 function FieldsDefinitions() {
     $data = @(
         [pscustomobject]@{ key = "Col_Bu"; value = "<Field DisplayName='Agence' Type='Text' Required='FALSE' ID='edcd16f9-2ed9-44e5-973f-6e11f941727b'  StaticName='Col_Bu' Name='Col_Bu'  Group='VC' />" }
-        [pscustomobject]@{ key = "Col_AgFirstName"; value = "<Field DisplayName='Aiguilleur - Prénom' Type='Text' Required='FALSE' ID='fb3b2040-d106-4d86-b197-6737c30b3edb'  StaticName='Col_AgFirstName' Name='Col_AgFirstName'  Group='VC' />" }
-        [pscustomobject]@{ key = "Col_AgLastName"; value = "<Field DisplayName='Aiguilleur - Nom' Type='Text' Required='FALSE' ID='5502f7c1-1595-4bc2-83a1-3697e94fba1c'  StaticName='Col_AgLastName' Name='Col_AgLastName'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_AgFullName"; value = "<Field DisplayName='Aiguilleur - Nom complet' Type='Text' Required='FALSE' ID='914a9c20-8e07-4e4b-8e59-72ef9c9e99f9'  StaticName='Col_AgFullName' Name='Col_AgFullName'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_FlFirstName"; value = "<Field DisplayName='Filleul - Prénom' Type='Text' Required='FALSE' ID='4afeddaa-e780-48e5-b633-311ff18e0969'  StaticName='Col_FlFirstName' Name='Col_FlFirstName'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_FlLastName"; value = "<Field DisplayName='Filleul - Nom' Type='Text' Required='FALSE' ID='da9a4228-c061-45a0-a002-6504365383f7'  StaticName='Col_FlLastName' Name='Col_FlLastName'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_AgUser"; value = "<Field Type='User' DisplayName='Aiguilleur' Name='Col_AgUser'  StaticName='Col_AgUser' ID='2440566b-19f8-4712-966e-1377f18babf5' Group='VC' Required='false'   />" }
+        [pscustomobject]@{ key = "Col_AgUserSPId"; value = "<Field Type='Number' DisplayName='Aiguilleur ID' Name='Col_AgUserSPId'  StaticName='Col_AgUserSPId' ID='a15a0476-5a90-4f85-bc41-61f27c9a9629' Group='VC' Required='false'   />" }
         [pscustomobject]@{ key = "Col_StartDateT"; value = "<Field DisplayName='Date de début du tutorat' Type='DateTime' Required='FALSE' ID='260b4735-5a14-455d-afb7-847e1b40e251'  StaticName='Col_StartDateT' Name='Col_StartDateT'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_DurationM"; value = "<Field DisplayName='Durée envisagée (mois)' Type='Number' Required='FALSE' ID='49b54ab6-543e-44ca-9e84-de3b650dd0d5'  StaticName='Col_DurationM' Name='Col_DurationM'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_Status"; value = "<Field DisplayName='Statut' Type='Text' Required='FALSE' ID='8c8d2cfa-c3a1-4e07-ac13-220a20e1f5c4'  StaticName='Col_Status' Name='Col_Status'  Group='VC' />" }
@@ -304,7 +304,7 @@ function FieldsDefinitions() {
         [pscustomobject]@{ key = "Col_Participants"; value = "<Field DisplayName='Participants' Type='Text' Required='FALSE' ID='931378eb-521b-418c-bd77-0043285614d6'  StaticName='Col_Participants' Name='Col_Participants'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_Ecoute"; value = "<Field DisplayName='Ecoute' Type='Number' Required='FALSE' ID='bb8ae7ee-043a-4b16-87db-bae26582f629'  StaticName='Col_Ecoute' Name='Col_Ecoute'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_QualityExchange"; value = "<Field DisplayName='Qualité échange' Type='Number' Required='FALSE' ID='197e74b2-9182-48e1-808e-7eca6c01f856'  StaticName='Col_QualityExchange' Name='Col_QualityExchange'  Group='VC' />" }
-        [pscustomobject]@{ key = "Col_Autonomy"; value = "<Field DisplayName='Col_Autonomie' Type='Number' Required='FALSE' ID='6dd0228e-2ffe-4268-97ca-dae8466fc0ff'  StaticName='Col_Autonomy' Name='Col_Autonomy'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_Autonomy"; value = "<Field DisplayName='Autonomie' Type='Number' Required='FALSE' ID='6dd0228e-2ffe-4268-97ca-dae8466fc0ff'  StaticName='Col_Autonomy' Name='Col_Autonomy'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_EvAigComment"; value = "<Field DisplayName='Eval - Aiguilleur - Commentaire' Type='Note' Required='FALSE' ID='07fd69df-84f6-442d-adeb-57e507bcd520' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_EvAigComment' Name='Col_EvAigComment'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_EvFlComment"; value = "<Field DisplayName='Eval - Filleul - Commentaire' Type='Note' Required='FALSE' ID='25b702e4-ac81-47af-99b5-11f9870eab62' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_EvFlComment' Name='Col_EvFlComment'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_Success"; value = "<Field DisplayName='Les succès' Type='Note' Required='FALSE' ID='9e57ee63-ffed-46fb-a5d9-fdec6b4e4252' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_Success' Name='Col_Success'  Group='VC' />" }
@@ -329,14 +329,13 @@ function FieldsDefinitions() {
         [pscustomobject]@{ key = "Col_LinkTarget"; value = "<Field Type='Choice' DisplayName='Target' ID='8d951170-61ee-4d3f-bb2c-5a604c373b94' Group='VC' Name='Col_LinkTarget' StaticName='Col_LinkTarget'  Required='false' FillInChoice='FALSE' ><Default>User</Default> <CHOICES><CHOICE></CHOICE><CHOICE>User</CHOICE><CHOICE>Admin</CHOICE></CHOICES></Field>" }
         [pscustomobject]@{ key = "Col_NewTab"; value = "<Field DisplayName='New tab' Type='Boolean' Required='FALSE' ID='544dc079-667b-477d-bd84-7d4689e2caa6'  StaticName='Col_NewTab' Name='Col_NewTab'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_LinkUrl"; value = "<Field DisplayName='Url' Type='URL' Format='Hyperlink'  Required='FALSE' ID='45e882b9-7b06-47aa-96dd-66ad04c1212b'  StaticName='Col_LinkUrl' Name='Col_LinkUrl'  Group='VC' />" }
-        [pscustomobject]@{ key = "Col_Order"; value = "<Field DisplayName='Order' Type='Number' Required='FALSE' ID='4d8086a0-0018-4261-9efe-ed778cc65d1d'  StaticName='Col_Order' Name='Col_Order'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_Order"; value = "<Field DisplayName='Ordre' Type='Number' Required='FALSE' ID='4d8086a0-0018-4261-9efe-ed778cc65d1d'  StaticName='Col_Order' Name='Col_Order'  Group='VC' />" }
     
         [pscustomobject]@{ key = "Col_E_Code"; value = "<Field DisplayName='Code' Type='Text' Required='FALSE' ID='7ae8799c-ccbe-4178-af8a-847b89038bcd'  StaticName='Col_E_Code' Name='Col_E_Code'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_Author"; value = "<Field Type='User' DisplayName='Créé par' Name='Col_Author'  StaticName='Col_Author' ID='f654905d-94ce-44bf-a705-79706fc0bd09' Group='VC' Required='false'  ShowInEditForm='FALSE' ShowInNewForm='FALSE' Indexed='TRUE'/>" }
         [pscustomobject]@{ key = "Col_Editor"; value = "<Field Type='User' DisplayName='Modifié par' Name='Col_Editor'  StaticName='Col_Editor' ID='b26c0826-6c0c-4948-9b72-219c1b822d3b' Group='VC' Required='false'  ShowInEditForm='FALSE'  ShowInNewForm='FALSE'  />" }
         [pscustomobject]@{ key = "Col_ParentId"; value = "<Field DisplayName='Parent Id' Type='Number' Required='FALSE' ID='d82d8d65-af2a-4451-ad88-b65fcc4b140b'  StaticName='Col_ParentId' Name='Col_ParentId'  Group='VC' Indexed='TRUE'/>" }
         [pscustomobject]@{ key = "Col_Guid"; value = "<Field DisplayName='Guid' Type='Text' Required='FALSE' ID='88dd37ce-8ae4-4f66-af6d-db16241a1487'  StaticName='Col_Guid' Name='Col_Guid'  Group='VC' Indexed='TRUE'/>" }
-        [pscustomobject]@{ key = "Col_Order"; value = "<Field DisplayName='Order' Type='Number' Required='FALSE' ID='c2f421a2-7fb5-4bce-95ca-5b6fbfdf784e'  StaticName='Col_Order' Name='Col_Order'  Group='VC' Indexed='TRUE'/>" }
         
         
     )
@@ -481,6 +480,8 @@ function InterviewFields() {
     $data = @(
         "Col_Bu"
         "Col_AgUser"
+        "Col_AgUserSPId"
+        "Col_AgFullName"
         "Col_FlFirstName"
         "Col_FlLastName"
         "Col_StartDateT"
@@ -524,6 +525,8 @@ function QuartlyInterviewFields() {
         "Col_CompSec"
         "Col_Guid"
         "Col_Order"
+        "Col_Author"
+        "Col_Editor"
     )
     return $data;
 }
@@ -594,7 +597,7 @@ function InterviewList($web) {
     $l = GetListByUrl $web "$url"
     AddCTToListV2 $l.Id $ct
     UpdateListView -List $l.Id -Fields $fields
-    AddFieldIndex  $l.Id "AgUser"
+    AddFieldIndex  $l.Id "Col_AgUser"
     AddFieldIndex  $l.Id "Col_Status"
     AddFieldIndex  $l.Id "Author"
     AddFieldIndex  $l.Id "Editor"
@@ -677,7 +680,7 @@ function BuNewList($web) {
 }
 function LinkNewList($web) {
     $url = "Lists/vc_link"
-    $list = "App - Links"
+    $list = "App - Liens"
     $ct = "VC Link"
     $fields = LinkFields 
     CreateListV2 $web $list $url $listDesc "GenericList"
@@ -707,21 +710,21 @@ function SetStructureRoot($siteURL) {
     AppSettingsCT
     BuCT
  
-    # InterviewList $web
-    # CreateLkFields  $context $web
-    # MailTemplateList $web
-    # LinkNewList $web
-    # AppSettingsNewList $web
-    # BuNewList $web
-    # RelatedInterviewCT $true
-    # RelatedInterviewList $web
-    # QuartlyInterviewCT $true
-    # QuartlyInterviewList $web
-    # AttachmentsCT $true
-    # AttachmentsNewList $web $true
+    InterviewList $web
+    CreateLkFields  $context $web
+    MailTemplateList $web
+    LinkNewList $web
+    AppSettingsNewList $web
+    BuNewList $web
+    RelatedInterviewCT $true
+    RelatedInterviewList $web
+    QuartlyInterviewCT $true
+    QuartlyInterviewList $web
+    AttachmentsCT $true
+    AttachmentsNewList $web $true
 
 }
-$siteURL = "https://vincic.sharepoint.com/sites/etag-dev"
+$siteURL = "https://vincic.sharepoint.com/sites/etag-dev2"
 #$siteURL = "https://futur365.sharepoint.com/sites/Dev08"
 
 cls

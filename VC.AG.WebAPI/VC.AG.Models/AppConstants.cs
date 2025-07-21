@@ -80,7 +80,9 @@ namespace VC.AG.Models
         }
         public static class ListNameKeys
         {
-            public const string Request = "vc_interview";
+            public const string Interview = "vc_interview";
+            public const string QInterview= "vc_quartlyinterview";
+            public const string Actions = "vc_relatedinterview";
             public const string Comment = "vc_requestcomments";
             public const string RequestAttachments = "vc_requestattachments";
             public const string SiteLinks = "vc_link";

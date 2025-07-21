@@ -34,7 +34,7 @@ namespace VC.AG.WebAPI.Models
                             { $"{AppConstants.AppKeys.Lk_Request}LookupId", $"{ParentId}" },
 
                         };
-                var enabledAuthorLists = new string[] { AppConstants.ListNameKeys.Request, AppConstants.ListNameKeys.RequestAttachments, AppConstants.ListNameKeys.Comment };
+                var enabledAuthorLists = new string[] { AppConstants.ListNameKeys.Interview, AppConstants.ListNameKeys.RequestAttachments, AppConstants.ListNameKeys.Comment };
                 if (enabledAuthorLists.Contains(ListName?.ToLower()))
                 {
                     var user = userSvc.GetMe().Result;

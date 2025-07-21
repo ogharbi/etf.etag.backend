@@ -42,14 +42,14 @@ namespace VC.AG.ServiceLayer.Services
             q.ListId = site.Lists?.GetStringValue2($"{q.ListName}");
             var stream = await uow.DBRepo.GetStream(q);
             if (stream != null && stream.Row?.Count == 0) throw new Exception(Commun.NotFoundOp);
-            stream = query.Force == true ? stream : stream?.CheckAccess($"{delegation}", user, true);
+           // stream = query.Force == true ? stream : stream?.CheckAccess($"{delegation}", user, true);
             WfRequest? result = stream?.ToWfRequest(delegation);
             return result;
         }
         public async Task<DBStream?> GetAll(DBQuery query, string? delegation = "")
         {
             DBStream? result = null;
-            if (!ListNameKeys.Request.EqualsNotNull(query?.ListName)) throw new InvalidOperationException($"Query authorized only for {query?.ListName}");
+            if (!ListNameKeys.Interview.EqualsNotNull(query?.ListName)) throw new InvalidOperationException($"Query authorized only for {query?.ListName}");
             var user = await userSvc.GetMe();
             var site = await siteSvc.Get(delegation) ?? throw new InvalidOperationException($"Unable to find the site : {delegation}");
             if (query != null)
@@ -58,14 +58,13 @@ namespace VC.AG.ServiceLayer.Services
                 q.SiteUrl = site.SiteUrl;
                 q.ListId = site.Lists?.GetStringValue2($"{q.ListName}");
                 result = await uow.DBRepo.GetStream(q);
-                result = result?.CheckAccess($"{delegation}", user);
+                //result = result?.CheckAccess($"{delegation}", user);
             }
             return result;
         }
         public async Task<DBStream?> GetAll(FormQuery query, string? delegation = "")
         {
             DBStream? result = null;
-            if (!ListNameKeys.Request.EqualsNotNull(query?.ListName)) throw new InvalidOperationException($"Query authorized only for {query?.ListName}");
             var user = await userSvc.GetMe();
             var site = await siteSvc.Get(delegation) ?? throw new InvalidOperationException($"Unable to find the site : {delegation}");
             if (query != null)
@@ -124,7 +123,7 @@ namespace VC.AG.ServiceLayer.Services
                 var qRequest = new DBQuery()
                 {
                     SiteUrl = site.SiteUrl,
-                    ListName = ListNameKeys.Request,
+                    ListName = ListNameKeys.Interview,
                     Filter = $"<Where><Eq><FieldRef Name='ID'/><Value Type='Number'>{query.ItemId}</Value></Eq></Where>"
                 };
                 var wfRequest = await Get(qRequest, delegation);
