@@ -2,6 +2,7 @@
 using VC.AG.Models.Entities;
 using VC.AG.Models.Enums;
 using VC.AG.Models.ValuesObject;
+using Wkhtmltopdf.NetCore;
 
 namespace VC.AG.ServiceLayer.Contracts
 {
@@ -16,6 +17,7 @@ namespace VC.AG.ServiceLayer.Contracts
         Task<DBItem?> Put(DBUpdate item);
         Task<string> Delete(DBUpdate item);
         Task<string?> PostForm(DBFormData item);
-     
+        Task<FileModel?> GetPdf(IGeneratePdf generatePdf, DBQuery data);
+
     }
 }

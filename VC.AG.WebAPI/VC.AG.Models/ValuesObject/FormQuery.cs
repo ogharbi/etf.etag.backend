@@ -17,6 +17,7 @@ namespace VC.AG.Models.ValuesObject
         public string? ContentTypeId { get; set; }
         public string? AigField { get; set; }
         public bool? InlineQuery { get; set; }
-       
+        public string? Name { get; set; }
+
     }
 }

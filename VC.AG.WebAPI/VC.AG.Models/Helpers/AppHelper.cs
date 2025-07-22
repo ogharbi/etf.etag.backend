@@ -15,6 +15,7 @@ using Microsoft.SharePoint.Client.Utilities;
 using System.Diagnostics.Eventing.Reader;
 using System.Diagnostics;
 using VC.AG.Models.Enums;
+using HandlebarsDotNet;
 namespace VC.AG.Models.Helpers
 {
     public static class AppHelper
@@ -213,6 +214,29 @@ namespace VC.AG.Models.Helpers
                 }
             }
             return result;
+        }
+        public static Stream GetPdfStream(IGeneratePdf generatePdf, string html, dynamic model, Wkhtmltopdf.NetCore.Options.Orientation orientation = Wkhtmltopdf.NetCore.Options.Orientation.Portrait)
+        {
+            HandlebarsBlockHelper.AddHelpers();
+            var template = Handlebars.Compile(html);
+            var result = template(model);
+            if (html.ToLower().IndexOf("orientation=landscape") >= 0) orientation = Wkhtmltopdf.NetCore.Options.Orientation.Landscape;
+            var myConvertOptions = new PdfConvertOptions
+            {
+                IsLowQuality = false,
+                //FooterCenter = "\" [page] / [topage] \"",
+                PageOrientation = orientation,
+                HeaderSpacing = 0,
+                PageSize = Wkhtmltopdf.NetCore.Options.Size.A4,
+                PageMargins = orientation == Wkhtmltopdf.NetCore.Options.Orientation.Portrait ? new Wkhtmltopdf.NetCore.Options.Margins(5, 5, 5, 5) : new Wkhtmltopdf.NetCore.Options.Margins(5, 5, 5, 5),
+            };
+            generatePdf.SetConvertOptions(myConvertOptions);
+            var pdf = generatePdf.GetPDF(result);
+            var pdfStream = new System.IO.MemoryStream();
+            pdfStream.Write(pdf, 0, pdf.Length);
+            pdfStream.Position = 0;
+            Stream streamResult = pdfStream;
+            return streamResult;
         }
 
     }

@@ -2,18 +2,18 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using  VC.AG.Models;
-using  VC.AG.ServiceLayer.Contracts;
-using  VC.AG.WebAPI.Models;
-using  VC.AG.Models.Extensions;
-using static  VC.AG.Models.AppConstants;
+using VC.AG.Models;
+using VC.AG.ServiceLayer.Contracts;
+using VC.AG.WebAPI.Models;
+using VC.AG.Models.Extensions;
+using static VC.AG.Models.AppConstants;
 using Microsoft.AspNetCore.Http.HttpResults;
-using  VC.AG.Models.ValuesObject;
-using  VC.AG.Models.Enums;
-using  VC.AG.Models.Entities;
+using VC.AG.Models.ValuesObject;
+using VC.AG.Models.Enums;
+using VC.AG.Models.Entities;
 using VC.AG.Models.ValuesObject.SPContext;
 
-namespace  VC.AG.WebAPI.Controllers
+namespace VC.AG.WebAPI.Controllers
 {
     [Authorize]
     [ApiController]
@@ -72,6 +72,24 @@ namespace  VC.AG.WebAPI.Controllers
             var result = formSvc.Put(d).Result;
             return Ok(result);
         }
+        [HttpPost("postbulk")]
+        [ProducesResponseType<DBItem>(StatusCodes.Status200OK)]
+        [Produces("application/json")]
+        public IActionResult PostBulk([FromBody] ReqCreates reqCreates)
+        {
+            var result = new List<DBItem>();
+            if (reqCreates.Data != null)
+            {
+                foreach (var reqCreate in reqCreates.Data)
+                {
+                    var d = reqCreate.ToDBCreate(userSvc);
+                    var r = formSvc.Post(d).Result;
+                    result.Add(r);
+                }
+            }
+
+            return Ok(result);
+        }
         [HttpPost("delete")]
         [ProducesResponseType<string>(StatusCodes.Status200OK)]
         [Produces("application/json")]
@@ -101,7 +119,7 @@ namespace  VC.AG.WebAPI.Controllers
             var result = formSvc.GenerateSharedLink(d, $"{wfUpdate.Comment}").Result;
             return Ok(result);
         }
-      
+
 
     }
 }

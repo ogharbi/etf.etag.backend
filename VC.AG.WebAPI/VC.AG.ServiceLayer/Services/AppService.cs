@@ -3,16 +3,21 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using Microsoft.SharePoint.Client;
+using Newtonsoft.Json;
 using System;
+using System.IO;
 using System.Reflection;
 using VC.AG.DAO.UnitOfWork;
 using VC.AG.Models.Entities;
 using VC.AG.Models.Enums;
 using VC.AG.Models.Extensions;
+using VC.AG.Models.Helpers;
 using VC.AG.Models.ValuesObject;
 using VC.AG.Models.ValuesObject.SPContext;
 using VC.AG.ServiceLayer.Contracts;
 using VC.AG.ServiceLayer.Helpers;
+using Wkhtmltopdf.NetCore;
+using static OfficeOpenXml.ExcelErrorValue;
 using static VC.AG.Models.AppConstants;
 
 namespace VC.AG.ServiceLayer.Services
@@ -166,13 +171,127 @@ namespace VC.AG.ServiceLayer.Services
             return result;
         }
 
-      
+
         public async Task<string?> SendReminder(ILogger logger)
         {
             var result = await notifSvc.SendReminder(logger);
             return $"{result}";
         }
 
-       
+        public async Task<FileModel?> GetPdf(IGeneratePdf generatePdf, DBQuery qp)
+        {
+            FileModel? result = null;
+            IDictionary<string, Object> itemPdf = new Dictionary<string, Object>();
+            var qInterviews = new List<dynamic>();
+            var actions = new List<dynamic>();
+            var force = false;
+            var site = await siteSvc.Get() ?? throw new InvalidOperationException($"Unable to find the site");
+
+            var dbFile = new DBFile()
+            {
+                SiteId = site.Id,
+                DriveId = site.Drives?[ListNameKeys.DocTemplates] as string,
+                Name = "Carnet.html"
+            };
+            DBFile? file = await uow.FileRepo.Get(dbFile, true);
+            if (file != null && file.ContentStream != null)
+            {
+                string htmlCacheKey = $"app-html-template-carnet";
+                cache.TryGetValue(htmlCacheKey, out string? html);
+                if (string.IsNullOrEmpty(html))
+                {
+                    var buffer = file.ContentStream.ReadAllBytes();
+                    html = System.Text.Encoding.UTF8.GetString(buffer, 0, buffer.Length);
+                   // cache.Set(htmlCacheKey, html);
+                }
+                IDictionary<string, Object> mValues = new Dictionary<string, Object>();
+                var dbQuery = new DBQuery()
+                {
+                    ListName = ListNameKeys.Interview,
+                    Filter = $"<Where><Eq><FieldRef Name='ID'/><Value Type='Number'>{qp.Id}</Value></Eq></Where>"
+                };
+                var mainItem = await GetAll(dbQuery);
+                if (mainItem != null)
+                {
+                    var values = mainItem.Row?.FirstOrDefault();
+                    if (values != null)
+                    {
+                        foreach (KeyValuePair<string, object> it in values)
+                        {
+                            if (!itemPdf.ContainsKey(it.Key)) itemPdf.Add(it.Key, it.Value);
+                        }
+                    }
+                    dbQuery = new DBQuery()
+                    {
+                        ListName = ListNameKeys.QInterview,
+                        Filter = $"<Where><Eq><FieldRef Name='Col_Lk_Request' LookupId='True'/><Value Type='Lookup'>{qp.Id}</Value></Eq></Where>"
+                    };
+                    var qItems = await GetAll(dbQuery);
+
+                    foreach (var sub in qItems.Row)
+                    {
+                        var qValues = new Dictionary<string, Object>();
+                        var title = "" + sub["Title"];
+                        foreach (KeyValuePair<string, object> it in sub)
+                        {
+                            if (!qValues.ContainsKey(it.Key)) qValues.Add(it.Key, it.Value);
+                        }
+                        qInterviews.Add(qValues);
+                    }
+
+                    dbQuery = new DBQuery()
+                    {
+                        ListName = ListNameKeys.Actions,
+                        Filter = $"<Where><Eq><FieldRef Name='Col_Lk_Request' LookupId='True'/><Value Type='Lookup'>{qp.Id}</Value></Eq></Where>"
+                    };
+                    var aItems = await GetAll(dbQuery);
+
+                    foreach (var sub in aItems.Row)
+                    {
+                        var aValues = new Dictionary<string, Object>();
+                        foreach (KeyValuePair<string, object> it in sub)
+                        {
+                            if (!aValues.ContainsKey(it.Key)) aValues.Add(it.Key, it.Value);
+                        }
+                        actions.Add(aValues);
+                    }
+                    var itemPdfGuid = itemPdf.ContainsKey("Col_Guid") ? "" + itemPdf["Col_Guid"] : string.Empty;
+                    if (!string.IsNullOrEmpty(itemPdfGuid))
+                    {
+                        var subItems = actions.Where(a => "" + a["Col_Guid"] == itemPdfGuid).ToList();
+                        itemPdf.Add("Objectifs", subItems);
+                    }
+                    var i = 1;
+                    foreach (var qItem in qInterviews)
+                    {
+                        var guid = qItem.ContainsKey("Col_Guid") ? "" + qItem["Col_Guid"] : string.Empty;
+                        if (!string.IsNullOrEmpty(guid))
+                        {
+                            var subItems = actions.Where(a => ("" + a["Title"]).Equals(ActionType.MissionRealisee.ToString(), StringComparison.OrdinalIgnoreCase) && "" + a["Col_Guid"] == guid).ToList();
+                            qItem.Add("Missions", subItems.AsEnumerable().OrderBy(x => x["Col_Order."]));
+                            subItems = actions.Where(a => ("" + a["Title"]).Equals(ActionType.AxeProgres.ToString(), StringComparison.OrdinalIgnoreCase) && "" + a["Col_Guid"] == guid).ToList();
+                            qItem.Add("Axes", subItems.AsEnumerable().OrderBy(x => x["Col_Order."]));
+                            subItems = actions.Where(a => ("" + a["Title"]).Equals(ActionType.Engagement.ToString(), StringComparison.OrdinalIgnoreCase) && "" + a["Col_Guid"] == guid).ToList();
+                            qItem.Add("Engagements", subItems.AsEnumerable().OrderBy(x => x["Col_Order."]));
+                            qItem["index"] = i;
+                            qItem["qindex"] = i*3;
+                            i++;
+                        }
+                    }
+                    itemPdf.Add("QItems", qInterviews.AsEnumerable().OrderBy(x => x["Col_Order."]));
+                    try
+                    {
+                        var stream = AppHelper.GetPdfStream(generatePdf, html, itemPdf, Wkhtmltopdf.NetCore.Options.Orientation.Portrait);
+                        result = new FileModel() { Title = $"{itemPdf["Title"]}.pdf", ContentStream = stream };
+                    }
+                    catch(Exception e)
+                    {
+
+                    }
+                   
+                }
+            }
+            return result;
+        }
     }
 }

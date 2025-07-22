@@ -7,6 +7,7 @@ namespace VC.AG.Models.ValuesObject
         public int Id { get; set; }
         public string? SiteUrl { get; set; }
         public string? SiteId { get; set; }
+        public string? Site { get; set; }
         public string? ListId { get; set; }
         public string? ListUrl { get; set; }
         public string? ListName { get; set; }
@@ -24,6 +25,7 @@ namespace VC.AG.Models.ValuesObject
         public bool? CatchError { get; set; }
         public UserEntity? User { get; set; }
         public bool? Force { get; set; }
+        public string? Name { get; set; }
 
     }
 }

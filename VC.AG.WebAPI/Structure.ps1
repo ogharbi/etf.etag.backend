@@ -588,6 +588,20 @@ function AttachmentsNewList($web, $addSiteFields) {
     AddFieldIndex  $l.Id "Modified"
 
 }
+function TemplateNewList($web) {
+
+    $url = "vc_templates"
+    $list = "App - Templates"
+    $ct = "VC Documents"
+    $fields = AttachmentFields
+    CreateListV2 $web $list $url $listDesc "DocumentLibrary"
+    $l = GetListByUrl $web "$url"
+    AddCTToListV2 $l.Id $ct
+    UpdateListView -List $l.Id -Fields $fields
+    AddFieldIndex  $l.Id "Created"
+    AddFieldIndex  $l.Id "Modified"
+
+}
 function InterviewList($web) {
     $url = "Lists/vc_interview"
     $list = "App - Carnets de bord"
@@ -700,28 +714,29 @@ function SetStructureRoot($siteURL) {
     $context.Load($web)
     $context.ExecuteQuery()
 
-    CreateFields
-    InterviewCT
-    RelatedInterviewCT $false
-    QuartlyInterviewCT $false
-    AttachmentsCT $false
-    LinkCT
-    MailTemplateCT
-    AppSettingsCT
-    BuCT
+    # CreateFields
+    # InterviewCT
+    # RelatedInterviewCT $false
+    # QuartlyInterviewCT $false
+    # AttachmentsCT $false
+    # LinkCT
+    # MailTemplateCT
+    # AppSettingsCT
+    # BuCT
  
-    InterviewList $web
-    CreateLkFields  $context $web
-    MailTemplateList $web
-    LinkNewList $web
-    AppSettingsNewList $web
-    BuNewList $web
-    RelatedInterviewCT $true
-    RelatedInterviewList $web
-    QuartlyInterviewCT $true
-    QuartlyInterviewList $web
-    AttachmentsCT $true
-    AttachmentsNewList $web $true
+    # InterviewList $web
+    # CreateLkFields  $context $web
+    # MailTemplateList $web
+    # LinkNewList $web
+    # AppSettingsNewList $web
+    # BuNewList $web
+    # RelatedInterviewCT $true
+    # RelatedInterviewList $web
+    # QuartlyInterviewCT $true
+    # QuartlyInterviewList $web
+    # AttachmentsCT $true
+    # AttachmentsNewList $web $true
+    TemplateNewList $web
 
 }
 $siteURL = "https://vincic.sharepoint.com/sites/etag-dev2"

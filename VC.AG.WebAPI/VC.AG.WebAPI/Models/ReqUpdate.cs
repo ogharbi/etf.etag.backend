@@ -9,9 +9,19 @@ namespace VC.AG.WebAPI.Models
     {
         public string? Site { get; set; }
         public string? List { get; set; }
-        public string? FormType { get; set; }
         public int? Id { get; set; }
         public object? Data { get; set; }
+        public DBQuery ToDBQuery()
+        {
+            dynamic? d1 = JsonConvert.DeserializeObject<dynamic>($"{Data}");
+            dynamic d2 = new { fields = d1?["fields"], contentType = d1?["contentType"] };
+            var item = new DBQuery()
+            {
+                Site = Site,
+                ListName = List
+            };
+            return item;
+        }
         public DBUpdate ToDBUpdate(IUserContract userSvc, bool addAuthor = true)
         {
             dynamic? d1 = JsonConvert.DeserializeObject<dynamic>($"{Data}");

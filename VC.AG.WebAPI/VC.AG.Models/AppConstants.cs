@@ -85,6 +85,7 @@ namespace VC.AG.Models
             public const string Actions = "vc_relatedinterview";
             public const string Comment = "vc_requestcomments";
             public const string RequestAttachments = "vc_requestattachments";
+            public const string DocTemplates = "vc_templates";
             public const string SiteLinks = "vc_link";
             public const string MailTemplate = "vc_mailtemplate";
             public const string Settings = "vc_settings";

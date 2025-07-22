@@ -13,6 +13,7 @@ using VC.AG.Models.ValuesObject;
 using VC.AG.ServiceLayer.Contracts;
 using VC.AG.WebAPI.Models;
 using static VC.AG.Models.AppConstants;
+using Wkhtmltopdf.NetCore;
 
 namespace VC.AG.WebAPI.Controllers
 {
@@ -20,7 +21,7 @@ namespace VC.AG.WebAPI.Controllers
     [ApiController]
     [ApiVersion(AppConstants.ApiVersion)]
     [Route("api/v{version:apiVersion}/app")]
-    public class AppController(ILogger<AppController> logger, IUserContract userSvc, IAppContract appSvc) : ControllerBase
+    public class AppController(ILogger<AppController> logger, IUserContract userSvc, IAppContract appSvc, IGeneratePdf generatePdf) : ControllerBase
     {
         [HttpGet("site")]
         [ProducesResponseType<SiteEntity>(StatusCodes.Status200OK)]
@@ -103,7 +104,18 @@ namespace VC.AG.WebAPI.Controllers
             var result = appSvc.Delete(d).Result;
             return Ok(result);
         }
-      
+        [HttpGet("pdf/{id}")]
+        public async Task<IActionResult> GetPdf(int id)
+        {
+            var qp = new DBQuery() { Id = id };
+            var file = await appSvc.GetPdf(generatePdf, qp);
+            var stream = file?.Content != null ? new MemoryStream(file.Content) : file?.ContentStream;
+            if (stream != null)
+                return new FileStreamResult(stream, "application/pdf");
+            else return Ok(null);
+
+
+        }
 
     }
 }

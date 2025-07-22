@@ -22,6 +22,14 @@ namespace VC.AG.ServiceLayer.Services
             var opInProgressCacheKey = "App.Cache.Loading";
             cache.TryGetValue(cacheKey, out SiteEntity? result);
             cache.TryGetValue(opInProgressCacheKey, out bool? appLoading);
+            if (force)
+            {
+                if (cache is MemoryCache memoryCache)
+                {
+                    var percentage = 1.0;//100%
+                    memoryCache.Compact(percentage);
+                }
+            }
             if (result == null || force)
             {
                 CheckAppInProgress(result, appLoading, delegation, opInProgressCacheKey);
