@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.SharePoint.Client;
+using Newtonsoft.Json;
 using VC.AG.Models.Helpers;
 using static VC.AG.Models.AppConstants;
 
@@ -40,7 +41,15 @@ namespace VC.AG.Models.ValuesObject.SPContext
                 var token = await authManager.GetToken();
                 if (token != null)
                 {
-                    result = $"{token.GetValueOrDefault().GetProperty("access_token")}";
+                    try
+                    {
+                        result = $"{token.GetValueOrDefault().GetProperty("access_token")}";
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception(token.ToString());
+                    }
+                 
                     if (!string.IsNullOrEmpty(result))
                     {
                         var expireInStr = $"{token.GetValueOrDefault().GetProperty("expires_in")}";

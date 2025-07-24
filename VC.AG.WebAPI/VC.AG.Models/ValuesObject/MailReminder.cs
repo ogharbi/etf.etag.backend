@@ -14,12 +14,9 @@ namespace VC.AG.Models.ValuesObject
         public string? ListId { get; set; }
         public int? itemId { get; set; }
         public string? To { get; set; }
-        public string? FormType { get; set; }
         public string? Status { get; set; }
         public string? Summury { get; set; }
-        public DateTime? LastReminder { get; set; }
-        public DateTime? NextReminder { get; set; }
-        public string? Locale { get; set; }
+        public DateTime? Date { get; set; }
         public int? ReminderFeq { get; set; }
         public Dictionary<string,object>? Values { get; set; }
     }

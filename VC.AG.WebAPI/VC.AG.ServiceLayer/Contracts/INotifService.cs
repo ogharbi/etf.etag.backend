@@ -12,8 +12,9 @@ namespace VC.AG.ServiceLayer.Contracts
 {
     public interface INotifContract
     {
-     
-        Task<bool> SendReminder(ILogger logger);
-     
+
+        Task<bool> SendReminder(DateTime? startDate, DateTime? endDate);
+
+
     }
 }

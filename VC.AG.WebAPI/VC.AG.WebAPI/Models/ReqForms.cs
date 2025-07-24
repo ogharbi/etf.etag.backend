@@ -10,7 +10,11 @@ namespace VC.AG.WebAPI.Models
         public RequestScope? Scope { get; set; }
         public DashMode? Mode { get; set; }
         public string? AigField { get; set; }
-        public string? Data { get; set; }
+        //AiguilleurField
+        public string? AgField { get; set; }
+        public string? DateField { get; set; }
+        public DateTime? MinDate { get; set; }
+        public DateTime? MaxDate { get; set; }
         public bool? InlineQuery { get; set; }
         public FormQuery ToFormQuery(UserEntity? user)
         {
@@ -30,8 +34,11 @@ namespace VC.AG.WebAPI.Models
                 AppendQuery = AppendQuery,
                 Status=Status,
                 Scope=Scope,
-                Data=Data,
+                Data=AgField,
                 AigField = AigField,
+                DateField=DateField,
+                MinDate=MinDate,
+                MaxDate=MaxDate,
                 NextHref = string.IsNullOrEmpty(NextHref) ? null : NextHref[1..],
                 User=user,
                 Mode=Mode

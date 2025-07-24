@@ -25,13 +25,16 @@ using Microsoft.Office.SharePoint.Tools;
 using System.Runtime.CompilerServices;
 using System.Xml;
 using Microsoft.AspNetCore.Http.HttpResults;
+using OfficeOpenXml;
+using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace VC.AG.ServiceLayer.Services
 {
-    public class FormService(IUnitOfWork uow, IMemoryCache cache, IConfiguration config, ISiteContract siteSvc, IUserContract userSvc, INotifContract notifSvc) : IFormContract
+    public class FormService(IUnitOfWork uow, IMemoryCache cache, IConfiguration config, ISiteContract siteSvc, IUserContract userSvc) : IFormContract
     {
         readonly SpoContext spoContext = new(config, cache);
-        readonly JobHelper jobHelper = new(uow, config, cache, siteSvc);
+        // readonly JobHelper jobHelper = new(uow, config, cache, siteSvc);
 
         public async Task<WfRequest?> Get(DBQuery query, string? delegation = "")
         {
@@ -42,7 +45,7 @@ namespace VC.AG.ServiceLayer.Services
             q.ListId = site.Lists?.GetStringValue2($"{q.ListName}");
             var stream = await uow.DBRepo.GetStream(q);
             if (stream != null && stream.Row?.Count == 0) throw new Exception(Commun.NotFoundOp);
-           // stream = query.Force == true ? stream : stream?.CheckAccess($"{delegation}", user, true);
+            // stream = query.Force == true ? stream : stream?.CheckAccess($"{delegation}", user, true);
             WfRequest? result = stream?.ToWfRequest(delegation);
             return result;
         }
@@ -76,6 +79,116 @@ namespace VC.AG.ServiceLayer.Services
                 if (string.IsNullOrEmpty(query.Filter) && query.InlineQuery != true)
                     query.Filter = query.GetQuery(user);
                 result = await uow.DBRepo.GetStream(q);
+            }
+            return result;
+        }
+        public async Task<FileModel?> Export(FormQuery query, string? delegation = "")
+        {
+            FileModel? result = null;
+            var user = await userSvc.GetMe();
+            var site = await siteSvc.Get(delegation) ?? throw new InvalidOperationException($"Unable to find the site : {delegation}");
+            if (query != null)
+            {
+                var q = query;
+                q.SiteUrl = site.SiteUrl;
+                q.ListId = site.Lists?.GetStringValue2($"{q.ListName}");
+                q.Site = delegation;
+                if (string.IsNullOrEmpty(query.Filter) && query.InlineQuery != true)
+                    query.Filter = query.GetQuery(user);
+                var items = await uow.DBRepo.GetStream(q, true);
+                var targetListMeta = site.ListsMeta?[$"{q.ListName?.ToLower()}"];
+                var q3 = new DBQuery() { SiteId = site.Id, SiteUrl = site.SiteUrl, ListId = q.ListId, CatchError = true };
+                var listFields = await uow.DBRepo.GetListColumns(q3);
+                var q1 = new DBQuery() { SiteId = site.Id, SiteUrl = site.SiteUrl, ListId = q.ListId, CatchError = true };
+                var views = await uow.DBRepo.GetListViews(q1);
+                var targetView = views?.FirstOrDefault(a => "Dashboard".Equals(a.Title, StringComparison.OrdinalIgnoreCase));
+                if (targetView == null) targetView = views?.FirstOrDefault();
+                var viewFields = targetView?.Values?["Fields"]  as List<string>;
+                var lines = new List<string>();
+                var line = string.Empty;
+                ExcelPackage excel = new ExcelPackage();
+                var workSheet = excel.Workbook.Worksheets.Add("RAC");
+                var index = 1;
+                var fields = listFields.Where(x => viewFields.Contains(x.UniqueId)).ToList();
+                foreach (var field in fields)
+                {
+                    workSheet.Cells[1, index].Value = field.Title;
+                    index++;
+                }
+                int recordIndex = 2;
+
+                foreach (dynamic item in items.Row)
+                {
+                    index = 1;
+                    Console.WriteLine(index);
+                    try
+                    {
+
+                        foreach (var field in fields)
+                        {
+                            string v = "";
+                            try
+                            {
+                                var v0 = "" + item[field.UniqueId];
+                                if (!string.IsNullOrEmpty(v0))
+                                {
+                                    var type = "" + field.Values["Type"];
+                                    switch (type)
+                                    {
+                                        case "DateTime":
+                                            var dt0 = Convert.ToDateTime(item[$"{field.UniqueId}."]);
+                                            v = dt0.ToShortDateString();
+                                            break;
+                                        case "Lookup":
+                                            v = "" + item[field.UniqueId][0]["lookupValue"];
+                                            break;
+                                        case "User":
+                                            v = "" + item[field.UniqueId][0]["title"];
+                                            break;
+                                        case "Taxonomy":
+                                            v = "" + item[field.UniqueId]["Label"];
+                                            break;
+                                        default:
+                                            v = "" + item[field.UniqueId];
+                                            break;
+                                    }
+                                }
+                            }
+                            catch (Exception ex1)
+                            {
+                            }
+                            v = v.Trim();
+                            v = v.Replace(";", string.Empty);
+                            workSheet.Cells[recordIndex, index].Value = v;
+                            index++;
+                        }
+                    }
+                    catch (Exception ex2)
+                    {
+                    }
+                    recordIndex++;
+                }
+                index = 1;
+                foreach (var field in fields)
+                {
+                    workSheet.Column(index).Width = 20;
+                    if (""+field.Values["Type"] == "DateTime")
+                    {
+                        workSheet.Column(index).Style.Numberformat.Format = DateTimeFormatInfo.CurrentInfo.ShortDatePattern;
+                        workSheet.Column(index).Style.Numberformat.Format = "dd-MM-yyyy";
+                    }
+                    index++;
+                }
+
+                byte[] fileContents = excel.GetAsByteArray();
+                Stream stream = new MemoryStream(fileContents);
+                var dtISO = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+                var fileName = $"AIG_Export_{dtISO}.xlsx";
+                result = new FileModel()
+                {
+                    Name= fileName,
+                    ContentStream = stream,
+                };
             }
             return result;
         }
@@ -139,7 +252,7 @@ namespace VC.AG.ServiceLayer.Services
             }
             return result;
         }
-      
+
         public async Task<string?> GenerateSharedLink(DBUpdate item, string fileUrl)
         {
             var site = await siteSvc.Get($"{item.Site}") ?? throw new InvalidOperationException($"Unable to find the site : {item.Site}");
@@ -177,7 +290,7 @@ namespace VC.AG.ServiceLayer.Services
             }
             return items;
         }
-       
+
 
 
     }

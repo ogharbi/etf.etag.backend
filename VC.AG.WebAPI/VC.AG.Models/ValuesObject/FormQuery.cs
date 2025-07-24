@@ -9,7 +9,6 @@ namespace VC.AG.Models.ValuesObject
 {
     public class FormQuery : DBQuery
     {
-        public string? Site { get; set; }
         public DashMode? Mode { get; set; }
         public RequestStatus? Status { get; set; }
         public RequestScope? Scope { get; set; }
@@ -17,7 +16,9 @@ namespace VC.AG.Models.ValuesObject
         public string? ContentTypeId { get; set; }
         public string? AigField { get; set; }
         public bool? InlineQuery { get; set; }
-        public string? Name { get; set; }
+        public string? DateField { get; set; }
+        public DateTime? MinDate { get; set; }
+        public DateTime? MaxDate { get; set; }
 
     }
 }

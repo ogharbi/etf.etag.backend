@@ -181,6 +181,8 @@ namespace VC.AG.Models
         {
             public const string WfStatus = "Col_Status";
             public const string Aiguilleur = "Col_AgUser";
+            public const string StartDate = "Col_StartDate";
+            public const string DueDate = "Col_DueDate";
         }
        
     }

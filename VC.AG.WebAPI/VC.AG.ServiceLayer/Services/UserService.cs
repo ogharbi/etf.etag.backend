@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Identity.Web;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using VC.AG.DAO.UnitOfWork;
 using VC.AG.Models.Entities;
 using VC.AG.Models.ValuesObject;
@@ -77,6 +78,13 @@ namespace VC.AG.ServiceLayer.Services
         {
             var rootSite = await site.Get();
             return rootSite;
+        }
+
+        public async Task<UserEntity?> GetById(int? spId)
+        {
+            var result = await uow.UserRep.Get(id: spId);
+            return result;
+
         }
     }
 }

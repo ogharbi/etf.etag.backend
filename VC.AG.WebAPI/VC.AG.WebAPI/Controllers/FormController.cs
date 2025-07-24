@@ -43,6 +43,20 @@ namespace VC.AG.WebAPI.Controllers
             var result = stream?.SerializeStream();
             return stream != null ? Ok(result) : Ok(null);
         }
+        [HttpPost("export")]
+        [ProducesResponseType<string>(StatusCodes.Status200OK)]
+        [Produces("application/json")]
+        public IActionResult Export([FromBody] ReqForms req)
+        {
+            var user = userSvc.GetMe().Result;
+            var query = req.ToFormQuery(user);
+            var file = formSvc.Export(query, req.Site).Result;
+            var stream = file?.Content != null ? new MemoryStream(file.Content) : file?.ContentStream;
+            var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            if (stream != null)
+                return File(stream, contentType, file?.Name);
+            else return NoContent();
+        }
         [HttpPost("filterValues")]
         [ProducesResponseType<string>(StatusCodes.Status200OK)]
         [Produces("application/json")]

@@ -106,7 +106,7 @@ namespace VC.AG.WebAPI.Extensions
             services.AddScoped<ISiteContract, SiteService>();
             services.AddScoped<IAppContract, AppService>();
             services.AddScoped<IFormContract, FormService>();
-            services.AddScoped<INotifContract, NotifService>();
+            //services.AddScoped<INotifContract, NotifService>();
             services.AddScoped<IFileService, FileService>();
             services.AddWkhtmltopdf();
         }

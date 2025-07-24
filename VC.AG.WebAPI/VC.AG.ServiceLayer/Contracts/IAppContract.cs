@@ -9,7 +9,7 @@ namespace VC.AG.ServiceLayer.Contracts
     public interface IAppContract
     {
         Task<SiteEntity?> GetSite(string delegation = "", bool force = false);
-        Task<SiteEntity?> RefreshSite(SiteRefreshTarget target,string delegation = "");
+        Task<SiteEntity?> RefreshSite(SiteRefreshTarget target, string delegation = "");
         Task<DBStream?> GetAll(DBQuery query, string? delegation = "");
         Task<IEnumerable<DBItem>?> GetRessource(Ressource resource, string? delegation = "", string? listName = "", string? viewId = "");
 
@@ -18,6 +18,7 @@ namespace VC.AG.ServiceLayer.Contracts
         Task<string> Delete(DBUpdate item);
         Task<string?> PostForm(DBFormData item);
         Task<FileModel?> GetPdf(IGeneratePdf generatePdf, DBQuery data);
+        //Task<string?> SendReminder(DateTime? startDate, DateTime? endDate, ILogger logger);
 
     }
 }

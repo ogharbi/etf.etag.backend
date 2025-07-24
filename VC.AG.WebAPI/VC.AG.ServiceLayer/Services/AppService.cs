@@ -22,10 +22,9 @@ using static VC.AG.Models.AppConstants;
 
 namespace VC.AG.ServiceLayer.Services
 {
-    public class AppService(IUnitOfWork uow, ISiteContract siteSvc, INotifContract notifSvc, IMemoryCache cache, IConfiguration config) : IAppContract
+    public class AppService(IUnitOfWork uow, ISiteContract siteSvc,IMemoryCache cache, IConfiguration config) : IAppContract
     {
         readonly SpoContext spoContext = new(config, cache);
-        readonly JobHelper jobHelper = new(uow, config, cache, siteSvc);
         public async Task<SiteEntity?> GetSite(string delegation = "", bool force = false)
         {
             var result = await siteSvc.Get(delegation, force) ?? throw new InvalidOperationException($"Unable to find the site : {delegation}");
@@ -120,6 +119,7 @@ namespace VC.AG.ServiceLayer.Services
                             ["Template"] = $"{list.Template}",
                             ["RootFolder"] = $"{list.RootFolder}"
                         };
+                        
                         r.Values = values;
                         rs.Add(r);
                     }
@@ -172,10 +172,11 @@ namespace VC.AG.ServiceLayer.Services
         }
 
 
-        public async Task<string?> SendReminder(ILogger logger)
+        public async Task<string?> SendReminder(DateTime? startDate,DateTime? endDate)
         {
-            var result = await notifSvc.SendReminder(logger);
-            return $"{result}";
+            //var result = await notifSvc.SendReminder(startDate,endDate);
+            //return $"{result}";
+            return null;
         }
 
         public async Task<FileModel?> GetPdf(IGeneratePdf generatePdf, DBQuery qp)
@@ -202,7 +203,7 @@ namespace VC.AG.ServiceLayer.Services
                 {
                     var buffer = file.ContentStream.ReadAllBytes();
                     html = System.Text.Encoding.UTF8.GetString(buffer, 0, buffer.Length);
-                   // cache.Set(htmlCacheKey, html);
+                    // cache.Set(htmlCacheKey, html);
                 }
                 IDictionary<string, Object> mValues = new Dictionary<string, Object>();
                 var dbQuery = new DBQuery()
@@ -274,21 +275,14 @@ namespace VC.AG.ServiceLayer.Services
                             subItems = actions.Where(a => ("" + a["Title"]).Equals(ActionType.Engagement.ToString(), StringComparison.OrdinalIgnoreCase) && "" + a["Col_Guid"] == guid).ToList();
                             qItem.Add("Engagements", subItems.AsEnumerable().OrderBy(x => x["Col_Order."]));
                             qItem["index"] = i;
-                            qItem["qindex"] = i*3;
+                            qItem["qindex"] = i * 3;
                             i++;
                         }
                     }
                     itemPdf.Add("QItems", qInterviews.AsEnumerable().OrderBy(x => x["Col_Order."]));
-                    try
-                    {
-                        var stream = AppHelper.GetPdfStream(generatePdf, html, itemPdf, Wkhtmltopdf.NetCore.Options.Orientation.Portrait);
-                        result = new FileModel() { Title = $"{itemPdf["Title"]}.pdf", ContentStream = stream };
-                    }
-                    catch(Exception e)
-                    {
+                    var stream = AppHelper.GetPdfStream(generatePdf, html, itemPdf, Wkhtmltopdf.NetCore.Options.Orientation.Portrait);
+                    result = new FileModel() { Title = $"{itemPdf["Title"]}.pdf", ContentStream = stream };
 
-                    }
-                   
                 }
             }
             return result;

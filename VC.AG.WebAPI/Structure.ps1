@@ -613,6 +613,8 @@ function InterviewList($web) {
     UpdateListView -List $l.Id -Fields $fields
     AddFieldIndex  $l.Id "Col_AgUser"
     AddFieldIndex  $l.Id "Col_Status"
+    AddFieldIndex  $l.Id "Col_StartDateT"
+    AddFieldIndex  $l.Id "Col_StartDate"
     AddFieldIndex  $l.Id "Author"
     AddFieldIndex  $l.Id "Editor"
 
@@ -637,6 +639,8 @@ function RelatedInterviewList($web,$addSiteFields) {
         AddCTToListV2 $l.Id $ct
         UpdateListView -List $l.Id -Fields $fields
     AddFieldIndex  $l.Id "Col_Lk_Request"
+    AddFieldIndex  $l.Id "Col_DueDate"
+    AddFieldIndex  $l.Id "Col_StartDate"
     AddFieldIndex  $l.Id "Created"
     AddFieldIndex  $l.Id "Modified"
     AddFieldIndex  $l.Id "Title"

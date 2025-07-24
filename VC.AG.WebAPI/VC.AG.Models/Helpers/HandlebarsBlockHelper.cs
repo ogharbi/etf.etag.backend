@@ -383,7 +383,7 @@ namespace VC.AG.Models.Helpers
                                 }
                                 else
                                 {
-                                    output.WriteSafeString(dt.ToLocalTime().ToString("dd/MM/yy"));
+                                    output.WriteSafeString(dt.ToLocalTime().ToString("dd/MM/yyyy"));
                                 }
                             }
                             else

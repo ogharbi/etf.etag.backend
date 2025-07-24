@@ -260,7 +260,7 @@ namespace VC.AG.DAO.Respository
                 foreach (var field in fields)
                 {
                     var staticName = field.StaticName;
-                    if (staticName.StartsWith("Col_") || staticName.StartsWith("Fiche"))
+                    if (staticName.StartsWith("Col_") || staticName.StartsWith("F_x003a"))
                     {
                         var id = field.Id.ToString();
                         DBItem model = new()

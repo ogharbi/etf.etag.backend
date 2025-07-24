@@ -52,7 +52,6 @@ namespace VC.AG.ServiceLayer.Services
         }
         void CheckAppInProgress(SiteEntity? result, bool? appLoading, string delegation, string opInProgressCacheKey)
         {
-
             if (result == null && appLoading == true && string.IsNullOrEmpty(delegation))
             {
                 throw new InvalidOperationException($"Application loading in progress. Please try in few moment later ...");

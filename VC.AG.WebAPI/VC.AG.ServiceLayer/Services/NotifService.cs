@@ -28,14 +28,19 @@ using VC.AG.Models.ValuesObject.SPContext;
 using System.Security.Claims;
 namespace VC.AG.ServiceLayer.Services
 {
-    public class NotifService(IUnitOfWork uow, IConfiguration config, IMemoryCache cache, ISiteContract siteSvc) : INotifContract
+    public class NotifService(IUnitOfWork uow, IConfiguration config, IMemoryCache cache, IUserContract userSvc,ISiteContract siteSvc) : INotifContract
     {
-        readonly JobHelper jobHelper = new(uow, config, cache, siteSvc);
+       readonly JobHelper jobHelper = new(uow, config, cache,userSvc, siteSvc);
         readonly GraphContext graphContext = new(config, cache);
 
-        public Task<bool> SendReminder(ILogger logger)
+        public async Task<bool> SendReminder(DateTime? startDate, DateTime? endDate)
         {
-            throw new NotImplementedException();
+            var result = true;
+            var rootSite = await siteSvc.Get() ?? throw new InvalidOperationException($"Unable to find the root site");
+            List<MailReminder> items = await jobHelper.GetWfInProgress(rootSite, startDate, endDate);
+            var reminderList = $"{config.GetValue<string>(AppSettingsKeys.AppReminderList)}";
+            //await jobHelper.SendReminder(items, reminderList, rootSite, logger);
+            return result;
         }
     }
 }

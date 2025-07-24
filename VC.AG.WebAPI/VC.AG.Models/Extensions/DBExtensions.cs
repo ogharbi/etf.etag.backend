@@ -113,12 +113,26 @@ namespace VC.AG.Models.Extensions
             string op;
             if (status != Enums.RequestStatus.None)
             {
-                op = $"<Eq><FieldRef Name='{AppConstants.RequestKeys.WfStatus}'/><Value Type='Text'>{GetRequestStatus(status)}</Value></Eq>";
+                op = $"<Eq><FieldRef Name='{RequestKeys.WfStatus}'/><Value Type='Text'>{GetRequestStatus(status)}</Value></Eq>";
                 ops.Add(op);
             }
             if (!string.IsNullOrEmpty(query.ItemId))
             {
                 op = $"<Eq><FieldRef Name='ID'/><Value Type='Counter'>{query.ItemId}</Value></Eq>";
+                ops.Add(op);
+            }
+            if (query.MinDate!=null)
+            {
+                var mnDate = query.MinDate.GetValueOrDefault().AddDays(1);
+                mnDate = new DateTime(mnDate.Year, mnDate.Month, mnDate.Day, 0, 0, 0);
+                op = $"<Gt><FieldRef Name='{query.DateField}'/><Value Type='DateTime' IncludeTimeValue='TRUE'>{query.MinDate?.ToString("s")}</Value></Gt>";
+                ops.Add(op);
+            }
+            if (query.MaxDate != null)
+            {
+                var mxDate = query.MaxDate.GetValueOrDefault().AddDays(2);
+                mxDate = new DateTime(mxDate.Year,mxDate.Month,mxDate.Day,23,59,0);
+                op = $"<Lt><FieldRef Name='{query.DateField}'/><Value Type='DateTime' IncludeTimeValue='TRUE'>{mxDate.ToString("s")}</Value></Lt>";
                 ops.Add(op);
             }
             switch (scope)
@@ -144,12 +158,14 @@ namespace VC.AG.Models.Extensions
                             var op1 = $"<Eq><FieldRef Name='{query.Data}'/><Value Type='Number'>{currentUser?.SPId}</Value></Eq>";
                             var op2 = $"<Eq><FieldRef Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
                             op = $"<Or>{op1}{op2}</Or>";
+                            ops.Add(op);
                         }
                         else
                         {
                             var op1 = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.RequestKeys.Aiguilleur}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
                             var op2 = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
                             op = $"<Or>{op1}{op2}</Or>";
+                            ops.Add(op);
                         }
                     }
                     break;

@@ -15,6 +15,7 @@ namespace VC.AG.ServiceLayer.Contracts
       
         Task<DBStream?> GetAll(DBQuery query, string? delegation = "");
         Task<DBStream?> GetAll(FormQuery query, string? delegation = "");
+        Task<FileModel?> Export(FormQuery query, string? delegation = "");
         Task<List<string>?> GetFilterValues(FormQuery query, string? delegation = "");
         Task<WfRequest?> Get(DBQuery query, string? delegation = "");
         Task<DBItem?> Post(DBCreate item);
