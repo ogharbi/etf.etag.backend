@@ -26,6 +26,7 @@ using Microsoft.SharePoint.News.DataModel;
 using Microsoft.Extensions.Azure;
 using VC.AG.Models.ValuesObject.SPContext;
 using System.Security.Claims;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 namespace VC.AG.ServiceLayer.Services
 {
     public class NotifService(IUnitOfWork uow, IConfiguration config, IMemoryCache cache, IUserContract userSvc,ISiteContract siteSvc) : INotifContract
@@ -33,14 +34,23 @@ namespace VC.AG.ServiceLayer.Services
        readonly JobHelper jobHelper = new(uow, config, cache,userSvc, siteSvc);
         readonly GraphContext graphContext = new(config, cache);
 
+      
+
         public async Task<bool> SendReminder(DateTime? startDate, DateTime? endDate)
         {
             var result = true;
             var rootSite = await siteSvc.Get() ?? throw new InvalidOperationException($"Unable to find the root site");
             List<MailReminder> items = await jobHelper.GetWfInProgress(rootSite, startDate, endDate);
             var reminderList = $"{config.GetValue<string>(AppSettingsKeys.AppReminderList)}";
-            //await jobHelper.SendReminder(items, reminderList, rootSite, logger);
+            await jobHelper.SendReminder(items, reminderList, rootSite, endDate);
             return result;
         }
+        public async Task<bool> SendNotifications(SiteEntity? rootSite, WfRequest? request, string? comment)
+        {
+            await jobHelper.SendNotification(rootSite,request,comment);
+            return true;
+        }
+
+
     }
 }

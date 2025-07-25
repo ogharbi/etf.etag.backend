@@ -21,7 +21,7 @@ namespace VC.AG.WebAPI.Controllers
     [ApiController]
     [ApiVersion(AppConstants.ApiVersion)]
     [Route("api/v{version:apiVersion}/app")]
-    public class AppController(ILogger<AppController> logger, IUserContract userSvc, IAppContract appSvc, IGeneratePdf generatePdf) : ControllerBase
+    public class AppController(ILogger<AppController> logger, IUserContract userSvc, IAppContract appSvc, INotifContract notifSvc, IGeneratePdf generatePdf) : ControllerBase
     {
         [HttpGet("site")]
         [ProducesResponseType<SiteEntity>(StatusCodes.Status200OK)]
@@ -113,9 +113,8 @@ namespace VC.AG.WebAPI.Controllers
             if (stream != null)
                 return new FileStreamResult(stream, "application/pdf");
             else return Ok(null);
-
-
         }
+      
 
     }
 }

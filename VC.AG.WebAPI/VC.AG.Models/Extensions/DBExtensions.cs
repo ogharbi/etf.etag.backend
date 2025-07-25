@@ -42,7 +42,7 @@ namespace VC.AG.Models.Extensions
             if (stream != null && stream.Row != null && stream.Row.Count > 0)
             {
                 var values = stream.Row[0];
-                var success = Enum.TryParse($"{values?.GetStringValue2(RequestKeys.WfStatus)}", out RequestStatus status);
+                var success = Enum.TryParse($"{values?.GetStringValue2(InterviewKeys.WfStatus)}", out RequestStatus status);
                 if (!success) status = RequestStatus.None;
                 result = new WfRequest()
                 {
@@ -113,7 +113,7 @@ namespace VC.AG.Models.Extensions
             string op;
             if (status != Enums.RequestStatus.None)
             {
-                op = $"<Eq><FieldRef Name='{RequestKeys.WfStatus}'/><Value Type='Text'>{GetRequestStatus(status)}</Value></Eq>";
+                op = $"<Eq><FieldRef Name='{InterviewKeys.WfStatus}'/><Value Type='Text'>{GetRequestStatus(status)}</Value></Eq>";
                 ops.Add(op);
             }
             if (!string.IsNullOrEmpty(query.ItemId))
@@ -130,7 +130,7 @@ namespace VC.AG.Models.Extensions
             }
             if (query.MaxDate != null)
             {
-                var mxDate = query.MaxDate.GetValueOrDefault().AddDays(2);
+                var mxDate = query.MaxDate.GetValueOrDefault().AddDays(1);
                 mxDate = new DateTime(mxDate.Year,mxDate.Month,mxDate.Day,23,59,0);
                 op = $"<Lt><FieldRef Name='{query.DateField}'/><Value Type='DateTime' IncludeTimeValue='TRUE'>{mxDate.ToString("s")}</Value></Lt>";
                 ops.Add(op);
@@ -145,7 +145,7 @@ namespace VC.AG.Models.Extensions
                     }
                     else
                     {
-                        op = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.RequestKeys.Aiguilleur}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
+                        op = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Aiguilleur}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
                         ops.Add(op);
                     }
 
@@ -162,7 +162,7 @@ namespace VC.AG.Models.Extensions
                         }
                         else
                         {
-                            var op1 = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.RequestKeys.Aiguilleur}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
+                            var op1 = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Aiguilleur}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
                             var op2 = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
                             op = $"<Or>{op1}{op2}</Or>";
                             ops.Add(op);

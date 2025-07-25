@@ -31,7 +31,7 @@ using System.Globalization;
 
 namespace VC.AG.ServiceLayer.Services
 {
-    public class FormService(IUnitOfWork uow, IMemoryCache cache, IConfiguration config, ISiteContract siteSvc, IUserContract userSvc) : IFormContract
+    public class FormService(IUnitOfWork uow, IMemoryCache cache, IConfiguration config, ISiteContract siteSvc, IUserContract userSvc,INotifContract notifSvc) : IFormContract
     {
         readonly SpoContext spoContext = new(config, cache);
         // readonly JobHelper jobHelper = new(uow, config, cache, siteSvc);
@@ -289,6 +289,19 @@ namespace VC.AG.ServiceLayer.Services
                 }
             }
             return items;
+        }
+        public async Task<bool> SendNotification(NotifQuery notifQuery)
+        {
+            var currentUser = await userSvc.GetMe();
+            var rootSite = await siteSvc.Get();
+            var dbQuery = new DBQuery()
+            {
+                ItemId=$"{notifQuery.Id}",
+                ListName=notifQuery.ListName
+            };
+            var request = await Get(dbQuery);
+           await notifSvc.SendNotifications(rootSite,request, notifQuery.Comment);
+            return true;
         }
 
 

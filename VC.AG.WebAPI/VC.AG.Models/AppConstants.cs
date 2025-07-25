@@ -177,14 +177,23 @@ namespace VC.AG.Models
             public const string Comment = "Col_Comment";
 
         }
-        public static class RequestKeys
+        public static class InterviewKeys
         {
             public const string WfStatus = "Col_Status";
             public const string Aiguilleur = "Col_AgUser";
             public const string StartDate = "Col_StartDate";
-            public const string DueDate = "Col_DueDate";
+            public const string Status = "Col_Status";
         }
-       
+
+        public static class QInterviewKeys
+        {
+            public const string AigId = "F_x003a_Aiguilleur_x0020_ID";
+            public const string StartDate = "Col_StartDate";
+            public const string DueDate = "Col_DueDate";
+            public const string Status = "Col_Status";
+
+        }
+
     }
 
 }

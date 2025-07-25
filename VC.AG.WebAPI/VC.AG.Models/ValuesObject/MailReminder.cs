@@ -13,11 +13,16 @@ namespace VC.AG.Models.ValuesObject
         public string? SiteUrl { get; set; }
         public string? ListId { get; set; }
         public int? itemId { get; set; }
-        public string? To { get; set; }
+        public int? RequestId { get; set; }
+        public string? Title { get; set; }
+        public string? UserEmail { get; set; }
+        public string? UserName{ get; set; }
+        public int? UserId { get; set; }
         public string? Status { get; set; }
         public string? Summury { get; set; }
         public DateTime? Date { get; set; }
-        public int? ReminderFeq { get; set; }
+        public DateTime? DueDate { get; set; }
+        public DateTime? StartDate { get; set; }
         public Dictionary<string,object>? Values { get; set; }
     }
 }

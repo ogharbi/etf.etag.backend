@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VC.AG.Models.Entities;
+using VC.AG.Models.Enums;
 using VC.AG.Models.ValuesObject;
 
 namespace VC.AG.ServiceLayer.Contracts
@@ -14,6 +15,8 @@ namespace VC.AG.ServiceLayer.Contracts
     {
 
         Task<bool> SendReminder(DateTime? startDate, DateTime? endDate);
+        Task<bool> SendNotifications(SiteEntity? rootSite,WfRequest? request,string? comment);
+     
 
 
     }

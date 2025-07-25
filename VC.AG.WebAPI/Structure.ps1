@@ -740,7 +740,7 @@ function SetStructureRoot($siteURL) {
     # QuartlyInterviewList $web
     # AttachmentsCT $true
     # AttachmentsNewList $web $true
-    TemplateNewList $web
+    #TemplateNewList $web
 
 }
 $siteURL = "https://vincic.sharepoint.com/sites/etag-dev2"

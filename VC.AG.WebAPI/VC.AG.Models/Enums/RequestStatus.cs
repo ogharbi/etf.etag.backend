@@ -7,7 +7,8 @@ namespace VC.AG.Models.Enums
         None = 1,
         NotStarted = 2,
         InProgress = 3,
-        Completed = 4
+        Completed = 4,
+        Archived = 5
 
     }
     public class RequestStatusStr

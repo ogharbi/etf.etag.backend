@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace VC.AG.Models.Enums
 {
-    public enum MailType
+    public enum NotifType
     {
-        None = 0,
-        Information=2,
-        Reminder=3
+        None=1,
+        AskForAction = 2
     }
 }

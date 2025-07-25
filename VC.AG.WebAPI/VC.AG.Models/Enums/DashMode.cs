@@ -8,7 +8,7 @@ namespace VC.AG.Models.Enums
 {
     public enum DashMode
     {
-        Default,
-        QInterview
+        Default=1,
+        QInterview=2
     }
 }

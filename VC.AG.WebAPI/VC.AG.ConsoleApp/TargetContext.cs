@@ -44,12 +44,12 @@ namespace VC.AG.ConsoleApp
             spoContext = new SpoContext(config, cache);
             ctx = spoContext.GetClientContext(url);
             siteSvc = new SiteService(uow, cache, null);
-            notifSvc = new NotifService(uow, config, cache, userSvc,siteSvc);
             userSvc = new UserService(uow, cache, siteSvc, null);
+            notifSvc = new NotifService(uow, config, cache, userSvc, siteSvc);
             formSvc = new FormService(uow, cache, config, siteSvc, userSvc);
             appSvc = new AppService(uow, siteSvc, cache, config);
             delegation = subsite;
-          
+
             RootSite = siteSvc.Get(null, false).Result;
             using var loggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder =>
             {
@@ -62,9 +62,9 @@ namespace VC.AG.ConsoleApp
         {
             string result = string.Empty;
             //await notifSvc.SendReminder(logger);
-            var s = new DateTime(2026, 01, 01);
-            var e = new DateTime(2027, 01, 01);
-            await notifSvc.SendReminder(s,e);
+            //var s = new DateTime(2026, 01, 01);
+            var e = DateTime.Now.AddMonths(12);
+            await notifSvc.SendReminder(null, e);
             return result;
         }
     }

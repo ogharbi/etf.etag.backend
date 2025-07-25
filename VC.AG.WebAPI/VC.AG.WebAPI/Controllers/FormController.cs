@@ -133,6 +133,15 @@ namespace VC.AG.WebAPI.Controllers
             var result = formSvc.GenerateSharedLink(d, $"{wfUpdate.Comment}").Result;
             return Ok(result);
         }
+        [HttpPost("notif")]
+        [ProducesResponseType<string>(StatusCodes.Status200OK)]
+        [Produces("application/json")]
+        public IActionResult Notification(ReqNotif reqNotif)
+        {
+            var result = formSvc.SendNotification(reqNotif.ToNotifQuery()).Result;
+            return Ok(result);
+        }
+
 
 
     }

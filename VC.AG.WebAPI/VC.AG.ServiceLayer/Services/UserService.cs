@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Identity.Web;
+using Microsoft.SharePoint.Client;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using VC.AG.DAO.UnitOfWork;
 using VC.AG.Models.Entities;
@@ -82,7 +83,13 @@ namespace VC.AG.ServiceLayer.Services
 
         public async Task<UserEntity?> GetById(int? spId)
         {
-            var result = await uow.UserRep.Get(id: spId);
+            string cacheKey = $"Profile-spid-{spId}";
+            cache.TryGetValue(cacheKey, out UserEntity? result);
+            if (result == null)
+            {
+                result = await uow.UserRep.Get(id:spId);
+                cache.Set(cacheKey, result);
+            }
             return result;
 
         }
