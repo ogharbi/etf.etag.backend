@@ -29,7 +29,70 @@ namespace VC.AG.ServiceLayer.Helpers
     public static class MailExtensions
     {
         private const string bearer = "Bearer";
-        public static async Task<string> Send(this MailObject mail, IConfiguration config, GraphContext graphContext)
+        public static Task<string> Send(this MailObject mail, IConfiguration config, GraphContext graphContext)
+        {
+            var result = string.Empty;
+            string log = string.Empty;
+            var smtpfrom = string.Empty;
+            try
+            {
+                var smtpEnable = config.GetValue<string>(AppSettingsKeys.AppSmtpEnabled);
+                var smtpServer = config.GetValue<string>(AppSettingsKeys.AppSmtpServer);
+                var smtpFrom = config.GetValue<string>(AppSettingsKeys.AppSmtpFrom);
+                var smtpUser = config.GetValue<string>(AppSettingsKeys.AppSmtpUser);
+                var smtpPwd = config.GetValue<string>(AppSettingsKeys.AppSmtpPwd);
+                if (smtpEnable != "true") return Task.FromResult("Not enabled");
+                ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+                SmtpClient client = new SmtpClient(smtpServer);
+                client.Credentials = new System.Net.NetworkCredential(smtpUser, smtpPwd);
+                MailAddress from = new MailAddress(smtpUser, string.Empty, System.Text.Encoding.UTF8);//new MailAddress(smtpFrom, string.Empty, System.Text.Encoding.UTF8);
+                client.EnableSsl = true;
+
+                MailMessage message = new MailMessage
+                {
+                    From = from,
+                    Subject = mail.Subject,
+                    Body = mail.Body
+                };
+                foreach (var t in mail.MailTo)
+                {
+                    message.To.Add(t);
+                }
+                if (mail.Cc != null)
+                {
+                    foreach (var t in mail.Cc)
+                    {
+                        message.CC.Add(t);
+                    }
+                }
+                string htmlTemplateMail = mail.Body;
+
+                message.IsBodyHtml = true;
+                message.SubjectEncoding = System.Text.Encoding.UTF8;
+                message.BodyEncoding = System.Text.Encoding.UTF8;
+                if (mail.Attachments != null)
+                {
+                    foreach (System.Net.Mail.Attachment attah in mail.Attachments)
+                    {
+                        message.Attachments.Add(attah);
+                    }
+                }
+                smtpfrom = message.From.Address.ToString();
+                client.Send(message);
+                result = "OK";
+            }
+            catch (Exception ex)
+            {
+                //return ex.Message+"; Stack :"+ex.StackTrace;
+                result = "KO :" + ex.ToString();
+                log = ex.ToString();
+
+            }
+            log = log + "\nSmtp From : " + smtpfrom;
+            return Task.FromResult(result);
+
+        }
+        public static async Task<string> Send2(this MailObject mail, IConfiguration config, GraphContext graphContext)
         {
             var result = string.Empty;
             try

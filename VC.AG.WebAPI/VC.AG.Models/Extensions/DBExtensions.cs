@@ -34,7 +34,7 @@ namespace VC.AG.Models.Extensions
             var r = System.Text.Json.JsonSerializer.Serialize(result);
             return r;
         }
-       
+
 
         public static WfRequest? ToWfRequest(this DBStream stream, string? site)
         {
@@ -121,7 +121,7 @@ namespace VC.AG.Models.Extensions
                 op = $"<Eq><FieldRef Name='ID'/><Value Type='Counter'>{query.ItemId}</Value></Eq>";
                 ops.Add(op);
             }
-            if (query.MinDate!=null)
+            if (query.MinDate != null)
             {
                 var mnDate = query.MinDate.GetValueOrDefault().AddDays(1);
                 mnDate = new DateTime(mnDate.Year, mnDate.Month, mnDate.Day, 0, 0, 0);
@@ -131,7 +131,7 @@ namespace VC.AG.Models.Extensions
             if (query.MaxDate != null)
             {
                 var mxDate = query.MaxDate.GetValueOrDefault().AddDays(1);
-                mxDate = new DateTime(mxDate.Year,mxDate.Month,mxDate.Day,23,59,0);
+                mxDate = new DateTime(mxDate.Year, mxDate.Month, mxDate.Day, 23, 59, 0);
                 op = $"<Lt><FieldRef Name='{query.DateField}'/><Value Type='DateTime' IncludeTimeValue='TRUE'>{mxDate.ToString("s")}</Value></Lt>";
                 ops.Add(op);
             }
@@ -140,12 +140,14 @@ namespace VC.AG.Models.Extensions
                 case Enums.RequestScope.MyTasks:
                     if (query.Mode == DashMode.QInterview)
                     {
-                        op = $"<Eq><FieldRef Name='{query.Data}'/><Value Type='Number'>{currentUser?.SPId}</Value></Eq>";
+                        op = $"<Or><Eq><FieldRef Name='{QInterviewKeys.AigId}'/><Value Type='Number'>{currentUser?.SPId}</Value></Eq>" +
+                                $"<Eq><FieldRef Name='{QInterviewKeys.AigId2}'/><Value Type='Number'>{currentUser?.SPId}</Value></Eq></Or>";
                         ops.Add(op);
                     }
                     else
                     {
-                        op = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Aiguilleur}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
+                        op = $"<Or><Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Aiguilleur}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>" +
+                            $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Aiguilleur2}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq></Or>";
                         ops.Add(op);
                     }
 
@@ -155,14 +157,16 @@ namespace VC.AG.Models.Extensions
                     {
                         if (query.Mode == DashMode.QInterview)
                         {
-                            var op1 = $"<Eq><FieldRef Name='{query.Data}'/><Value Type='Number'>{currentUser?.SPId}</Value></Eq>";
+                            var op1 = $"<Or><Eq><FieldRef Name='{QInterviewKeys.AigId}'/><Value Type='Number'>{currentUser?.SPId}</Value></Eq>" +
+                                $"<Eq><FieldRef Name='{QInterviewKeys.AigId2}'/><Value Type='Number'>{currentUser?.SPId}</Value></Eq></Or>";
                             var op2 = $"<Eq><FieldRef Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
                             op = $"<Or>{op1}{op2}</Or>";
                             ops.Add(op);
                         }
                         else
                         {
-                            var op1 = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Aiguilleur}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
+                            var op1 = $"<Or><Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Aiguilleur}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>" +
+                                $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Aiguilleur2}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq></Or>";
                             var op2 = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
                             op = $"<Or>{op1}{op2}</Or>";
                             ops.Add(op);

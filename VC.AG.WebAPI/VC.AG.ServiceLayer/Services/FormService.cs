@@ -297,7 +297,8 @@ namespace VC.AG.ServiceLayer.Services
             var dbQuery = new DBQuery()
             {
                 ItemId=$"{notifQuery.Id}",
-                ListName=notifQuery.ListName
+                ListName=notifQuery.ListName,
+                Filter=$"<Where><Eq><FieldRef Name='ID'/><Value Type='Number'>{notifQuery.Id}</Value></Eq></Where>"
             };
             var request = await Get(dbQuery);
            await notifSvc.SendNotifications(rootSite,request, notifQuery.Comment);

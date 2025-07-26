@@ -291,11 +291,14 @@ function RemoveElementCtFromList($list) {
 function FieldsDefinitions() {
     $data = @(
         [pscustomobject]@{ key = "Col_Bu"; value = "<Field DisplayName='Agence' Type='Text' Required='FALSE' ID='edcd16f9-2ed9-44e5-973f-6e11f941727b'  StaticName='Col_Bu' Name='Col_Bu'  Group='VC' />" }
-        [pscustomobject]@{ key = "Col_AgFullName"; value = "<Field DisplayName='Aiguilleur - Nom complet' Type='Text' Required='FALSE' ID='914a9c20-8e07-4e4b-8e59-72ef9c9e99f9'  StaticName='Col_AgFullName' Name='Col_AgFullName'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_FlFirstName"; value = "<Field DisplayName='Filleul - Prénom' Type='Text' Required='FALSE' ID='4afeddaa-e780-48e5-b633-311ff18e0969'  StaticName='Col_FlFirstName' Name='Col_FlFirstName'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_FlLastName"; value = "<Field DisplayName='Filleul - Nom' Type='Text' Required='FALSE' ID='da9a4228-c061-45a0-a002-6504365383f7'  StaticName='Col_FlLastName' Name='Col_FlLastName'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_AgUser"; value = "<Field Type='User' DisplayName='Aiguilleur' Name='Col_AgUser'  StaticName='Col_AgUser' ID='2440566b-19f8-4712-966e-1377f18babf5' Group='VC' Required='false'   />" }
+        [pscustomobject]@{ key = "Col_AgFullName"; value = "<Field DisplayName='Aiguilleur_Nom complet' Type='Text' Required='FALSE' ID='914a9c20-8e07-4e4b-8e59-72ef9c9e99f9'  StaticName='Col_AgFullName' Name='Col_AgFullName'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_AgUserSPId"; value = "<Field Type='Number' DisplayName='Aiguilleur ID' Name='Col_AgUserSPId'  StaticName='Col_AgUserSPId' ID='a15a0476-5a90-4f85-bc41-61f27c9a9629' Group='VC' Required='false'   />" }
+        [pscustomobject]@{ key = "Col_AgUser2"; value = "<Field Type='User' DisplayName='Aiguilleur2' Name='Col_AgUser2'  StaticName='Col_AgUser2' ID='c974172e-fccb-46c9-8e09-0104d90c2899' Group='VC' Required='false'   />" }
+        [pscustomobject]@{ key = "Col_AgFullName2"; value = "<Field DisplayName='Aiguilleur2_Nom complet' Type='Text' Required='FALSE' ID='a371245c-833a-422a-88ce-9c1f7f783505'  StaticName='Col_AgFullName2' Name='Col_AgFullName2'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_AgUserSPId2"; value = "<Field Type='Number' DisplayName='Aiguilleur2_ID' Name='Col_AgUserSPId2'  StaticName='Col_AgUserSPId2' ID='6f6385ec-c8f3-429c-89e3-5db4d39a80ed' Group='VC' Required='false'   />" }
         [pscustomobject]@{ key = "Col_StartDateT"; value = "<Field DisplayName='Date de début du tutorat' Type='DateTime' Required='FALSE' ID='260b4735-5a14-455d-afb7-847e1b40e251'  StaticName='Col_StartDateT' Name='Col_StartDateT'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_DurationM"; value = "<Field DisplayName='Durée envisagée (mois)' Type='Number' Required='FALSE' ID='49b54ab6-543e-44ca-9e84-de3b650dd0d5'  StaticName='Col_DurationM' Name='Col_DurationM'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_Status"; value = "<Field DisplayName='Statut' Type='Text' Required='FALSE' ID='8c8d2cfa-c3a1-4e07-ac13-220a20e1f5c4'  StaticName='Col_Status' Name='Col_Status'  Group='VC' />" }
@@ -482,6 +485,9 @@ function InterviewFields() {
         "Col_AgUser"
         "Col_AgUserSPId"
         "Col_AgFullName"
+        "Col_AgUser2"
+        "Col_AgUserSPId2"
+        "Col_AgFullName2"
         "Col_FlFirstName"
         "Col_FlLastName"
         "Col_StartDateT"
@@ -718,8 +724,8 @@ function SetStructureRoot($siteURL) {
     $context.Load($web)
     $context.ExecuteQuery()
 
-    # CreateFields
-    # InterviewCT
+    CreateFields
+    InterviewCT
     # RelatedInterviewCT $false
     # QuartlyInterviewCT $false
     # AttachmentsCT $false

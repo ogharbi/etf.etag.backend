@@ -17,6 +17,7 @@ using VC.AG.Models.ValuesObject.SPContext;
 using VC.AG.ServiceLayer.Contracts;
 using static VC.AG.Models.AppConstants;
 using VC.AG.Models.Extensions;
+using Azure.Core;
 
 namespace VC.AG.ServiceLayer.Helpers
 {
@@ -190,22 +191,19 @@ namespace VC.AG.ServiceLayer.Helpers
                 summury.Append("</table>");
             }
         }
-        public async Task<string> SendNotification(SiteEntity rootSite, WfRequest request, string? comment)
+        public async Task<string> SendNotification(SiteEntity? rootSite, WfRequest? request, string? comment)
         {
             var result = string.Empty;
-            var email = request.Values?.GetStringValue2("Col_AgUser.email");
+            var email = request?.Values?.GetStringValue2("Col_AgUser.email");
             var mailTemplate = rootSite?.MailTemplates?.FirstOrDefault(a => MailType.Information.ToString().EqualsNotNull(a.Values?.GetStringValue2(AppConstants.AppKeys.Code)));
-            if (mailTemplate != null && !string.IsNullOrEmpty(email)
+            if (mailTemplate != null && !string.IsNullOrEmpty(email))
             {
                 var subject = mailTemplate.Values?.GetStringValue2(MailTemplateKeys.Subject);
                 var body = mailTemplate.Values?.GetStringValue2(MailTemplateKeys.Body);
-                var appUrl = $"{config.GetValue<string>(AppSettingsKeys.AppUrl)}";
-                var appLink = $"<a href=\"{appUrl}\">{appUrl}</a>";
-                subject = subject?.Replace("[AppLink]", appLink).Replace("[ID]", request.Id);
-                body = body?.Replace("[AppLink]", appLink).Replace("[ID]", request.Id);
-                body = body?.Replace("[Comment]",comment);
+                subject = UpdateHtml(subject, request, comment);
+                body = UpdateHtml(body, request, comment);
+
                 var summury = new StringBuilder();
-                body = body?.Replace("[Details]", summury.ToString());
                 var tos = new List<string>()
                                     {
                                       email
@@ -219,6 +217,26 @@ namespace VC.AG.ServiceLayer.Helpers
                 var sendResult = await mailObject.Send(config, graphContext);
             }
             return result;
+        }
+        string? UpdateHtml(string? body, WfRequest? request, string? comment)
+        {
+            var appUrl = $"{config.GetValue<string>(AppSettingsKeys.AppUrl)}";
+            var appLink = $"<a href=\"{appUrl}\">{appUrl}</a>";
+            var itemLink = $"<a href=\"{appUrl}/forms/{request?.Id}\">{request?.Values?["Title"]}</a>";
+            body = body?.Replace("[AppLink]", appLink);
+            body = body?.Replace("[ItemLink]", itemLink);
+            body = body?.Replace("[ID]", request?.Id);
+            body = body?.Replace("[Comment]", comment);
+            body = body?.Replace("[ID]", request?.Id);
+            if (request?.Values != null)
+            {
+                foreach (KeyValuePair<string, object> r in request.Values)
+                {
+                    body = body?.Replace($"[{r.Key}]", $"{r.Value}");
+                }
+            }
+            return body;
+
         }
 
 

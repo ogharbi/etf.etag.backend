@@ -22,6 +22,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Scripts", "_Scripts", "{C8
 		Structure.ps1 = Structure.ps1
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Webjobs", "Webjobs", "{21D6912B-491D-4AE4-B0B5-666319774898}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VC.AG.ReminderJob", "VC.AG.ReminderJob\VC.AG.ReminderJob.csproj", "{2F0B411C-640F-47C8-A760-F884A68E488A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +52,10 @@ Global
 		{BEF005E0-8072-4049-8029-50903F01B9C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BEF005E0-8072-4049-8029-50903F01B9C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BEF005E0-8072-4049-8029-50903F01B9C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F0B411C-640F-47C8-A760-F884A68E488A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F0B411C-640F-47C8-A760-F884A68E488A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F0B411C-640F-47C8-A760-F884A68E488A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F0B411C-640F-47C8-A760-F884A68E488A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -57,6 +65,7 @@ Global
 		{658B94FF-9371-4D0F-ADAD-7E15F57771EA} = {63171847-3466-45F5-84CA-FB5C5EB387FD}
 		{8AF6D99E-9F49-4000-966D-858F5E9F2147} = {63171847-3466-45F5-84CA-FB5C5EB387FD}
 		{BEF005E0-8072-4049-8029-50903F01B9C6} = {1E6A111E-ADFE-408B-B5B7-6F1C39997270}
+		{2F0B411C-640F-47C8-A760-F884A68E488A} = {21D6912B-491D-4AE4-B0B5-666319774898}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8EEC7946-6AFC-441A-9002-8B90CBA96350}

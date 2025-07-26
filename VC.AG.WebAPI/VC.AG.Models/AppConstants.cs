@@ -181,13 +181,15 @@ namespace VC.AG.Models
         {
             public const string WfStatus = "Col_Status";
             public const string Aiguilleur = "Col_AgUser";
+            public const string Aiguilleur2 = "Col_AgUser2";
             public const string StartDate = "Col_StartDate";
             public const string Status = "Col_Status";
         }
 
         public static class QInterviewKeys
         {
-            public const string AigId = "F_x003a_Aiguilleur_x0020_ID";
+            public const string AigId = "F_x003a_Aiguilleur_ID";
+            public const string AigId2 = "F_x003a_Aiguilleur2_ID";
             public const string StartDate = "Col_StartDate";
             public const string DueDate = "Col_DueDate";
             public const string Status = "Col_Status";
