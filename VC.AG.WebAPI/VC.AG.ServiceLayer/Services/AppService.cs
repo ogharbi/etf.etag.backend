@@ -203,7 +203,7 @@ namespace VC.AG.ServiceLayer.Services
                 {
                     var buffer = file.ContentStream.ReadAllBytes();
                     html = System.Text.Encoding.UTF8.GetString(buffer, 0, buffer.Length);
-                    // cache.Set(htmlCacheKey, html);
+                    cache.Set(htmlCacheKey, html);
                 }
                 IDictionary<string, Object> mValues = new Dictionary<string, Object>();
                 var dbQuery = new DBQuery()

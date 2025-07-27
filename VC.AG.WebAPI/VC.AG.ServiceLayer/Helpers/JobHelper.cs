@@ -214,7 +214,7 @@ namespace VC.AG.ServiceLayer.Helpers
                     Subject = subject,
                     Body = body
                 };
-                var sendResult = await mailObject.Send(config, graphContext);
+                result = await mailObject.Send(config, graphContext);
             }
             return result;
         }
@@ -222,7 +222,7 @@ namespace VC.AG.ServiceLayer.Helpers
         {
             var appUrl = $"{config.GetValue<string>(AppSettingsKeys.AppUrl)}";
             var appLink = $"<a href=\"{appUrl}\">{appUrl}</a>";
-            var itemLink = $"<a href=\"{appUrl}/forms/{request?.Id}\">{request?.Values?["Title"]}</a>";
+            var itemLink = $"<a href=\"{appUrl}/forms/{request?.Id}\">Fiche ${request?.Id}</a>";
             body = body?.Replace("[AppLink]", appLink);
             body = body?.Replace("[ItemLink]", itemLink);
             body = body?.Replace("[ID]", request?.Id);

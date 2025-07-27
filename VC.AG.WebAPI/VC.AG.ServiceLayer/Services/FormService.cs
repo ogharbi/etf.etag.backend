@@ -290,7 +290,7 @@ namespace VC.AG.ServiceLayer.Services
             }
             return items;
         }
-        public async Task<bool> SendNotification(NotifQuery notifQuery)
+        public async Task<string?> SendNotification(NotifQuery notifQuery)
         {
             var currentUser = await userSvc.GetMe();
             var rootSite = await siteSvc.Get();
@@ -301,8 +301,8 @@ namespace VC.AG.ServiceLayer.Services
                 Filter=$"<Where><Eq><FieldRef Name='ID'/><Value Type='Number'>{notifQuery.Id}</Value></Eq></Where>"
             };
             var request = await Get(dbQuery);
-           await notifSvc.SendNotifications(rootSite,request, notifQuery.Comment);
-            return true;
+          var result= await notifSvc.SendNotifications(rootSite,request, notifQuery.Comment);
+            return result;
         }
 
 

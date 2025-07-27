@@ -340,6 +340,15 @@ function FieldsDefinitions() {
         [pscustomobject]@{ key = "Col_ParentId"; value = "<Field DisplayName='Parent Id' Type='Number' Required='FALSE' ID='d82d8d65-af2a-4451-ad88-b65fcc4b140b'  StaticName='Col_ParentId' Name='Col_ParentId'  Group='VC' Indexed='TRUE'/>" }
         [pscustomobject]@{ key = "Col_Guid"; value = "<Field DisplayName='Guid' Type='Text' Required='FALSE' ID='88dd37ce-8ae4-4f66-af6d-db16241a1487'  StaticName='Col_Guid' Name='Col_Guid'  Group='VC' Indexed='TRUE'/>" }
         
+        [pscustomobject]@{ key = "Col_AgSignture"; value = "<Field DisplayName='Ag - signature' Type='Note' Required='FALSE' ID='85fda0d1-6f36-41d2-ad33-5581e6192e5f' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_AgSignture' Name='Col_AgSignture'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_AgSignName"; value = "<Field DisplayName='Ag - Signature - Nom' Type='Text' Required='FALSE' ID='1f4c5034-1d4d-4f81-8158-220411a08d2c'  StaticName='Col_AgSignName' Name='Col_AgSignName'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_AgSignDate"; value = "<Field DisplayName='Ag - Signature - Date' Type='DateTime' Required='FALSE' ID='09ae074e-c3e5-4e06-b571-69fd89a4c20c'  StaticName='Col_AgSignDate' Name='Col_AgSignDate'  Group='VC' />" }
+
+        [pscustomobject]@{ key = "Col_FlSignture"; value = "<Field DisplayName='Fl - signature' Type='Note' Required='FALSE' ID='42e14a49-c793-470b-96a4-89719afad875' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_FlSignture' Name='Col_FlSignture'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_FlSignName"; value = "<Field DisplayName='Fl - Signature - Nom' Type='Text' Required='FALSE' ID='30ea4608-456d-4763-a6a2-2fb663f49534'  StaticName='Col_FlSignName' Name='Col_FlSignName'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_FlSignDate"; value = "<Field DisplayName='Fl - Signature - Date' Type='DateTime' Required='FALSE' ID='b9571f93-afa5-4293-a915-5ac2fa368b13'  StaticName='Col_FlSignDate' Name='Col_FlSignDate'  Group='VC' />" }
+
+
         
     )
     return $data;
@@ -504,6 +513,12 @@ function InterviewFields() {
         "Col_BlAigComment"
         "Col_BlFlComment"
         "Col_Lesson"
+        "Col_AgSignture"
+        "Col_AgSignName"
+        "Col_AgSignDate"
+        "Col_FlSignture"
+        "Col_FlSignName"
+        "Col_FlSignDate"
         "Col_Guid"
         "Col_Author"
         "Col_Editor"

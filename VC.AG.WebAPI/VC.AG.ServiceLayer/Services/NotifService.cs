@@ -45,10 +45,10 @@ namespace VC.AG.ServiceLayer.Services
             await jobHelper.SendReminder(items, reminderList, rootSite, endDate);
             return result;
         }
-        public async Task<bool> SendNotifications(SiteEntity? rootSite, WfRequest? request, string? comment)
+        public async Task<string> SendNotifications(SiteEntity? rootSite, WfRequest? request, string? comment)
         {
-            await jobHelper.SendNotification(rootSite,request,comment);
-            return true;
+           var result= await jobHelper.SendNotification(rootSite,request,comment);
+            return result;
         }
 
 
