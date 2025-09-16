@@ -52,7 +52,7 @@ namespace VC.AG.ServiceLayer.Services
         public async Task<DBStream?> GetAll(DBQuery query, string? delegation = "")
         {
             DBStream? result = null;
-            if (!ListNameKeys.Interview.EqualsNotNull(query?.ListName)) throw new InvalidOperationException($"Query authorized only for {query?.ListName}");
+            if (!ListNameKeys.Interview.EqualsNotNull(query?.ListName) || !ListNameKeys.Contract.EqualsNotNull(query?.ListName)) throw new InvalidOperationException($"Query authorized only for {query?.ListName}");
             var user = await userSvc.GetMe();
             var site = await siteSvc.Get(delegation) ?? throw new InvalidOperationException($"Unable to find the site : {delegation}");
             if (query != null)

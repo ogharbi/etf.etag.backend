@@ -10,6 +10,9 @@
     {
         public string? Title { get; set; }
         public string? Email { get; set; }
+        public string? Department { get; set; }
+        public string? MobilePhone { get; set; }
 
     }
+   
 }

@@ -5,7 +5,7 @@ namespace VC.AG.WebAPI.Models
 {
     public class ReqAssignAccess
     {
-        public string? Site { get; set; }
+        public AppTarget? AppTarget { get; set; }
         public int? UserId { get; set; }
         public string? Role { get; set; }
         public string? Action { get; set; }
@@ -15,7 +15,7 @@ namespace VC.AG.WebAPI.Models
             if (!rsucess) role = UserRole.None;
             var asuccess = Enum.TryParse(Action, out AssignAction action);
             if (!asuccess) action = AssignAction.None;
-            var r = new AssignAccess() { Site = Site, UserId = UserId, Role = role, Action = action };
+            var r = new AssignAccess() { AppTarget = AppTarget, UserId = UserId, Role = role, Action = action };
             return r;
         }
     }

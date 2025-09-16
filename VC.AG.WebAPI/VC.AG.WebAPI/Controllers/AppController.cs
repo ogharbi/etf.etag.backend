@@ -33,12 +33,11 @@ namespace VC.AG.WebAPI.Controllers
         }
         [ProducesResponseType<SiteEntity>(StatusCodes.Status200OK)]
         [HttpGet("refreshsite")]
-        public IActionResult RefreshSite([FromQuery(Name = "d")] string delegation, [FromQuery(Name = "t")] SiteRefreshTarget siteRefreshTarget)
+        public IActionResult RefreshSite([FromQuery(Name = "t")] SiteRefreshTarget siteRefreshTarget)
         {
             logger.LogInformation($"Get SiteInfo");
-            var d = "root".EqualsNotNull(delegation) ? string.Empty : delegation;
-            var result = appSvc.RefreshSite(siteRefreshTarget, d).Result;
-            return result != null ? (IActionResult)Ok(result.GetBasicInfo()) : throw new ArgumentNullException($"Unable to find delegation : {delegation}");
+            var result = appSvc.RefreshSite(siteRefreshTarget).Result;
+            return result != null ? (IActionResult)Ok(result.GetBasicInfo()):Ok();
         }
         [HttpGet("ressource")]
         [ProducesResponseType<string>(StatusCodes.Status200OK)]
@@ -61,7 +60,7 @@ namespace VC.AG.WebAPI.Controllers
         public IActionResult Get([FromBody] ReqQuery req)
         {
             var query = req.ToDGQuery();
-            if (req.ListName.EqualsNotNull(ListNameKeys.Interview)) throw new UnauthorizedAccessException($"{req.ListName} is secured");
+            if (req.ListName.EqualsNotNull(ListNameKeys.Interview) || req.ListName.EqualsNotNull(ListNameKeys.Contract)) throw new UnauthorizedAccessException($"{req.ListName} is secured");
             var stream = appSvc.GetAll(query, req.Site).Result;
             var result = stream?.SerializeStream();
             return stream != null ? (IActionResult)Ok(result) : Ok(null);

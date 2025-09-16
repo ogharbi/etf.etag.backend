@@ -11,6 +11,8 @@ using VC.AG.Models.Enums;
 using VC.AG.Models.Helpers;
 using Microsoft.Identity.Client;
 using Microsoft.SharePoint.Client;
+using Microsoft.SharePoint.News.DataModel;
+using System.Collections.Generic;
 namespace VC.AG.ServiceLayer.Services
 {
     public class SiteService(IUnitOfWork uow, IMemoryCache cache, ILogger<SiteService>? logger) : ISiteContract
@@ -108,42 +110,36 @@ namespace VC.AG.ServiceLayer.Services
         public async Task<IEnumerable<Access>?> GetUserAccess(UserEntity user, bool force = false)
         {
             var result = new List<Access>();
-            var rootSite = await Get();
-            var sites = rootSite?.Sites?.Select(item => item.Key);
-            if (sites != null)
+            var site = await Get();
+            if (force)
             {
-                foreach (var item in sites)
-                {
-                    var s = await Get(item);
-                    if (force)
-                    {
-                        s = await Refresh(SiteRefreshTarget.Access, item);
-                    }
-                    if (s != null)
-                    {
-                        UpdateAccess0(ref result, user, s);
-                    }
-
-                }
+                site = await Refresh(SiteRefreshTarget.Access, "");
+            }
+            if (site != null)
+            {
+                UpdateAccess0(ref result, user, site);
             }
             return result;
         }
 
         private static void UpdateAccess0(ref List<Access> result, UserEntity user, SiteEntity s)
         {
-            List<Access>? sAccessList = null;
             if (user.IsSiteAdmin == true)
             {
-                var a = new Access() { Site = s.RootFolder?.ToUpper(), Role = UserRole.Admin.ToString() };
+                result.Add(new Access() { AppTarget = AppTarget.CT, Role = UserRole.Admin.ToString() });
+                result.Add(new Access() { AppTarget = AppTarget.AG, Role = UserRole.Admin.ToString() });
             }
-           
-            if (sAccessList != null)
-                result.AddRange(sAccessList);
+            if (s.AccessList != null)
+            {
+                var access = s.AccessList.Where(a => a.User?.SPId == user.SPId).ToList();
+                result.AddRange(access);
+            }
+
         }
 
-       
 
-    
+
+
 
         public async Task<SiteEntity?> Refresh(SiteRefreshTarget target, string? delegation = "")
         {

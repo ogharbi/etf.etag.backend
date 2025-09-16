@@ -10,6 +10,8 @@ namespace VC.AG.Models.Entities
         public string? DisplayName { get; set; }
         public string? AccountName { get; set; }
         public string? Email { get; set; }
+        public string? Department { get; set; }
+        public string? MobilePhone { get; set; }
         public int SPId { get; set; }
         public int ProfileId { get; set; }
         public List<string>? Groups { get; set; }
@@ -27,13 +29,9 @@ namespace VC.AG.Models.Entities
             AccountName = spUser.LoginName;
             Email = spUser.Email;
             DisplayName = spUser.Title;
-            IsSiteAdmin = spUser.IsSiteAdmin;
             Groups = groups;
-            if (Groups.Count > 0)
-            {
-                var isLocalAdmin = Groups.Exists(a => a.Equals(SiteGroups.Admins, StringComparison.InvariantCultureIgnoreCase));
-                IsSiteAdmin = isLocalAdmin;
-            }
+            IsSiteAdmin = Groups.Exists(a => a.Equals(SiteGroups.AppAdmins, StringComparison.InvariantCultureIgnoreCase));
+
         }
 
 

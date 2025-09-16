@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace VC.AG.Models.Enums
 {
-    public enum DashTarget
+    public enum AppTarget
     {
-        Default=1,
-        QInterview=2,
-        Contract=3
+         None= 0,
+         AG=1,
+         CT=2
     }
 }

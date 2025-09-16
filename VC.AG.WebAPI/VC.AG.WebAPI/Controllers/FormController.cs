@@ -101,7 +101,6 @@ namespace VC.AG.WebAPI.Controllers
                     result.Add(r);
                 }
             }
-
             return Ok(result);
         }
         [HttpPost("delete")]

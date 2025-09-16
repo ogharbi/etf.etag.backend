@@ -1,4 +1,5 @@
 ﻿using VC.AG.Models.Entities;
+using VC.AG.Models.Enums;
 
 namespace VC.AG.Models.ValuesObject
 {
@@ -8,6 +9,7 @@ namespace VC.AG.Models.ValuesObject
         public string? SiteUrl { get; set; }
         public string? SiteId { get; set; }
         public string? Site { get; set; }
+        public AppTarget? AppTarget { get; set; }
         public string? ListId { get; set; }
         public string? ListUrl { get; set; }
         public string? ListName { get; set; }

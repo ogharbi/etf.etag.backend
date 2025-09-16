@@ -14,7 +14,9 @@ namespace VC.AG.Models
         public const string EnCulture = "en-US";
         public static class SiteGroups
         {
-            public const string Admins = "AG admins";
+            public const string AGAdmins = "Admins - AG";
+            public const string CTAdmins = "Admins - CT";
+            public const string AppAdmins = "Admins - App";
             public const string Users = "AG Users";
         }
         public static class Commun
@@ -80,16 +82,21 @@ namespace VC.AG.Models
         }
         public static class ListNameKeys
         {
-            public const string Interview = "vc_interview";
-            public const string QInterview= "vc_quartlyinterview";
-            public const string Actions = "vc_relatedinterview";
-            public const string Comment = "vc_requestcomments";
-            public const string RequestAttachments = "vc_requestattachments";
-            public const string DocTemplates = "vc_templates";
-            public const string SiteLinks = "vc_link";
-            public const string MailTemplate = "vc_mailtemplate";
-            public const string Settings = "vc_settings";
-            public const string Bus = "vc_bu";
+            public const string Interview = "etf_interview";
+            public const string Contract = "etf_contract";
+            public const string QInterview= "etf_quartlyinterview";
+            public const string Actions = "etf_relatedinterview";
+            public const string Comment = "etf_requestcomments";
+            public const string AGAttachments = "etf_agattachments";
+            public const string CTAttachments = "etf_ctattachments";
+            public const string DocTemplates = "etf_templates";
+            public const string SiteLinks = "etf_link";
+            public const string MailTemplate = "etf_mailtemplate";
+            public const string Settings = "etf_settings";
+            public const string Bus = "etf_bu";
+            public const string ActionTemplates = "etf_tempaction";
+            public const string CTAccess = "etf_ctaccess";
+            public const string AGAcess = "etf_agaccess";
 
         }
         public static class AppKeys
@@ -114,9 +121,10 @@ namespace VC.AG.Models
             public const string Name = "Col_E_Name";
             public const string Enabled = "Col_E_Enabled";
             public const string Disabled = "Col_E_Disabled";
-            public const string User = "Col_E_User";
-            public const string UserRole = "Col_E_UserRole";
+            public const string User = "Col_User";
+            public const string UserRole = "Col_UserRole";
             public const string Lk_Request = "Col_Lk_Request";
+            public const string Lk_Contract= "Col_Lk_Contract";
 
         }
         public static class TranslationKeys
@@ -161,9 +169,9 @@ namespace VC.AG.Models
         }
         public static class AccessKeys
         {
-            public const string User = "Col_E_User";
-            public const string Role = "Col_E_UserRole";
-            public const string Level = "Col_E_LevelRole";
+            public const string User = "Col_User";
+            public const string Role = "Col_UserRole";
+            public const string Level = "Col_LevelRole";
             public const string SelectFields = $"Title,{User},{Role},{AppKeys.Code},{Level}";
         }
         public static class RequestAttachmentKeys
@@ -179,9 +187,8 @@ namespace VC.AG.Models
         }
         public static class InterviewKeys
         {
-            public const string WfStatus = "Col_Status";
-            public const string Aiguilleur = "Col_AgUser";
-            public const string Aiguilleur2 = "Col_AgUser2";
+            public const string Aiguilleur = "Col_RespUser";
+            public const string Aiguilleur2 = "Col_RespUser2";
             public const string StartDate = "Col_StartDate";
             public const string Status = "Col_Status";
         }

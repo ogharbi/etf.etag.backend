@@ -42,7 +42,7 @@ namespace VC.AG.Models.Extensions
             if (stream != null && stream.Row != null && stream.Row.Count > 0)
             {
                 var values = stream.Row[0];
-                var success = Enum.TryParse($"{values?.GetStringValue2(InterviewKeys.WfStatus)}", out RequestStatus status);
+                var success = Enum.TryParse($"{values?.GetStringValue2(InterviewKeys.Status)}", out RequestStatus status);
                 if (!success) status = RequestStatus.None;
                 result = new WfRequest()
                 {
@@ -100,7 +100,7 @@ namespace VC.AG.Models.Extensions
             }
 
             var ops = new List<string>();
-            var isAdmin = currentUser?.IsSiteAdmin == true || currentUser?.Access?.Any(a => query.Site.EqualsNotNull(a.Site) && (a.Role.EqualsNotNull(UserRole.Admin.ToString()))) == true;
+            var isAdmin = currentUser?.IsSiteAdmin == true || currentUser?.Access?.Any(a => query.AppTarget == a.AppTarget && (a.Role.EqualsNotNull(UserRole.Admin.ToString()))) == true;
             UpdateQuery(ref ops, query, scope, currentUser, isAdmin);
             var filterOps = AppHelper.BuildQuery(ops, "And");
             filterOps = string.IsNullOrEmpty(filterOps) ? null : $"<Where>{filterOps}</Where>";
@@ -113,7 +113,7 @@ namespace VC.AG.Models.Extensions
             string op;
             if (status != Enums.RequestStatus.None)
             {
-                op = $"<Eq><FieldRef Name='{InterviewKeys.WfStatus}'/><Value Type='Text'>{GetRequestStatus(status)}</Value></Eq>";
+                op = $"<Eq><FieldRef Name='{InterviewKeys.Status}'/><Value Type='Text'>{GetRequestStatus(status)}</Value></Eq>";
                 ops.Add(op);
             }
             if (!string.IsNullOrEmpty(query.ItemId))
@@ -138,7 +138,7 @@ namespace VC.AG.Models.Extensions
             switch (scope)
             {
                 case Enums.RequestScope.MyTasks:
-                    if (query.Mode == DashMode.QInterview)
+                    if (query.DashTarget == DashTarget.QInterview)
                     {
                         op = $"<Or><Eq><FieldRef Name='{QInterviewKeys.AigId}'/><Value Type='Number'>{currentUser?.SPId}</Value></Eq>" +
                                 $"<Eq><FieldRef Name='{QInterviewKeys.AigId2}'/><Value Type='Number'>{currentUser?.SPId}</Value></Eq></Or>";
@@ -155,22 +155,28 @@ namespace VC.AG.Models.Extensions
                 case Enums.RequestScope.AllRequests:
                     if (!isAdmin)
                     {
-                        if (query.Mode == DashMode.QInterview)
+                        switch (query.DashTarget)
                         {
-                            var op1 = $"<Or><Eq><FieldRef Name='{QInterviewKeys.AigId}'/><Value Type='Number'>{currentUser?.SPId}</Value></Eq>" +
-                                $"<Eq><FieldRef Name='{QInterviewKeys.AigId2}'/><Value Type='Number'>{currentUser?.SPId}</Value></Eq></Or>";
-                            var op2 = $"<Eq><FieldRef Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
-                            op = $"<Or>{op1}{op2}</Or>";
-                            ops.Add(op);
+                            case DashTarget.QInterview:
+                                var op1 = $"<Or><Eq><FieldRef Name='{QInterviewKeys.AigId}'/><Value Type='Number'>{currentUser?.SPId}</Value></Eq>" +
+                              $"<Eq><FieldRef Name='{QInterviewKeys.AigId2}'/><Value Type='Number'>{currentUser?.SPId}</Value></Eq></Or>";
+                                var op2 = $"<Eq><FieldRef Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
+                                op = $"<Or>{op1}{op2}</Or>";
+                                ops.Add(op);
+                                break;
+                            case DashTarget.Default:
+                                op1 = $"<Or><Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Aiguilleur}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>" +
+                                 $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Aiguilleur2}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq></Or>";
+                                op2 = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
+                                op = $"<Or>{op1}{op2}</Or>";
+                                ops.Add(op);
+                                break;
+                            case DashTarget.Contract:
+                                op = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
+                                ops.Add(op);
+                                break;
                         }
-                        else
-                        {
-                            var op1 = $"<Or><Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Aiguilleur}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>" +
-                                $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Aiguilleur2}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq></Or>";
-                            var op2 = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
-                            op = $"<Or>{op1}{op2}</Or>";
-                            ops.Add(op);
-                        }
+
                     }
                     break;
                 case Enums.RequestScope.MyRequests:

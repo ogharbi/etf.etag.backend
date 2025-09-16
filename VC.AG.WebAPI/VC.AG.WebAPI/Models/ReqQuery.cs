@@ -1,4 +1,5 @@
-﻿using VC.AG.Models.ValuesObject;
+﻿using VC.AG.Models.Enums;
+using VC.AG.Models.ValuesObject;
 
 namespace VC.AG.WebAPI.Models
 {
@@ -6,6 +7,7 @@ namespace VC.AG.WebAPI.Models
     {
         public int? Id { get; set; }
         public string? Site { get; set; }
+        public AppTarget? AppTarget { get; set; }
         public string? ListName { get; set; }
         public string? ItemId { get; set; }
         public string? Filter { get; set; }

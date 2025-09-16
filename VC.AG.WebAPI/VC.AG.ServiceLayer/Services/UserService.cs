@@ -68,7 +68,7 @@ namespace VC.AG.ServiceLayer.Services
         }
         public async Task<string?> Assign(AssignAccess assign)
         {
-            var siteInfo = await site.Get(assign.Site);
+            var siteInfo = await site.Get();
             assign.SiteUrl = siteInfo?.SiteUrl;
             var result = await uow.UserRep.UpdateAssignment(assign);
             return result;

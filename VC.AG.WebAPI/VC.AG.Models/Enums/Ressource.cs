@@ -6,6 +6,7 @@
         AppSettings,
         SiteLinks,
         Bus,
+        ActionTemplates,
         Lists,
         ContentTypes,
         Fields,

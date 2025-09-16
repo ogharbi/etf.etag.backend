@@ -67,6 +67,9 @@ namespace VC.AG.ServiceLayer.Services
                     case Ressource.Bus:
                         result = site.Bus;
                         break;
+                    case Ressource.ActionTemplates:
+                        result = site.ActionTemplates;
+                        break;
                     case Ressource.Views:
                         var q1 = new DBQuery() { SiteId = site.Id, SiteUrl = site.SiteUrl, ListId = listId, CatchError = true };
                         result = await uow.DBRepo.GetListViews(q1);

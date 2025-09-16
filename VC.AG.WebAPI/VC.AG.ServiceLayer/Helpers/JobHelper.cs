@@ -48,8 +48,8 @@ namespace VC.AG.ServiceLayer.Helpers
                     ops.Add($"<Lt><FieldRef Name='{QInterviewKeys.DueDate}'/><Value IncludeTimeValue='TRUE' Type='DateTime'>{endDate.Value.ToString("s")}</Value></Lt>");
                 }
                 ops.Add($"<Or>" +
-                    $"<Eq><FieldRef Name='{InterviewKeys.WfStatus}'/><Value Type='Text'>{RequestStatusStr.NotStarted}</Value></Eq>" +
-                    $"<Eq><FieldRef Name='{InterviewKeys.WfStatus}'/><Value Type='Text'>{RequestStatusStr.InProgress}</Value></Eq>" +
+                    $"<Eq><FieldRef Name='{InterviewKeys.Status}'/><Value Type='Text'>{RequestStatusStr.NotStarted}</Value></Eq>" +
+                    $"<Eq><FieldRef Name='{InterviewKeys.Status}'/><Value Type='Text'>{RequestStatusStr.InProgress}</Value></Eq>" +
                     $"</Or>");
                 var filterOps = AppHelper.BuildQuery(ops, "And");
                 string v = @$"<Where>

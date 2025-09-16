@@ -64,7 +64,7 @@ namespace VC.AG.DAO.Respository
             {
                 foreach (var u in users)
                 {
-                    lstUsers.Add(new UserEntity() { AccountName = u.Key, DisplayName = u.DisplayText, Email = u.EntityData?.Email });
+                    lstUsers.Add(new UserEntity() { AccountName = u.Key, DisplayName = u.DisplayText, Email = u.EntityData?.Email, Department = u.EntityData?.Department, MobilePhone = u.EntityData?.MobilePhone });
                 }
             }
             return lstUsers;
@@ -82,7 +82,15 @@ namespace VC.AG.DAO.Respository
                 case Models.Enums.UserRole.None:
                     break;
                 case Models.Enums.UserRole.Admin:
-                    targetGroup = web.AssociatedOwnerGroup;
+                    switch (assign.AppTarget)
+                    {
+                        case Models.Enums.AppTarget.AG: targetGroup = web.SiteGroups.GetByName(AppConstants.SiteGroups.AGAdmins);
+                            break;
+                        case Models.Enums.AppTarget.CT:
+                            targetGroup = web.SiteGroups.GetByName(AppConstants.SiteGroups.CTAdmins);
+                            break;
+                    }
+                 //targetGroup = web.AssociatedOwnerGroup;
                     break;
                 case Models.Enums.UserRole.User:
                     break;

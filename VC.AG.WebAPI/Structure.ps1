@@ -228,9 +228,42 @@ function UpdateListView {
     )
     $view = Get-PnPView -List $list
     if ($addTitle -eq $true) {
-        $fields = @('Title') + $fields
+        #$Fields = @('Title') + $fields
     }
-    $v = Set-PnPView -List $list -Identity $view[0].Title -Fields $fields
+    $v = Set-PnPView -List $list -Identity $view[0].Title -Fields $Fields
+}
+function AddListView2 {
+    param(
+        $ctx,
+        [String]$List,
+        [String] $Title,
+        $Fields,
+        $Query
+    )
+   
+    Write-Host "Looking for view $Title"
+    $view = Get-PnPView -List $List -Identity $Title -erroraction 'silentlycontinue'
+    if ($view -eq $null) {
+        Add-PnPView -List $List -Title $Title -Fields $Fields -Query $Query
+        Write-host "View $Title added to list $list" -foregroundcolor green
+    }
+    else {
+        if ($null -eq $query) {
+            Set-PnPView -List $List -Identity $view.Title -Fields $Fields
+        }
+        else {
+            $targetList = $Ctx.Web.Lists.GetById($List)
+ 
+            #Get the view to update
+            $targetView = $targetList.Views.GetByTitle($view.Title)
+            $ctx.ExecuteQuery()
+            $targetView.ViewQuery = $Query
+            $targetView.Update()
+            $ctx.ExecuteQuery()
+            Set-PnPView -List $List -Identity $view.Title -Fields $Fields
+        }
+        Write-host "View $Title updated for list $list" -foregroundcolor green
+    }
 }
 function GetListByUrl($web, $url) {
     Write-Host "List url : $url"
@@ -290,19 +323,45 @@ function RemoveElementCtFromList($list) {
 }
 function FieldsDefinitions() {
     $data = @(
-        [pscustomobject]@{ key = "Col_Bu"; value = "<Field DisplayName='Agence' Type='Text' Required='FALSE' ID='edcd16f9-2ed9-44e5-973f-6e11f941727b'  StaticName='Col_Bu' Name='Col_Bu'  Group='VC' />" }
-        [pscustomobject]@{ key = "Col_FlFirstName"; value = "<Field DisplayName='Filleul - Prénom' Type='Text' Required='FALSE' ID='4afeddaa-e780-48e5-b633-311ff18e0969'  StaticName='Col_FlFirstName' Name='Col_FlFirstName'  Group='VC' />" }
-        [pscustomobject]@{ key = "Col_FlLastName"; value = "<Field DisplayName='Filleul - Nom' Type='Text' Required='FALSE' ID='da9a4228-c061-45a0-a002-6504365383f7'  StaticName='Col_FlLastName' Name='Col_FlLastName'  Group='VC' />" }
-        [pscustomobject]@{ key = "Col_AgUser"; value = "<Field Type='User' DisplayName='Aiguilleur' Name='Col_AgUser'  StaticName='Col_AgUser' ID='2440566b-19f8-4712-966e-1377f18babf5' Group='VC' Required='false'   />" }
-        [pscustomobject]@{ key = "Col_AgFullName"; value = "<Field DisplayName='Aiguilleur_Nom complet' Type='Text' Required='FALSE' ID='914a9c20-8e07-4e4b-8e59-72ef9c9e99f9'  StaticName='Col_AgFullName' Name='Col_AgFullName'  Group='VC' />" }
-        [pscustomobject]@{ key = "Col_AgUserSPId"; value = "<Field Type='Number' DisplayName='Aiguilleur ID' Name='Col_AgUserSPId'  StaticName='Col_AgUserSPId' ID='a15a0476-5a90-4f85-bc41-61f27c9a9629' Group='VC' Required='false'   />" }
-        [pscustomobject]@{ key = "Col_AgUser2"; value = "<Field Type='User' DisplayName='Aiguilleur2' Name='Col_AgUser2'  StaticName='Col_AgUser2' ID='c974172e-fccb-46c9-8e09-0104d90c2899' Group='VC' Required='false'   />" }
-        [pscustomobject]@{ key = "Col_AgFullName2"; value = "<Field DisplayName='Aiguilleur2_Nom complet' Type='Text' Required='FALSE' ID='a371245c-833a-422a-88ce-9c1f7f783505'  StaticName='Col_AgFullName2' Name='Col_AgFullName2'  Group='VC' />" }
-        [pscustomobject]@{ key = "Col_AgUserSPId2"; value = "<Field Type='Number' DisplayName='Aiguilleur2_ID' Name='Col_AgUserSPId2'  StaticName='Col_AgUserSPId2' ID='6f6385ec-c8f3-429c-89e3-5db4d39a80ed' Group='VC' Required='false'   />" }
-        [pscustomobject]@{ key = "Col_StartDateT"; value = "<Field DisplayName='Date de début du tutorat' Type='DateTime' Required='FALSE' ID='260b4735-5a14-455d-afb7-847e1b40e251'  StaticName='Col_StartDateT' Name='Col_StartDateT'  Group='VC' />" }
-        [pscustomobject]@{ key = "Col_DurationM"; value = "<Field DisplayName='Durée envisagée (mois)' Type='Number' Required='FALSE' ID='49b54ab6-543e-44ca-9e84-de3b650dd0d5'  StaticName='Col_DurationM' Name='Col_DurationM'  Group='VC' />" }
-        [pscustomobject]@{ key = "Col_Status"; value = "<Field DisplayName='Statut' Type='Text' Required='FALSE' ID='8c8d2cfa-c3a1-4e07-ac13-220a20e1f5c4'  StaticName='Col_Status' Name='Col_Status'  Group='VC' />" }
+         #Commun
+        [pscustomobject]@{ key = "Col_FullName"; value = "<Field DisplayName='Nom / prénom' Type='Text' Required='FALSE' ID='C7EC4B3D-1AFB-41CF-8933-23472481316A'  StaticName='Col_FullName' Name='Col_FullName'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_Tel"; value = "<Field DisplayName='Téléphone' Type='Text' Required='FALSE' ID='A24C1AFD-9922-4396-9BF2-541A4FADD62C'  StaticName='Col_Tel' Name='Col_Tel'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_Email"; value = "<Field DisplayName='Email' Type='Text' Required='FALSE' ID='92E47F3C-5E3D-4165-8A1F-797A21108BB3'  StaticName='Col_Email' Name='Col_Email'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_Position"; value = "<Field DisplayName='Poste' Type='Text' Required='FALSE' ID='3AF470B3-BA4B-4698-8228-5B4006DDF8EB'  StaticName='Col_Position' Name='Col_Position'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_Promotion"; value = "<Field DisplayName='Promotion' Type='Text' Required='FALSE' ID='0E6E46DC-9486-4E77-A329-9F62941CBB27'  StaticName='Col_Promotion' Name='Col_Promotion'  Group='VC' />" }
+        
         [pscustomobject]@{ key = "Col_StartDate"; value = "<Field DisplayName='Date de début' Type='DateTime' Required='FALSE' ID='64b112b6-a958-4e3b-9eaf-c18d7a7e89b2'  StaticName='Col_StartDate' Name='Col_StartDate'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_EndDate"; value = "<Field DisplayName='Date de fin' Type='DateTime' Required='FALSE' ID='932d90ef-8c9d-4a05-8f19-762ea276cc65'  StaticName='Col_EndDate' Name='Col_EndDate'  Group='VC' />" }
+        
+        [pscustomobject]@{ key = "Col_RespUser"; value = "<Field Type='User' DisplayName='Responsable' Name='Col_RespUser'  StaticName='Col_RespUser' ID='E4C06628-0860-4962-B138-8FF8109A5541' Group='VC' Required='false'   />" }
+        [pscustomobject]@{ key = "Col_RespFullName"; value = "<Field DisplayName='Responsable : nom complet' Type='Text' Required='FALSE' ID='3C3E4066-9D24-47AC-9982-BF021AB7A81E'  StaticName='Col_RespFullName' Name='Col_RespFullName'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_RespUserSPId"; value = "<Field Type='Number' DisplayName='Responsable ID' Name='Col_RespUserSPId'  StaticName='Col_RespUserSPId' ID='94F9245E-0977-4507-ADB7-F267E902F08B' Group='VC' Required='false'   />" }
+        [pscustomobject]@{ key = "Col_RespPosition"; value = "<Field DisplayName='Responsable : fonction' Type='Text' Required='FALSE' ID='FC7190E1-B0A0-4916-8B81-879B27EC92EF'  StaticName='Col_RespPosition' Name='Col_RespPosition'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_Bu"; value = "<Field DisplayName='Agence' Type='Text' Required='FALSE' ID='edcd16f9-2ed9-44e5-973f-6e11f941727b'  StaticName='Col_Bu' Name='Col_Bu'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_DirGeneral"; value = "<Field DisplayName='Direction générale' Type='Text' Required='FALSE' ID='5BD32A58-F985-43FE-B4D7-4B92B62192FE'  StaticName='Col_DirGeneral' Name='Col_DirGeneral'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_UrlR"; value = "<Field DisplayName='URL' Type='Note' Required='FALSE' ID='605145bc-de13-4e04-9c53-2735332160c6' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_UrlR' Name='Col_UrlR'  Group='VC' RichTextMode='FullHtml' RichText='TRUE' />" }
+        [pscustomobject]@{ key = "Col_FormType"; value = "<Field DisplayName='Type de formulaire' Type='Text' Required='FALSE' ID='2FBC8417-20C6-4AF1-9B51-93B6EA483288'  StaticName='Col_FormType' Name='Col_FormType'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_FormTarget"; value = "<Field DisplayName='Périmètre' Type='Text' Required='FALSE' ID='1FFDF589-9340-4B44-BEA0-154B8D41E0E4'  StaticName='Col_FormTarget' Name='Col_FormTarget'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_Status"; value = "<Field DisplayName='Statut' Type='Text' Required='FALSE' ID='8c8d2cfa-c3a1-4e07-ac13-220a20e1f5c4'  StaticName='Col_Status' Name='Col_Status'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_Guid"; value = "<Field DisplayName='Guid' Type='Text' Required='FALSE' ID='88dd37ce-8ae4-4f66-af6d-db16241a1487'  StaticName='Col_Guid' Name='Col_Guid'  Group='VC' Indexed='TRUE'/>" }
+        [pscustomobject]@{ key = "Col_Author"; value = "<Field Type='User' DisplayName='Créé par' Name='Col_Author'  StaticName='Col_Author' ID='f654905d-94ce-44bf-a705-79706fc0bd09' Group='VC' Required='false'  ShowInEditForm='FALSE' ShowInNewForm='FALSE' Indexed='TRUE'/>" }
+        [pscustomobject]@{ key = "Col_Editor"; value = "<Field Type='User' DisplayName='Modifié par' Name='Col_Editor'  StaticName='Col_Editor' ID='b26c0826-6c0c-4948-9b72-219c1b822d3b' Group='VC' Required='false'  ShowInEditForm='FALSE'  ShowInNewForm='FALSE'  />" }
+        
+        [pscustomobject]@{ key = "Col_RespSignture"; value = "<Field DisplayName='Responsable - signature' Type='Note' Required='FALSE' ID='85fda0d1-6f36-41d2-ad33-5581e6192e5f' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_RespSignture' Name='Col_RespSignture'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_RespSignName"; value = "<Field DisplayName='Responsable - Signature - Nom' Type='Text' Required='FALSE' ID='1f4c5034-1d4d-4f81-8158-220411a08d2c'  StaticName='Col_RespSignName' Name='Col_RespSignName'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_RespSignDate"; value = "<Field DisplayName='Responsable - Signature - Date' Type='DateTime' Required='FALSE' ID='09ae074e-c3e5-4e06-b571-69fd89a4c20c'  StaticName='Col_RespSignDate' Name='Col_RespSignDate'  Group='VC' />" }
+
+        [pscustomobject]@{ key = "Col_CandSignture"; value = "<Field DisplayName='Candidat - signature' Type='Note' Required='FALSE' ID='16126A88-B23E-4E55-AE0B-E288EC5CEE19' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CandSignture' Name='Col_CandSignture'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CandSignName"; value = "<Field DisplayName='Candidat - Signature - Nom' Type='Text' Required='FALSE' ID='51A7E597-7016-4A28-A78A-6251FC2ED5C8'  StaticName='Col_CandSignName' Name='Col_CandSignName'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CandSignDate"; value = "<Field DisplayName='Candidat - Signature - Date' Type='DateTime' Required='FALSE' ID='CC84997E-5522-4146-8484-A41120E03AD3'  StaticName='Col_CandSignDate' Name='Col_CandSignDate'  Group='VC' />" }
+
+        #Aiguilleur
+    
+        [pscustomobject]@{ key = "Col_RespUser2"; value = "<Field Type='User' DisplayName='Responsable2' Name='Col_RespUser2'  StaticName='Col_RespUser2' ID='c974172e-fccb-46c9-8e09-0104d90c2899' Group='VC' Required='false'   />" }
+        [pscustomobject]@{ key = "Col_RespFullName2"; value = "<Field DisplayName='Responsable2_Nom complet' Type='Text' Required='FALSE' ID='a371245c-833a-422a-88ce-9c1f7f783505'  StaticName='Col_RespFullName2' Name='Col_RespFullName2'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_RespUserSPId2"; value = "<Field Type='Number' DisplayName='Responsable2_ID' Name='Col_RespUserSPId2'  StaticName='Col_RespUserSPId2' ID='6f6385ec-c8f3-429c-89e3-5db4d39a80ed' Group='VC' Required='false'   />" }
+        [pscustomobject]@{ key = "Col_StartDateT"; value = "<Field DisplayName='Date de début du tutorat' Type='DateTime' Required='FALSE' ID='260b4735-5a14-455d-afb7-847e1b40e251'  StaticName='Col_StartDateT' Name='Col_StartDateT'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_DurationM"; value = "<Field DisplayName='Durée envisagée' Type='Number' Required='FALSE' ID='49b54ab6-543e-44ca-9e84-de3b650dd0d5'  StaticName='Col_DurationM' Name='Col_DurationM'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_DueDate"; value = "<Field DisplayName='Date prévue' Type='DateTime' Required='FALSE' ID='62bf7a6a-b35e-4cdb-a8ee-c70b19210eeb'  StaticName='Col_DueDate' Name='Col_DueDate'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_Participants"; value = "<Field DisplayName='Participants' Type='Text' Required='FALSE' ID='931378eb-521b-418c-bd77-0043285614d6'  StaticName='Col_Participants' Name='Col_Participants'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_Ecoute"; value = "<Field DisplayName='Ecoute' Type='Number' Required='FALSE' ID='bb8ae7ee-043a-4b16-87db-bae26582f629'  StaticName='Col_Ecoute' Name='Col_Ecoute'  Group='VC' />" }
@@ -314,10 +373,97 @@ function FieldsDefinitions() {
         [pscustomobject]@{ key = "Col_SoftSkills"; value = "<Field DisplayName='Savoir-être' Type='Note' Required='FALSE' ID='6137ec71-0cfd-4edc-bee4-2f3cdf369ef2' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_SoftSkills' Name='Col_SoftSkills'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_MomMissing"; value = "<Field DisplayName='Moments manquants' Type='Note' Required='FALSE' ID='a369a42f-4b53-45c3-8f9a-75dd24b27aa1' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_MomMissing' Name='Col_MomMissing'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_CompSec"; value = "<Field DisplayName='Comportement Sec/Env/Qua' Type='Note' Required='FALSE' ID='2fbc7637-72f1-4a13-ac18-b9c8ac9ef138' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CompSec' Name='Col_CompSec'  Group='VC' />" }
-        [pscustomobject]@{ key = "Col_EndDate"; value = "<Field DisplayName='Date de fin' Type='DateTime' Required='FALSE' ID='932d90ef-8c9d-4a05-8f19-762ea276cc65'  StaticName='Col_EndDate' Name='Col_EndDate'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_BlAigComment"; value = "<Field DisplayName='Bilan - Aiguilleur - Commentaire' Type='Note' Required='FALSE' ID='ed45af1e-2eaf-4a0a-81e2-e5abf6a74a48' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_BlAigComment' Name='Col_BlAigComment'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_BlFlComment"; value = "<Field DisplayName='Bilan - Filleul - Commentaire' Type='Note' Required='FALSE' ID='c75706db-2244-41d4-8953-ec7ab5512911' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_BlFlComment' Name='Col_BlFlComment'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_Lesson"; value = "<Field DisplayName='Les leçons' Type='Note' Required='FALSE' ID='09e9fd81-3125-4b21-b0ce-aa77795b526f' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_Lesson' Name='Col_Lesson'  Group='VC' />" }
+        
+        #Contrat : alternant
+        [pscustomobject]@{ key = "Col_CtrHiringDate"; value = "<Field DisplayName='Date embauche' Type='DateTime' Required='FALSE' ID='456EBE25-2D72-4FB5-8074-447BDCD6F5D4'  StaticName='Col_CtrHiringDate' Name='Col_CtrHiringDate'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrMeetDate"; value = "<Field DisplayName='Date entretien' Type='DateTime' Required='FALSE' ID='59C06D66-1E0D-473A-AA61-D22CF7F76715'  StaticName='Col_CtrMeetDate' Name='Col_CtrMeetDate'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrEcole"; value = "<Field DisplayName='Ecole' Type='Text' Required='FALSE' ID='D0CE0A07-A5D9-429F-A455-0E45B924CB70'  StaticName='Col_CtrEcole' Name='Col_CtrEcole'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrDiplome"; value = "<Field DisplayName='Diplôme' Type='Text' Required='FALSE' ID='94173C71-C5C3-4A23-86B4-C7443B2605A0'  StaticName='Col_CtrDiplome' Name='Col_CtrDiplome'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrDescMission"; value = "<Field DisplayName='Description des missions confiées' Type='Note' Required='FALSE' ID='39132B7C-1740-4CFB-BEDB-F867C1E245E5' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrDescMission' Name='Col_CtrDescMission'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrDescMission2"; value = "<Field DisplayName='Description des missions confiées 2' Type='Note' Required='FALSE' ID='00453698-C14E-412D-A076-F7000B17FA71' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrDescMission2' Name='Col_CtrDescMission2'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrDescMission3"; value = "<Field DisplayName='Description des missions confiées 3' Type='Note' Required='FALSE' ID='3319ACD9-9D17-464C-8EAB-2E2D39B7B6B3' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrDescMission3' Name='Col_CtrDescMission3'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrComp"; value = "<Field DisplayName='Compétences acquises' Type='Note' Required='FALSE' ID='78EEA0A1-5F22-4AE2-B0D3-90FF7DBCB53B' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrComp' Name='Col_CtrComp'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrTypeCh"; value = "<Field DisplayName='Type de chantiers confiés' Type='Note' Required='FALSE' ID='F5AF20C5-2133-4131-9536-B0B221475021' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrTypeCh' Name='Col_CtrTypeCh'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrPositionETF"; value = "<Field DisplayName='Poste chez ETF / VC' Type='Boolean' Required='FALSE' ID='5DD4CE58-480B-4F0D-9B46-B3E0F7E870FA'  StaticName='Col_CtrPositionETF' Name='Col_CtrPositionETF'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrPositionETFDesc"; value = "<Field DisplayName='Poste : description' Type='Text' Required='FALSE' ID='DF74C352-4425-4236-9FB2-1AF83A449067'  StaticName='Col_CtrPositionETFDesc' Name='Col_CtrPositionETFDesc'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrMobility"; value = "<Field DisplayName='Mobilité' Type='Text' Required='FALSE' ID='FDD92AA2-15B4-45B5-84A1-3BA07D423F18'  StaticName='Col_CtrMobility' Name='Col_CtrMobility'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrMobilityReg"; value = "<Field DisplayName='Mobilité - Région' Type='Text' Required='FALSE' ID='7D401293-BCC7-4B56-A066-FB700BF37EEA'  StaticName='Col_CtrMobilityReg' Name='Col_CtrMobilityReg'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrPojectPro"; value = "<Field DisplayName='Projet professionnel' Type='Text' Required='FALSE' ID='21FE1A2B-275B-46F7-A590-7B7E6C63EF00'  StaticName='Col_CtrPojectPro' Name='Col_CtrPojectPro'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrRecoETF"; value = "<Field DisplayName='ETF recommandé' Type='Boolean' Required='FALSE' ID='FDF53F0B-B914-4689-8B07-0730A55FEDD1'  StaticName='Col_CtrRecoETF' Name='Col_CtrRecoETF'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrObs"; value = "<Field DisplayName='Observations' Type='Note' Required='FALSE' ID='9DFFE5D2-DE8D-40C3-B226-670FA645EF71' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrObs' Name='Col_CtrObs'  Group='VC' />" }
+
+        #Chef chantier
+        [pscustomobject]@{ key = "Col_CtrIntAgence"; value = "<Field DisplayName='Intégration agence' Type='Note' Required='FALSE' ID='8F5FD199-F464-45AB-BBE1-D9694BCF470F' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrIntAgence' Name='Col_CtrIntAgence'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrIntPromo"; value = "<Field DisplayName='Intégration promotion' Type='Note' Required='FALSE' ID='78B2139D-3B92-4718-87D1-C54CB5F450D6' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrIntPromo' Name='Col_CtrIntPromo'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrPtPos"; value = "<Field DisplayName='Points positifs année' Type='Note' Required='FALSE' ID='31E01AD6-9D56-4239-944B-E5DC8EEF21D3' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrPtPos' Name='Col_CtrPtPos'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrlAccPre"; value = "<Field DisplayName='Accueillir - Commentaire' Type='Note' Required='FALSE' ID='E89CA304-51F1-44E1-9A08-E329155B4509' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrlAccPre' Name='Col_CtrlAccPre'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrSavFComment"; value = "<Field DisplayName='Savoir-faire - Commentaire' Type='Note' Required='FALSE' ID='8532FC35-3290-4BC7-9ADB-7DB807013DB1' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrSavFComment' Name='Col_CtrSavFComment'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrSupComment"; value = "<Field DisplayName='Superviser - Commentaire' Type='Note' Required='FALSE' ID='69C8BDAB-0A5E-4E10-A061-250C96E549CC' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrSupComment' Name='Col_CtrSupComment'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrProgComment"; value = "<Field DisplayName='Progression - Commentaire' Type='Note' Required='FALSE' ID='6FC80030-52A0-4993-9BCB-8A3DEFCE908C' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrProgComment' Name='Col_CtrProgComment'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrFormComment"; value = "<Field DisplayName='Formation - Commentaire' Type='Note' Required='FALSE' ID='9AECCDC6-E7E9-4003-8620-746A52CD3E86' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrFormComment' Name='Col_CtrFormComment'  Group='VC' />" }
+
+        [pscustomobject]@{ key = "Col_CtrSecFer"; value = "<Field DisplayName='Séc. ferroviaire' Type='Boolean' Required='FALSE' ID='A39B3EE2-1994-4C0D-82F5-BE93BD1C4CC8'  StaticName='Col_CtrSecFer' Name='Col_CtrSecFer'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrSecFer2"; value = "<Field DisplayName='Séc. ferroviaire 2' Type='Boolean' Required='FALSE' ID='264594E8-5BB0-4910-8C90-771BB13BC6AD'  StaticName='Col_CtrSecFer2' Name='Col_CtrSecFer2'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrSecFerDuree"; value = "<Field DisplayName='Séc. ferroviaire : durée' Type='Text' Required='FALSE' ID='D9843C90-799D-4639-AA35-74EE6A235861'  StaticName='Col_CtrSecFer' Name='Col_CtrSecFerDuree'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrSecFerAgence"; value = "<Field DisplayName='Séc. ferroviaire : agence' Type='Text' Required='FALSE' ID='9012B6DE-5030-496F-AD43-078949DA2FE3'  StaticName='Col_CtrSecFerAgence' Name='Col_CtrSecFerAgence'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrSecFerMission"; value = "<Field DisplayName='Séc. ferroviaire : missions' Type='Note' Required='FALSE' ID='A888DE28-509E-4020-BAF8-D64E289EAD73' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrSecFerMission' Name='Col_CtrSecFerMission'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrSecFerMissioné"; value = "<Field DisplayName='Séc. ferroviaire : missions 2' Type='Note' Required='FALSE' ID='AC88D819-FB92-4568-901D-24B691DCE01C' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrSecFerMissioné' Name='Col_CtrSecFerMissioné'  Group='VC' />" }
+        
+        [pscustomobject]@{ key = "Col_CtrPrev"; value = "<Field DisplayName='Prévention' Type='Boolean' Required='FALSE' ID='3E46BA9A-1558-405B-AF86-F47A9CF16F0D'  StaticName='Col_CtrPrev' Name='Col_CtrPrev'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrPrev2"; value = "<Field DisplayName='Prévention 2' Type='Boolean' Required='FALSE' ID='DA167DC9-8869-449E-9DA5-FD7516B09768'  StaticName='Col_CtrPrev2' Name='Col_CtrPrev2'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrPrevDuree"; value = "<Field DisplayName='Prévention : durée' Type='Text' Required='FALSE' ID='D705CD33-7CCC-4BD9-AE8C-F03E022247CB'  StaticName='Col_CtrPrev' Name='Col_CtrPrevDuree'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrPrevAgence"; value = "<Field DisplayName='Prévention : agence' Type='Text' Required='FALSE' ID='7598A444-2AD7-4BA9-BB1C-FB07BDF77A33'  StaticName='Col_CtrPrevAgence' Name='Col_CtrPrevAgence'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrPrevMission"; value = "<Field DisplayName='Prévention : missions' Type='Note' Required='FALSE' ID='015307E9-B9C5-4A72-B988-84F0A23721B7' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrPrevMission' Name='Col_CtrPrevMission'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrPrevMission2"; value = "<Field DisplayName='Prévention : missions 2' Type='Note' Required='FALSE' ID='E780B419-5DAF-4A36-A5AC-388325BB005C' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrPrevMission2' Name='Col_CtrPrevMission2'  Group='VC' />" }
+        
+        [pscustomobject]@{ key = "Col_CtrMat"; value = "<Field DisplayName='Matériel' Type='Boolean' Required='FALSE' ID='B9352561-E2A9-4480-81BE-DBEF28075BB1'  StaticName='Col_CtrMat' Name='Col_CtrMat'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrMat2"; value = "<Field DisplayName='Matériel 2' Type='Boolean' Required='FALSE' ID='475C3946-1AA4-49F5-B83D-C9C8663AFE9F'  StaticName='Col_CtrMat2' Name='Col_CtrMat2'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrMatDuree"; value = "<Field DisplayName='Matériel : durée' Type='Text' Required='FALSE' ID='8405C27B-7148-48FB-9CC4-EA08370ABDF3'  StaticName='Col_CtrMat' Name='Col_CtrMatDuree'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrMatAgence"; value = "<Field DisplayName='Matériel : agence' Type='Text' Required='FALSE' ID='24D8191D-D811-48B2-BEA9-833BA880B2C1'  StaticName='Col_CtrMatAgence' Name='Col_CtrMatAgence'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrMatMission"; value = "<Field DisplayName='Matériel : missions' Type='Note' Required='FALSE' ID='A32192E7-EE9E-4F1E-AC54-CDC6C97D9272' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrMatMission' Name='Col_CtrMatMission'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrMatMission2"; value = "<Field DisplayName='Matériel : missions' Type='Note' Required='FALSE' ID='C14DBB70-B0ED-4022-8C8F-313C17A6397B' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrMatMission2' Name='Col_CtrMatMission2'  Group='VC' />" }
+        
+        [pscustomobject]@{ key = "Col_CtrPointsForts"; value = "<Field DisplayName='Points forts' Type='Note' Required='FALSE' ID='F015E343-AE73-413D-A1F5-B6BF5F0C119B' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrPointsForts' Name='Col_CtrPointsForts'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrPointsForts2"; value = "<Field DisplayName='Points forts 2' Type='Note' Required='FALSE' ID='22D3CAEF-F29D-4E82-ADE2-0FCF31F15A0A' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrPointsForts2' Name='Col_CtrPointsForts2'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrAxeProgress"; value = "<Field DisplayName='Axe progrès' Type='Note' Required='FALSE' ID='BB08369B-C977-4271-9FE6-22ECB00BE320' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrAxeProgress' Name='Col_CtrAxeProgress'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrAxeProgress2"; value = "<Field DisplayName='Axe progrès 2' Type='Note' Required='FALSE' ID='5ED33E41-E9A4-4053-94FB-E58514D2A092' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrAxeProgress2' Name='Col_CtrAxeProgress2'  Group='VC' />" }
+
+        [pscustomobject]@{ key = "Col_CtrFinComment"; value = "<Field DisplayName='Financier : commentaire' Type='Note' Required='FALSE' ID='F5FDB2FD-1E13-4610-8722-F5E72A76B9C3' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrFinComment' Name='Col_CtrFinComment'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrFinComment2"; value = "<Field DisplayName='Financier : commentaire 2' Type='Note' Required='FALSE' ID='1830526A-21C3-44EB-AFE4-0E06405E01AD' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrFinComment2' Name='Col_CtrFinComment2'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrContractComment"; value = "<Field DisplayName='Contractuel : commentaire' Type='Note' Required='FALSE' ID='691CC283-F49D-46A5-AEE6-2ECFF8797C1E' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrContractComment' Name='Col_CtrContractComment'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrContractComment2"; value = "<Field DisplayName='Contractuel : commentaire 2' Type='Note' Required='FALSE' ID='4AC99E25-0942-49D4-B2DE-566F2EEFE788' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrContractComment2' Name='Col_CtrContractComment2'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrPrevComment"; value = "<Field DisplayName='Prévention : commentaire' Type='Note' Required='FALSE' ID='91A52FF2-DC4A-45F2-96BE-D6D9906C87CC' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrPrevComment' Name='Col_CtrPrevComment'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrPrevComment2"; value = "<Field DisplayName='Prévention : commentaire 2' Type='Note' Required='FALSE' ID='D8CB5884-DC2B-49A1-A2E4-DF5BA37ED43F' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrPrevComment2' Name='Col_CtrPrevComment2'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrCommerceComment"; value = "<Field DisplayName='Commencial : commentaire' Type='Note' Required='FALSE' ID='8804E530-34A8-4DAC-9DE4-4B31AD820DEA' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrCommerceComment' Name='Col_CtrCommerceComment'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrCommerceComment2"; value = "<Field DisplayName='Commencial : commentaire 2' Type='Note' Required='FALSE' ID='E89A18F4-2264-402E-8471-F8F03D2F216E' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrCommerceComment2' Name='Col_CtrCommerceComment2'  Group='VC' />" }
+
+        [pscustomobject]@{ key = "Col_CtrBilan"; value = "<Field DisplayName='Bilan' Type='Note' Required='FALSE' ID='A7386176-BC15-45DD-8CBB-05680BB09A86' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrBilan' Name='Col_CtrBilan'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrBilan2"; value = "<Field DisplayName='Bilan 2' Type='Note' Required='FALSE' ID='E5A6C1D1-3C69-466D-8E52-67B9C77426D4' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrBilan2' Name='Col_CtrBilan2'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrBilan3"; value = "<Field DisplayName='Bilan 3' Type='Note' Required='FALSE' ID='34BD4CF2-801E-47E7-B73F-ADF0596C3AC6' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrBilan3' Name='Col_CtrBilan3'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrBilan4"; value = "<Field DisplayName='Bilan 4' Type='Note' Required='FALSE' ID='D666D4E4-C4E8-44EC-8B52-4813F4701BF3' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrBilan4' Name='Col_CtrBilan4'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrRemarksEvent"; value = "<Field DisplayName='Remarques éventuelles' Type='Note' Required='FALSE' ID='B847BB12-F04C-4A2E-AB54-6516059C0FC2' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrRemarksEvent' Name='Col_CtrRemarksEvent'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrRemarksEvent2"; value = "<Field DisplayName='Remarques éventuelles 2' Type='Note' Required='FALSE' ID='C0423849-CD5B-43EE-AE5C-B1D29CBD012E' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrRemarksEvent2' Name='Col_CtrRemarksEvent2'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrRemarksEvent3"; value = "<Field DisplayName='Remarques éventuelles 3' Type='Note' Required='FALSE' ID='D1A20FAD-8EFF-4721-A535-613739164C2E' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrRemarksEvent3' Name='Col_CtrRemarksEvent3'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrRemarksEvent4"; value = "<Field DisplayName='Remarques éventuelles 4' Type='Note' Required='FALSE' ID='BEE9CC91-0804-4CBB-947D-AE25F7731457' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrRemarksEvent4' Name='Col_CtrRemarksEvent4'  Group='VC' />" }
+
+        [pscustomobject]@{ key = "Col_CtrPlusPlu"; value = "<Field DisplayName='Plus plu' Type='Note' Required='FALSE' ID='A489F86C-4983-4A3E-BCB3-514B265474C3' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrPlusPlu' Name='Col_CtrPlusPlu'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrMoinsPlu"; value = "<Field DisplayName='Moins plu' Type='Note' Required='FALSE' ID='D911E415-2946-4DEA-B423-1C3E8BC8A3E9' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrMoinsPlu' Name='Col_CtrMoinsPlu'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrFormationETF"; value = "<Field DisplayName='Formation ETF Ac.' Type='Note' Required='FALSE' ID='9C36F954-A099-4E70-8C27-C69F2B8F62C3' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrFormationETF' Name='Col_CtrFormationETF'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrDispoTut"; value = "<Field DisplayName='Disponibilité tuteur' Type='Note' Required='FALSE' ID='F3295156-DEC8-4E37-BCEA-D0D7B50CC176' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrDispoTut' Name='Col_CtrDispoTut'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrRessenti"; value = "<Field DisplayName='Ressenti' Type='Note' Required='FALSE' ID='BC1BA687-D562-4B90-B15C-53779FFA4A38' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrRessenti' Name='Col_CtrRessenti'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrLienPromo"; value = "<Field DisplayName='Lien promo' Type='Note' Required='FALSE' ID='5072A39F-8EE0-4E40-815B-10A7EEAD73B6' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrLienPromo' Name='Col_CtrLienPromo'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrPointsPos"; value = "<Field DisplayName='Points positifs' Type='Note' Required='FALSE' ID='E12565B0-B575-408A-B44B-B1A2CBC65B26' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrPointsPos' Name='Col_CtrPointsPos'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrIdeeAm"; value = "<Field DisplayName='Idées amélioration' Type='Note' Required='FALSE' ID='0E52BF09-4529-4F68-B7FE-F1F61AEF381C' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrIdeeAm' Name='Col_CtrIdeeAm'  Group='VC' />" }
+
+        #Conducteurs 
+        [pscustomobject]@{ key = "Col_CtrBilanPremSem"; value = "<Field DisplayName='Bilan premières semaines agence' Type='Note' Required='FALSE' ID='48999F0F-AA5E-447B-9467-1A57277B0EEA' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrBilanPremSem' Name='Col_CtrBilanPremSem'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrAspPratique"; value = "<Field DisplayName='Aspect pratique' Type='Note' Required='FALSE' ID='78BE05FF-7B97-4EAF-A9FA-EAC8D22B7EE6' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrAspPratique' Name='Col_CtrAspPratique'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrDiffRenc"; value = "<Field DisplayName='Difficultés rencontrées' Type='Note' Required='FALSE' ID='BCE886FA-A181-4745-86A9-C2D581A864DC' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrDiffRenc' Name='Col_CtrDiffRenc'  Group='VC' />" }
+
+
         #Related interview
         [pscustomobject]@{ key = "Col_Action1"; value = "<Field DisplayName='Action 1' Type='Note' Required='FALSE' ID='9087b0cb-0579-490a-b72a-81ce7a2e5a63' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_Action1' Name='Col_Action1'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_Action2"; value = "<Field DisplayName='Action 2' Type='Note' Required='FALSE' ID='4d6507ba-334d-4bb1-b33b-2948cd336eab' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_Action2' Name='Col_Action2'  Group='VC' />" }
@@ -335,19 +481,20 @@ function FieldsDefinitions() {
         [pscustomobject]@{ key = "Col_Order"; value = "<Field DisplayName='Ordre' Type='Number' Required='FALSE' ID='4d8086a0-0018-4261-9efe-ed778cc65d1d'  StaticName='Col_Order' Name='Col_Order'  Group='VC' />" }
     
         [pscustomobject]@{ key = "Col_E_Code"; value = "<Field DisplayName='Code' Type='Text' Required='FALSE' ID='7ae8799c-ccbe-4178-af8a-847b89038bcd'  StaticName='Col_E_Code' Name='Col_E_Code'  Group='VC' />" }
-        [pscustomobject]@{ key = "Col_Author"; value = "<Field Type='User' DisplayName='Créé par' Name='Col_Author'  StaticName='Col_Author' ID='f654905d-94ce-44bf-a705-79706fc0bd09' Group='VC' Required='false'  ShowInEditForm='FALSE' ShowInNewForm='FALSE' Indexed='TRUE'/>" }
-        [pscustomobject]@{ key = "Col_Editor"; value = "<Field Type='User' DisplayName='Modifié par' Name='Col_Editor'  StaticName='Col_Editor' ID='b26c0826-6c0c-4948-9b72-219c1b822d3b' Group='VC' Required='false'  ShowInEditForm='FALSE'  ShowInNewForm='FALSE'  />" }
         [pscustomobject]@{ key = "Col_ParentId"; value = "<Field DisplayName='Parent Id' Type='Number' Required='FALSE' ID='d82d8d65-af2a-4451-ad88-b65fcc4b140b'  StaticName='Col_ParentId' Name='Col_ParentId'  Group='VC' Indexed='TRUE'/>" }
-        [pscustomobject]@{ key = "Col_Guid"; value = "<Field DisplayName='Guid' Type='Text' Required='FALSE' ID='88dd37ce-8ae4-4f66-af6d-db16241a1487'  StaticName='Col_Guid' Name='Col_Guid'  Group='VC' Indexed='TRUE'/>" }
         
-        [pscustomobject]@{ key = "Col_AgSignture"; value = "<Field DisplayName='Ag - signature' Type='Note' Required='FALSE' ID='85fda0d1-6f36-41d2-ad33-5581e6192e5f' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_AgSignture' Name='Col_AgSignture'  Group='VC' />" }
-        [pscustomobject]@{ key = "Col_AgSignName"; value = "<Field DisplayName='Ag - Signature - Nom' Type='Text' Required='FALSE' ID='1f4c5034-1d4d-4f81-8158-220411a08d2c'  StaticName='Col_AgSignName' Name='Col_AgSignName'  Group='VC' />" }
-        [pscustomobject]@{ key = "Col_AgSignDate"; value = "<Field DisplayName='Ag - Signature - Date' Type='DateTime' Required='FALSE' ID='09ae074e-c3e5-4e06-b571-69fd89a4c20c'  StaticName='Col_AgSignDate' Name='Col_AgSignDate'  Group='VC' />" }
+        #Access fields
 
-        [pscustomobject]@{ key = "Col_FlSignture"; value = "<Field DisplayName='Fl - signature' Type='Note' Required='FALSE' ID='42e14a49-c793-470b-96a4-89719afad875' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_FlSignture' Name='Col_FlSignture'  Group='VC' />" }
-        [pscustomobject]@{ key = "Col_FlSignName"; value = "<Field DisplayName='Fl - Signature - Nom' Type='Text' Required='FALSE' ID='30ea4608-456d-4763-a6a2-2fb663f49534'  StaticName='Col_FlSignName' Name='Col_FlSignName'  Group='VC' />" }
-        [pscustomobject]@{ key = "Col_FlSignDate"; value = "<Field DisplayName='Fl - Signature - Date' Type='DateTime' Required='FALSE' ID='b9571f93-afa5-4293-a915-5ac2fa368b13'  StaticName='Col_FlSignDate' Name='Col_FlSignDate'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_UserRole"; value = "<Field Type='Choice' DisplayName='Rôle utilisateur' ID='8da866a3-d42b-4b22-b044-fcfac1c93ad6' Group='VC' Name='Col_UserRole' StaticName='Col_UserRole'  Required='false' FillInChoice='FALSE'  ><Default>Aiguilleur</Default> <CHOICES><CHOICE>Admin</CHOICE><CHOICE>RH</CHOICE><CHOICE>Aiguilleur</CHOICE><CHOICE>User</CHOICE></CHOICES></Field>" }
+        [pscustomobject]@{ key = "Col_LevelRole"; value = "<Field Type='Choice' DisplayName='Niveau accès' Name='Col_LevelRole'  StaticName='Col_LevelRole' ID='7c884426-31f0-4f5c-98c0-87a3b9181900' Group='VC' Required='false'  FillInChoice='FALSE'  ><Default></Default> <CHOICES><CHOICE></CHOICE><CHOICE>Delegation</CHOICE><CHOICE>Region</CHOICE><CHOICE>BU</CHOICE><CHOICE>MU</CHOICE></CHOICES></Field>" }
+        [pscustomobject]@{ key = "Col_User"; value = "<Field Type='User' DisplayName='Utilisateur' Name='Col_User'  StaticName='Col_User' ID='4f299631-f8d7-4fff-84b7-27fa1bc6b31c' Group='VC' Required='false'   />" }
+        
 
+       # Aigilleurs List
+        # [pscustomobject]@{ key = "Col_Function"; value = "<Field DisplayName='Fonction' Type='Text' Required='FALSE' ID='EA16A241-6647-4C4F-B099-F25D8D4FF0E6'  StaticName='Col_Function' Name='Col_Function'  Group='VC' />" }
+        # [pscustomobject]@{ key = "Col_BusinessBu"; value = "<Field DisplayName='Filière métier' Type='Text' Required='FALSE' ID='52381EA9-C769-44C2-A4F8-CFFE4ECC8573'  StaticName='Col_BusinessBu' Name='Col_BusinessBu'  Group='VC' />" }
+        # [pscustomobject]@{ key = "Col_TelPro"; value = "<Field DisplayName='Téléphone professionnel' Type='Text' Required='FALSE' ID='E5A7BB29-8579-4943-AF63-BB6C4D92F3ED'  StaticName='Col_TelPro' Name='Col_TelPro'  Group='VC' />" }
+      
 
         
     )
@@ -377,8 +524,12 @@ function CreateFields() {
     }
 }
 function CreateLkFields($ctx,$web){
-    $list = GetListByUrl $web "Lists/vc_interview" 
-    $fieldsToCreate += InitColumn "Col_Lk_Request" "Fiche de suivi" "" "Lookup" "false" "   EnforceUniqueValues='FALSE'" $list.Id "Title"
+    $fieldsToCreate=@()
+    $list = GetListByUrl $web "Lists/etf_interview" 
+    $fieldsToCreate += InitColumn "Col_Lk_Request" "Fiche AG" "" "Lookup" "false" "   EnforceUniqueValues='FALSE'" $list.Id "Title"
+    $list = GetListByUrl $web "Lists/etf_contract" 
+    $fieldsToCreate += InitColumn "Col_Lk_Contract" "Fiche CT" "" "Lookup" "false" "  EnforceUniqueValues='FALSE'" $list.Id "Title"
+   
     foreach ($f in $fieldsToCreate) {
         $fieldExist = Get-PnPField $f.Name -erroraction 'silentlycontinue'
         $key = $f.Name
@@ -404,7 +555,7 @@ function LinkFields() {
 
 function MailTemplateCT() {
     
-    $ct = "VC Mail template"
+    $ct = "ETF Mail template"
     AddContentType $ct
     $fields = LinkFields
     $fields | ForEach-Object {
@@ -414,7 +565,7 @@ function MailTemplateCT() {
     return $fields;
 } 
 function LinkCT() {
-    $ct = "VC Link"
+    $ct = "ETF Link"
     AddContentType $ct
     $fields = LinkFields 
     $fields | ForEach-Object {
@@ -426,7 +577,7 @@ function AppSettingsFields() {
     "Col_E_Code"
 }
 function AppSettingsCT() {
-    $ct = "VC Settings"
+    $ct = "ETF Settings"
     AddContentType $ct
     $fields = AppSettingsFields 
     $fields | ForEach-Object {
@@ -438,7 +589,7 @@ function BuFields() {
     "Col_E_Code"
 }
 function BuCT() {
-    $ct = "VC BU"
+    $ct = "ETF BU"
     AddContentType $ct
     $fields = BuFields 
     $fields | ForEach-Object {
@@ -456,7 +607,7 @@ function MailTemplateFields() {
 }
 function MailTemplateCT() {
     
-    $ct = "VC Mail template"
+    $ct = "ETF Mail template"
     AddContentType $ct
     $fields = MailTemplateFields
     $fields | ForEach-Object {
@@ -476,11 +627,12 @@ function AttachmentFields() {
     return $fields;
 }
 function AttachmentsCT($addParentFields) {
-    $ct = "VC Documents"
+    $ct = "ETF Documents"
     AddContentType $ct "Document"
     $fields = AttachmentFields
     if($addParentFields){
         $fields+=ParentFields
+        $fields+=CTParentFields
     }
     $fields | ForEach-Object {
         $staticName = $_
@@ -488,47 +640,208 @@ function AttachmentsCT($addParentFields) {
     }
 }
 
+function RootRequestFields(){
+    $data = @(
+        "Col_FormType"
+        "Col_FormTarget"
+        "Col_Status"
+        "Col_UrlR"
+        "Col_Bu"
+        "Col_DirGeneral"
+        "Col_FullName"
+        "Col_Tel"
+        "Col_Email"
+        "Col_Position"
+        "Col_RespUser"
+        "Col_RespFullName"
+        "Col_RespPosition"
+        "Col_RespUserSPId"
+        "Col_StartDate"
+        "Col_EndDate"
+        "Col_Guid"
+        "Col_Author"
+        "Col_Editor"
+        "Col_RespSignture"
+        "Col_RespSignName"
+        "Col_RespSignDate"
+        "Col_CandSignture"
+        "Col_CandSignName"
+        "Col_CandSignDate"
+       
+    )
+    return $data;
+}
+
 function InterviewFields() {
     $data = @(
-        "Col_Bu"
-        "Col_AgUser"
-        "Col_AgUserSPId"
-        "Col_AgFullName"
-        "Col_AgUser2"
-        "Col_AgUserSPId2"
-        "Col_AgFullName2"
-        "Col_FlFirstName"
-        "Col_FlLastName"
         "Col_StartDateT"
+        "Col_RespUser2"
+        "Col_RespUserSPId2"
+        "Col_RespFullName2"
         "Col_DurationM"
-        "Col_Status"
-        "Col_StartDate"
         "Col_Participants"
         "Col_Ecoute"
         "Col_QualityExchange"
         "Col_Autonomy"
         "Col_EvAigComment"
         "Col_EvFlComment"
-        "Col_EndDate"
         "Col_BlAigComment"
         "Col_BlFlComment"
         "Col_Lesson"
-        "Col_AgSignture"
-        "Col_AgSignName"
-        "Col_AgSignDate"
-        "Col_FlSignture"
-        "Col_FlSignName"
-        "Col_FlSignDate"
-        "Col_Guid"
-        "Col_Author"
-        "Col_Editor"
     )
     return $data;
 }
-function interviewCT(){
-      $ct = "VC Interview"
+function StageFields(){
+    $data = @(
+        "Col_CtrHiringDate"
+       "Col_CtrMeetDate"
+       "Col_CtrEcole"
+       "Col_CtrDiplome"
+       "Col_DurationM"
+       "Col_CtrDescMission"
+       "Col_CtrDescMission2"
+       "Col_CtrDescMission3"
+       "Col_CtrComp"
+       "Col_CtrTypeCh"
+       "Col_CtrPositionETF"
+       "Col_CtrPositionETFDesc"
+       "Col_CtrMobility"
+       "Col_CtrMobilityReg"
+       "Col_CtrPojectPro"
+       "Col_CtrRecoETF"
+       "Col_CtrObs"
+       
+    )
+    return $data;
+}
+function ChantierFields(){
+    $data = @(
+       "Col_CtrHiringDate"
+       "Col_Participants"
+       "Col_CtrDescMission"
+       "Col_CtrIntAgence"
+       "Col_CtrIntPromo"
+       "Col_CtrPtPos"
+       "Col_CtrObs"
+       "Col_CtrlAccPre"
+       "Col_CtrSavFComment"
+       "Col_CtrSupComment"
+       "Col_CtrProgComment"
+       "Col_CtrFormComment"
+       "Col_CtrSecFer"
+       "Col_CtrSecFerDuree"
+       "Col_CtrSecFerAgence"
+       "Col_CtrSecFerMission"
+       "Col_CtrPrev"
+       "Col_CtrPrevDuree"
+       "Col_CtrPrevAgence"
+       "Col_CtrPrevMission"
+       "Col_CtrMat"
+       "Col_CtrMatDuree"
+       "Col_CtrMatAgence"
+       "Col_CtrMatMission"
+       "Col_CtrPointsForts"
+       "Col_CtrAxeProgress"
+       "Col_CtrFinComment"
+       "Col_CtrContractComment"
+       "Col_CtrPrevComment"
+       "Col_CtrCommerceComment"
+       "Col_CtrBilan"
+       "Col_CtrRemarksEvent"
+       "Col_CtrPlusPlu"
+       "Col_CtrMoinsPlu"
+       "Col_CtrFormationETF"
+       "Col_CtrDispoTut"
+       "Col_CtrRessenti"
+       "Col_CtrLienPromo"
+       "Col_CtrPointsPos"
+       "Col_CtrIdeeAm"
+    )
+    return $data;
+}
+function ConducteurFields(){
+      $data = @(
+        "Col_CtrHiringDate"
+        "Col_CtrMeetDate"
+        "Col_Position"
+        "Col_Promotion"
+        "Col_Participants"
+        "Col_CtrBilanPremSem"
+        "Col_CtrAspPratique"
+        "Col_CtrIntPromo"
+        "Col_CtrDiffRenc"
+        "Col_CtrDispoTut"
+        "Col_CtrRemarksEvent"
+        "Col_CtrRemarksEvent2"
+        "Col_CtrRemarksEvent3"
+        "Col_CtrRemarksEvent4"
+        "Col_CtrDescMission"
+        "Col_CtrSecFer"
+        "Col_CtrSecFerMission"
+        "Col_CtrPrev"
+        "Col_CtrPrevMission"
+        "Col_CtrMat"
+        "Col_CtrMatMission"
+        "Col_CtrFinComment"
+        "Col_CtrContractComment"
+        "Col_CtrPrevComment"
+        "Col_CtrCommerceComment"
+        "Col_CtrPointsForts"
+        "Col_CtrAxeProgress"
+        "Col_CtrSecFer2"
+        "Col_CtrSecFerMission2"
+        "Col_CtrPrev2"
+        "Col_CtrPrevMission2"
+        "Col_CtrMat2"
+        "Col_CtrMatMission2"
+        "Col_CtrFinComment2"
+        "Col_CtrContractComment2"
+        "Col_CtrPrevComment2"
+        "Col_CtrCommerceComment2"
+        "Col_CtrPointsForts2"
+        "Col_CtrAxeProgress2"
+        "Col_CtrBilan"
+        "Col_CtrBilan2"
+        "Col_CtrBilan3"
+        "Col_CtrBilan4"
+        
+        )
+    return $data;
+}
+function RootRequestCT(){
+      $ct = "ETF Root Request"
     AddContentType $ct
+    $fields = RootRequestFields
+    $fields | ForEach-Object {
+        $staticName = $_
+        AddFieldToCT $staticName $ct
+    }
+    return $fields;
+}
+function interviewCT(){
+      $ct = "ETF Interview" 
+    AddContentType $ct "ETF Root Request"
     $fields = InterviewFields
+    $fields | ForEach-Object {
+        $staticName = $_
+        AddFieldToCT $staticName $ct
+    }
+    return $fields;
+}
+function stageCT(){
+      $ct = "ETF Stage" 
+    AddContentType $ct "ETF Root Request"
+    $fields = StageFields
+    $fields | ForEach-Object {
+        $staticName = $_
+        AddFieldToCT $staticName $ct
+    }
+    return $fields;
+}
+function ChantierCT(){
+      $ct = "ETF Chef chantier" 
+    AddContentType $ct "ETF Root Request"
+    $fields = ChantierFields
     $fields | ForEach-Object {
         $staticName = $_
         AddFieldToCT $staticName $ct
@@ -552,7 +865,7 @@ function QuartlyInterviewFields() {
     return $data;
 }
 function QuartlyInterviewCT($addParentFields){
-      $ct = "VC Quartly interview"
+      $ct = "ETF Quartly interview"
     AddContentType $ct
     $fields = QuartlyInterviewFields
     if($addParentFields){
@@ -578,7 +891,7 @@ function RelatedInterviewFields() {
     return $fields;
 }
 function RelatedInterviewCT($addParentFields){
-      $ct = "VC Related interview"
+      $ct = "ETF Related interview"
     AddContentType $ct
     $fields = RelatedInterviewFields
     if($addParentFields){
@@ -590,11 +903,71 @@ function RelatedInterviewCT($addParentFields){
     }
     return $fields;
 }
-function AttachmentsNewList($web, $addSiteFields) {
+function RelatedActionFields() {
+    $fields = @(
+        "Col_Action1"
+        "Col_Action2"
+        "Col_Status"
+        "Col_Comment"
+        "Col_Guid"
+        "Col_Order"
+        "Col_Author"
+        "Col_Editor"
+    )
+    return $fields;
+}
+function RelatedActionCT($addParentFields){
+      $ct = "ETF Related action"
+    AddContentType $ct
+    $fields = RelatedActionFields
+    if($addParentFields){
+        $fields+=CTParentFields
+    }
+    $fields | ForEach-Object {
+        $staticName = $_
+        AddFieldToCT $staticName $ct
+    }
+    return $fields;
+}
+function TemplateActionFields() {
+    $fields = @(
+        "Col_Action1"
+        "Col_Action2"
+        "Col_Comment"
+        "Col_Guid"
+        "Col_Order"
+        "Col_Author"
+        "Col_Editor"
+    )
+    return $fields;
+}
+function TemplateActionCT(){
+      $ct = "ETF Template action"
+    AddContentType $ct
+    $fields = TemplateActionFields
+    $fields | ForEach-Object {
+        $staticName = $_
+        AddFieldToCT $staticName $ct
+    }
+    return $fields;
+}
+function TemplateActionNewList($web, $addSiteFields) {
 
-    $url = "vc_attachments"
-    $list = "App - Documents"
-    $ct = "VC Documents"
+    $url = "etf_tempaction"
+    $list = "App - Modèles actions"
+    $ct = "ETF Template action"
+    $fields = TemplateActionFields
+    $fields = @('Title') + $fields
+    CreateListV2 $web $list $url $listDesc "GenericList"
+    $l = GetListByUrl $web "$url"
+    AddCTToListV2 $l.Id $ct
+    UpdateListView -List $l.Id -Fields $fields
+}
+function AttachmentsAGNewList($web, $addSiteFields) {
+
+    $url = "etf_agattachments"
+    $list = "AG - Documents"
+    $ct = "ETF Documents"
     $fields = AttachmentFields
     if ($addSiteFields) {
         $fields += ParentFields
@@ -609,11 +982,30 @@ function AttachmentsNewList($web, $addSiteFields) {
     AddFieldIndex  $l.Id "Modified"
 
 }
+function AttachmentsCTNewList($web, $addSiteFields) {
+
+    $url = "etf_ctattachments"
+    $list = "CT - Documents"
+    $ct = "ETF Documents"
+    $fields = AttachmentFields
+    if ($addSiteFields) {
+        $fields += CTParentFields
+    }
+    CreateListV2 $web $list $url $listDesc "DocumentLibrary"
+    $l = GetListByUrl $web "$url"
+    AddCTToListV2 $l.Id $ct
+    UpdateListView -List $l.Id -Fields $fields
+    AddFieldIndex  $l.Id "Col_ParentId"
+    AddFieldIndex  $l.Id "Col_Lk_Contract"
+    AddFieldIndex  $l.Id "Created"
+    AddFieldIndex  $l.Id "Modified"
+
+}
 function TemplateNewList($web) {
 
-    $url = "vc_templates"
+    $url = "etf_templates"
     $list = "App - Templates"
-    $ct = "VC Documents"
+    $ct = "ETF Documents"
     $fields = AttachmentFields
     CreateListV2 $web $list $url $listDesc "DocumentLibrary"
     $l = GetListByUrl $web "$url"
@@ -623,33 +1015,43 @@ function TemplateNewList($web) {
     AddFieldIndex  $l.Id "Modified"
 
 }
-function InterviewList($web) {
-    $url = "Lists/vc_interview"
-    $list = "App - Carnets de bord"
-    $ct = "VC Interview"
+function ParentFields(){
+    $fields = @(
+      "Col_Lk_Request"
+      "Col_Lk_Contract"
+    )
+    return $fields;
+}
+function CTParentFields(){
+    $fields = @(
+      "Col_Lk_Contract"
+    )
+    return $fields;
+}
+function InterviewList($web,$context) {
+    $url = "Lists/etf_interview"
+    $list = "AG - Carnets de bord"
+    $ct = "ETF Interview"
     $fields = InterviewFields 
     CreateListV2 $web $list $url $listDesc "GenericList"
     $l = GetListByUrl $web "$url"
     AddCTToListV2 $l.Id $ct
-    UpdateListView -List $l.Id -Fields $fields
-    AddFieldIndex  $l.Id "Col_AgUser"
+    $viewFields=getViewFields "AG"
+    UpdateListView -List $l.Id -Fields $viewFields
+    $viewFields=getViewFields "AGAll"
+    AddListView2 -ctx $context -List $l.Id -Title "Tableau"  -Fields $viewFields -Query "<OrderBy><FieldRef Name='ID'  Ascending='FALSE'/></OrderBy>"
+    AddFieldIndex  $l.Id "Col_RespUser"
     AddFieldIndex  $l.Id "Col_Status"
     AddFieldIndex  $l.Id "Col_StartDateT"
     AddFieldIndex  $l.Id "Col_StartDate"
-    AddFieldIndex  $l.Id "Author"
-    AddFieldIndex  $l.Id "Editor"
+    AddFieldIndex  $l.Id "Col_Author"
+    AddFieldIndex  $l.Id "Col_Editor"
 
 }
-function ParentFields(){
-    $fields = @(
-      "Col_Lk_Request"
-    )
-    return $fields;
-}
 function RelatedInterviewList($web,$addSiteFields) {
-    $url = "Lists/vc_relatedinterview"
-    $list = "App - Actions"
-    $ct = "VC Related interview"
+    $url = "Lists/etf_relatedinterview"
+    $list = "AG - Actions"
+    $ct = "ETF Related interview"
     $fields = RelatedInterviewFields 
     if ($addSiteFields) {
             $fields += ParentFields
@@ -660,8 +1062,6 @@ function RelatedInterviewList($web,$addSiteFields) {
         AddCTToListV2 $l.Id $ct
         UpdateListView -List $l.Id -Fields $fields
     AddFieldIndex  $l.Id "Col_Lk_Request"
-    AddFieldIndex  $l.Id "Col_DueDate"
-    AddFieldIndex  $l.Id "Col_StartDate"
     AddFieldIndex  $l.Id "Created"
     AddFieldIndex  $l.Id "Modified"
     AddFieldIndex  $l.Id "Title"
@@ -670,9 +1070,9 @@ function RelatedInterviewList($web,$addSiteFields) {
 
 }
 function QuartlyInterviewList($web,$addSiteFields) {
-    $url = "Lists/vc_quartlyinterview"
-    $list = "App - Entretiens trimestiels"
-    $ct = "VC Quartly interview"
+    $url = "Lists/etf_quartlyinterview"
+    $list = "AG - Entretiens trimestiels"
+    $ct = "ETF Quartly interview"
     $fields = QuartlyInterviewFields
     if ($addSiteFields) {
             $fields += ParentFields
@@ -682,15 +1082,227 @@ function QuartlyInterviewList($web,$addSiteFields) {
         $l = GetListByUrl $web "$url"
         AddCTToListV2 $l.Id $ct
         UpdateListView -List $l.Id -Fields $fields
-    AddFieldIndex  $l.Id "Col_Lk_Request"
-    AddFieldIndex  $l.Id "Created"
-    AddFieldIndex  $l.Id "Modified"
+        AddFieldIndex  $l.Id "Col_Lk_Request"
+        AddFieldIndex  $l.Id "Created"
+        AddFieldIndex  $l.Id "Modified"
 
 }
+function ContractNewList($web,$context) {
+    $url = "Lists/etf_contract"
+    $list = "CT - Contrats"
+    CreateListV2 $web $list $url $listDesc "GenericList"
+  
+    $l = GetListByUrl $web "$url"
+    if($l.id -eq $null){
+        Start-Sleep -Milliseconds 2000
+        $l = GetListByUrl $web "$url"
+        Start-Sleep -Milliseconds 2000
+    }
+    $ct = "ETF Stage"
+    AddCTToListV2 $l.Id $ct
+    $ct = "ETF Chef chantier"
+    AddCTToListV2 $l.Id $ct
+    $viewFields=getViewFields "CTALL"
+    UpdateListView -List $l.Id -Fields $viewFields
+    $viewFields=getViewFields "CTStage"
+    AddListView2 -ctx $context -List $l.Id -Title "Stage - Etudiant"  -Fields $viewFields -Query "<Where><Eq><FieldRef Name='Col_FormType'/><Value Type='Text'>Stage - Etudiant</Value></Eq></Where><OrderBy><FieldRef Name='ID'  Ascending='FALSE'/></OrderBy>"
+    AddListView2 -ctx $context -List $l.Id -Title "Stage - Tuteur"  -Fields $viewFields -Query "<Where><Eq><FieldRef Name='Col_FormType'/><Value Type='Text'>Stage - Tuteur</Value></Eq></Where><OrderBy><FieldRef Name='ID'  Ascending='FALSE'/></OrderBy>"
+    AddListView2 -ctx $context -List $l.Id -Title "Alternance - Etudiant"  -Fields $viewFields -Query "<Where><Eq><FieldRef Name='Col_FormType'/><Value Type='Text'>Alternance - Etudiant</Value></Eq></Where><OrderBy><FieldRef Name='ID'  Ascending='FALSE'/></OrderBy>"
+    AddListView2 -ctx $context -List $l.Id -Title "Alternance - Tuteur"  -Fields $viewFields -Query "<Where><Eq><FieldRef Name='Col_FormType'/><Value Type='Text'>Alternance - Tuteur</Value></Eq></Where><OrderBy><FieldRef Name='ID'  Ascending='FALSE'/></OrderBy>"
+    $viewFields=getViewFields "CTChantier"
+    AddListView2 -ctx $context -List $l.Id -Title "Chantier"  -Fields $viewFields -Query "<Where><Eq><FieldRef Name='Col_FormType'/><Value Type='Text'>Chantier</Value></Eq></Where><OrderBy><FieldRef Name='ID'  Ascending='FALSE'/></OrderBy>"
+    AddListView2 -ctx $context -List $l.Id -Title "Chantier"  -Fields $viewFields -Query "<Where><Eq><FieldRef Name='Col_FormType'/><Value Type='Text'>Chantier</Value></Eq></Where><OrderBy><FieldRef Name='ID'  Ascending='FALSE'/></OrderBy>"
+    $viewFields=getViewFields "CTConducteur"
+    AddListView2 -ctx $context -List $l.Id -Title "Conducteur"  -Fields $viewFields -Query "<Where><Eq><FieldRef Name='Col_FormType'/><Value Type='Text'>Conducteur</Value></Eq></Where><OrderBy><FieldRef Name='ID'  Ascending='FALSE'/></OrderBy>"
+
+    AddFieldIndex  $l.Id "Col_Status"
+    AddFieldIndex  $l.Id "Col_FormType"
+    AddFieldIndex  $l.Id "Col_Author"
+    AddFieldIndex  $l.Id "Col_Editor"
+
+}
+function RelatedContractsNewList($web,$addSiteFields) {
+    $url = "Lists/etf_relatedcontract"
+    $list = "CT - Actions"
+    $ct = "ETF Related action"
+    $fields = RelatedActionFields 
+    if ($addSiteFields) {
+            $fields += CTParentFields
+    }
+    $l = GetListByUrl $web "$url"
+    CreateListV2 $web $list $url $listDesc "GenericList"
+    $l = GetListByUrl $web "$url"
+    AddCTToListV2 $l.Id $ct
+    UpdateListView -List $l.Id -Fields $fields
+    AddFieldIndex  $l.Id "Col_Lk_Contract"
+    AddFieldIndex  $l.Id "Created"
+    AddFieldIndex  $l.Id "Modified"
+    AddFieldIndex  $l.Id "Title"
+    AddFieldIndex  $l.Id "Author"
+    AddFieldIndex  $l.Id "Editor"
+
+}
+function getViewFields($target){
+    $r=@()
+switch ($target) {
+    "AG" { $r=@(
+        "ID"
+        "LinkTitle"
+        "Col_RespUser"
+        "Col_RespUser2"
+        "Col_FullName"
+        "Col_DirGeneral"
+        "Col_Bu"
+        "Col_Status"
+        "Col_UrlR"
+        "Created"
+		"Col_StartDateT"
+        "Col_DurationM"
+        "Col_StartDate"
+        "Col_EndDate"
+		"Col_Participants"
+       
+        "Modified"
+        "Col_Author"
+        "Col_Editor"
+    )  }
+    "AGAll" { 
+        $r=@(
+        "ID"
+        "LinkTitle"
+        "Col_FormType"
+		"Col_UrlR"
+        "Col_Status"
+        "Col_Bu"
+        "Col_DirGeneral"
+        "Col_FullName"
+        "Col_Tel"
+        "Col_Email"
+        "Col_Position"
+        "Col_RespUser"
+        "Col_RespFullName"
+        "Col_RespUserSPId"
+		"Col_StartDateT"
+        "Col_StartDate"
+        "Col_EndDate"
+		"Col_DurationM"
+        "Col_RespUser2"
+        "Col_RespUserSPId2"
+        "Col_RespFullName2"
+        "Col_Participants"
+        "Col_Ecoute"
+        "Col_QualityExchange"
+        "Col_Autonomy"
+        "Col_EvAigComment"
+        "Col_EvFlComment"
+        "Col_BlAigComment"
+        "Col_BlFlComment"
+        "Col_Lesson"
+        "Col_Author"
+        "Col_Editor"
+        "Created"
+        "Modified"
+		"Col_Guid"
+        "Col_RespSignture"
+        "Col_RespSignName"
+        "Col_RespSignDate"
+        "Col_CandSignture"
+        "Col_CandSignName"
+        "Col_CandSignDate"
+       
+    ) }
+    "CTStage" {  
+
+        $r=@(
+       "ID"
+       "LinkTitle"
+       "Col_FormType"
+       "Col_FormTarget"
+	   "Col_UrlR"
+       "Col_RespUser"
+	   "Col_FullName"
+	   "Col_Status"
+	   "Col_StartDate"
+       "Col_EndDate"
+	   "Col_CtrHiringDate"
+       "Col_CtrMeetDate"
+       "Col_CtrDescMission"
+       "Col_Author"
+       "Col_Editor"
+       "Created"
+       "Modified"
+    ) 
+    }
+    "CTChantier"{
+             $r=@(
+                "ID"
+                "LinkTitle"
+                "Col_FormType"
+                "Col_FormTarget"
+                "Col_UrlR"
+                "Col_RespUser"
+                "Col_FullName"
+                "Col_Status"
+                "Col_StartDate"
+                "Col_EndDate"
+                "Col_CtrHiringDate"
+                "Col_Participants"
+                "Col_CtrDescMission"
+                "Col_Author"
+                "Col_Editor"
+                "Created"
+                "Modified"
+             )
+    }
+    "CTConducteur"{
+             $r=@(
+                "ID"
+                "LinkTitle"
+                "Col_FormType"
+                "Col_FormTarget"
+                "Col_UrlR"
+                "Col_RespUser"
+                "Col_FullName"
+                "Col_Status"
+                "Col_StartDate"
+                "Col_EndDate"
+                "Col_CtrHiringDate"
+                "Col_Participants"
+                "Col_CtrDescMission"
+                "Col_Author"
+                "Col_Editor"
+                "Created"
+                "Modified"
+             )
+    }
+    "CTALL" {  
+        $r=@(
+        "ID"
+        "LinkTitle"
+        "Col_FormType"
+        "Col_FormTarget"
+        "Col_Status"
+        "Col_UrlR"
+        "Col_RespUser"
+        "Col_FullName"
+        "Col_StartDate"
+        "Col_EndDate"
+        "Col_CtrHiringDate"
+        "Col_CtrMeetDate"
+        "Col_Author"
+        "Col_Editor"
+        "Created"
+        "Modified"
+    ) }
+    Default {}
+}
+return $r;
+}
+
 function MailTemplateList($web) {
-    $url = "Lists/vc_mailtemplate"
+    $url = "Lists/etf_mailtemplate"
     $list = "App - Mail templates"
-    $ct = "VC Mail template"
+    $ct = "ETF Mail template"
     $fields = MailTemplateFields 
     CreateListV2 $web $list $url $listDesc "GenericList"
     $l = GetListByUrl $web "$url"
@@ -698,9 +1310,9 @@ function MailTemplateList($web) {
     UpdateListView -List $l.Id -Fields $fields
 }
 function AppSettingsNewList($web) {
-    $url = "Lists/vc_settings"
+    $url = "Lists/etf_settings"
     $list = "App - Paramètres"
-    $ct = "VC Settings"
+    $ct = "ETF Settings"
     CreateListV2 $web $list $url $listDesc "GenericList"
     $l = GetListByUrl $web "$url"
     AddCTToListV2 $l.Id $ct
@@ -708,9 +1320,9 @@ function AppSettingsNewList($web) {
     UpdateListView -List $l.Id -Fields $fields
 }
 function BuNewList($web) {
-    $url = "Lists/vc_Bu"
+    $url = "Lists/etf_Bu"
     $list = "App - Agences"
-    $ct = "VC BU"
+    $ct = "ETF BU"
     CreateListV2 $web $list $url $listDesc "GenericList"
     $l = GetListByUrl $web "$url"
     AddCTToListV2 $l.Id $ct
@@ -718,10 +1330,50 @@ function BuNewList($web) {
     UpdateListView -List $l.Id -Fields $fields
 }
 function LinkNewList($web) {
-    $url = "Lists/vc_link"
+    $url = "Lists/etf_link"
     $list = "App - Liens"
-    $ct = "VC Link"
+    $ct = "ETF Link"
     $fields = LinkFields 
+    CreateListV2 $web $list $url $listDesc "GenericList"
+    $l = GetListByUrl $web "$url"
+    AddCTToListV2 $l.Id $ct
+    UpdateListView -List $l.Id -Fields $fields
+}
+function AccessFields() {
+    $fields = @(
+        "Col_User"
+        "Col_E_Code"
+        "Col_UserRole"
+        "Col_LevelRole"
+        "Col_Author"
+        "Col_Editor"
+    )
+    return $fields;
+}
+function AccessCT() {
+    $ct = "ETF Access"
+    AddContentType $ct
+    $fields = AccessFields
+    $fields | ForEach-Object {
+        $staticName = $_
+        AddFieldToCT $staticName $ct
+    }
+}
+function AccessCTNewList($web) {
+    $url = "Lists/etf_ctaccess"
+    $list = "CT - Accès"
+    $ct = "ETF Access"
+    $fields = AccessFields 
+    CreateListV2 $web $list $url $listDesc "GenericList"
+    $l = GetListByUrl $web "$url"
+    AddCTToListV2 $l.Id $ct
+    UpdateListView -List $l.Id -Fields $fields
+}
+function AccessAGNewList($web) {
+    $url = "Lists/etf_agaccess"
+    $list = "AG - Accès"
+    $ct = "ETF Access"
+    $fields = AccessFields 
     CreateListV2 $web $list $url $listDesc "GenericList"
     $l = GetListByUrl $web "$url"
     AddCTToListV2 $l.Id $ct
@@ -739,32 +1391,45 @@ function SetStructureRoot($siteURL) {
     $context.Load($web)
     $context.ExecuteQuery()
 
-    CreateFields
-    InterviewCT
+     CreateFields
+    # RootRequestCT
+    # InterviewCT
+    stageCT
+    # ChantierCT
     # RelatedInterviewCT $false
+    # RelatedActionCT  $false
     # QuartlyInterviewCT $false
     # AttachmentsCT $false
     # LinkCT
     # MailTemplateCT
     # AppSettingsCT
     # BuCT
+    # AccessCT
+    #TemplateActionCT
  
-    # InterviewList $web
+    # InterviewList $web $context
+    # ContractNewList $web $context
     # CreateLkFields  $context $web
     # MailTemplateList $web
     # LinkNewList $web
     # AppSettingsNewList $web
     # BuNewList $web
     # RelatedInterviewCT $true
-    # RelatedInterviewList $web
     # QuartlyInterviewCT $true
     # QuartlyInterviewList $web
+    # RelatedActionCT $true
+    # RelatedContractsNewList $web $true
+    # RelatedInterviewList $web
     # AttachmentsCT $true
-    # AttachmentsNewList $web $true
-    #TemplateNewList $web
+    # AttachmentsAGNewList $web $true
+    # AttachmentsCTNewList $web $true
+    # TemplateNewList $web
+    # AccessCTNewList $web
+    # AccessAGNewList $web
+    #TemplateActionNewList $web
 
 }
-$siteURL = "https://vincic.sharepoint.com/sites/etag-dev2"
+$siteURL = "https://vincic.sharepoint.com/sites/etag-dev4"
 #$siteURL = "https://futur365.sharepoint.com/sites/Dev08"
 
 cls

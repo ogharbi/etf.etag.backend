@@ -9,7 +9,7 @@ namespace VC.AG.Models.ValuesObject
 {
     public class FormQuery : DBQuery
     {
-        public DashMode? Mode { get; set; }
+        public DashTarget? DashTarget { get; set; }
         public RequestStatus? Status { get; set; }
         public RequestScope? Scope { get; set; }
         public string? Data { get; set; }
