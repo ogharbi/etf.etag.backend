@@ -16,6 +16,8 @@ namespace VC.AG.WebAPI.Models
         public DateTime? MinDate { get; set; }
         public DateTime? MaxDate { get; set; }
         public bool? InlineQuery { get; set; }
+        public string? FormType { get; set; }
+
         public FormQuery ToFormQuery(UserEntity? user)
         {
             var q = new FormQuery()
@@ -24,6 +26,7 @@ namespace VC.AG.WebAPI.Models
                 ItemId = ItemId,
                 ListName = ListName,
                 Filter = Filter,
+                FormType=FormType,
                 InlineQuery= InlineQuery,
                 Expand = Expand,
                 Select = Select,

@@ -111,6 +111,11 @@ namespace VC.AG.Models.Extensions
         {
             var status = query.Status;
             string op;
+            if (!string.IsNullOrEmpty(query.FormType))
+            {
+                op = $"<Eq><FieldRef Name='{InterviewKeys.FormType}'/><Value Type='Text'>{query.FormType}</Value></Eq>";
+                ops.Add(op);
+            }
             if (status != Enums.RequestStatus.None)
             {
                 op = $"<Eq><FieldRef Name='{InterviewKeys.Status}'/><Value Type='Text'>{GetRequestStatus(status)}</Value></Eq>";

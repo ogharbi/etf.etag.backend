@@ -19,6 +19,8 @@ namespace VC.AG.Models.ValuesObject
         public string? DateField { get; set; }
         public DateTime? MinDate { get; set; }
         public DateTime? MaxDate { get; set; }
+        public string? FormType { get; set; }
+
 
     }
 }

@@ -191,6 +191,7 @@ namespace VC.AG.Models
             public const string Aiguilleur2 = "Col_RespUser2";
             public const string StartDate = "Col_StartDate";
             public const string Status = "Col_Status";
+            public const string FormType = "Col_FormType";
         }
 
         public static class QInterviewKeys

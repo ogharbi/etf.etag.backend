@@ -851,7 +851,7 @@ function ChantierCT(){
 function QuartlyInterviewFields() {
     $data = @(
         "Col_DueDate"    
-        "Col_StartDate"
+        "Col_CtrMeetDate"
         "Col_Status"
         "Col_MomMissing"
         "Col_Success"
@@ -1081,7 +1081,8 @@ function QuartlyInterviewList($web,$addSiteFields) {
         CreateListV2 $web $list $url $listDesc "GenericList"
         $l = GetListByUrl $web "$url"
         AddCTToListV2 $l.Id $ct
-        UpdateListView -List $l.Id -Fields $fields
+        $viewFields=getViewFields "QINT"
+        UpdateListView -List $l.Id -Fields $viewFields
         AddFieldIndex  $l.Id "Col_Lk_Request"
         AddFieldIndex  $l.Id "Created"
         AddFieldIndex  $l.Id "Modified"
@@ -1145,6 +1146,18 @@ function RelatedContractsNewList($web,$addSiteFields) {
 function getViewFields($target){
     $r=@()
 switch ($target) {
+    "QINT"{
+        $r=@(
+        "LinkTitle"
+        "Col_DueDate"    
+        "Col_CtrMeetDate"
+        "Col_Status"
+        "Col_Author"
+        "Col_Editor"
+        "Col_Order"
+        
+        )
+    }
     "AG" { $r=@(
         "ID"
         "LinkTitle"
@@ -1394,7 +1407,7 @@ function SetStructureRoot($siteURL) {
      CreateFields
     # RootRequestCT
     # InterviewCT
-    stageCT
+    # stageCT
     # ChantierCT
     # RelatedInterviewCT $false
     # RelatedActionCT  $false
@@ -1416,7 +1429,7 @@ function SetStructureRoot($siteURL) {
     # BuNewList $web
     # RelatedInterviewCT $true
     # QuartlyInterviewCT $true
-    # QuartlyInterviewList $web
+    QuartlyInterviewList $web
     # RelatedActionCT $true
     # RelatedContractsNewList $web $true
     # RelatedInterviewList $web
