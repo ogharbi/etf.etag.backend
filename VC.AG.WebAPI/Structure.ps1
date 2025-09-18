@@ -323,7 +323,7 @@ function RemoveElementCtFromList($list) {
 }
 function FieldsDefinitions() {
     $data = @(
-         #Commun
+        #Commun
         [pscustomobject]@{ key = "Col_FullName"; value = "<Field DisplayName='Nom / prénom' Type='Text' Required='FALSE' ID='C7EC4B3D-1AFB-41CF-8933-23472481316A'  StaticName='Col_FullName' Name='Col_FullName'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_Tel"; value = "<Field DisplayName='Téléphone' Type='Text' Required='FALSE' ID='A24C1AFD-9922-4396-9BF2-541A4FADD62C'  StaticName='Col_Tel' Name='Col_Tel'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_Email"; value = "<Field DisplayName='Email' Type='Text' Required='FALSE' ID='92E47F3C-5E3D-4165-8A1F-797A21108BB3'  StaticName='Col_Email' Name='Col_Email'  Group='VC' />" }
@@ -379,7 +379,7 @@ function FieldsDefinitions() {
         
         #Contrat : alternant
         [pscustomobject]@{ key = "Col_CtrHiringDate"; value = "<Field DisplayName='Date embauche' Type='DateTime' Required='FALSE' ID='456EBE25-2D72-4FB5-8074-447BDCD6F5D4'  StaticName='Col_CtrHiringDate' Name='Col_CtrHiringDate'  Group='VC' />" }
-        [pscustomobject]@{ key = "Col_CtrMeetDate"; value = "<Field DisplayName='Date entretien' Type='DateTime' Required='FALSE' ID='59C06D66-1E0D-473A-AA61-D22CF7F76715'  StaticName='Col_CtrMeetDate' Name='Col_CtrMeetDate'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrMeetDate"; value = "<Field DisplayName='Date bilan' Type='DateTime' Required='FALSE' ID='59C06D66-1E0D-473A-AA61-D22CF7F76715'  StaticName='Col_CtrMeetDate' Name='Col_CtrMeetDate'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_CtrEcole"; value = "<Field DisplayName='Ecole' Type='Text' Required='FALSE' ID='D0CE0A07-A5D9-429F-A455-0E45B924CB70'  StaticName='Col_CtrEcole' Name='Col_CtrEcole'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_CtrDiplome"; value = "<Field DisplayName='Diplôme' Type='Text' Required='FALSE' ID='94173C71-C5C3-4A23-86B4-C7443B2605A0'  StaticName='Col_CtrDiplome' Name='Col_CtrDiplome'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_CtrDescMission"; value = "<Field DisplayName='Description des missions confiées' Type='Note' Required='FALSE' ID='39132B7C-1740-4CFB-BEDB-F867C1E245E5' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrDescMission' Name='Col_CtrDescMission'  Group='VC' />" }
@@ -393,13 +393,15 @@ function FieldsDefinitions() {
         [pscustomobject]@{ key = "Col_CtrMobilityReg"; value = "<Field DisplayName='Mobilité - Région' Type='Text' Required='FALSE' ID='7D401293-BCC7-4B56-A066-FB700BF37EEA'  StaticName='Col_CtrMobilityReg' Name='Col_CtrMobilityReg'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_CtrPojectPro"; value = "<Field DisplayName='Projet professionnel' Type='Text' Required='FALSE' ID='21FE1A2B-275B-46F7-A590-7B7E6C63EF00'  StaticName='Col_CtrPojectPro' Name='Col_CtrPojectPro'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_CtrRecoETF"; value = "<Field DisplayName='ETF recommandé' Type='Boolean' Required='FALSE' ID='FDF53F0B-B914-4689-8B07-0730A55FEDD1'  StaticName='Col_CtrRecoETF' Name='Col_CtrRecoETF'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrRecoEtud"; value = "<Field DisplayName='Stagiaire recommandé' Type='Boolean' Required='FALSE' ID='AF4C1462-3A05-454E-9307-306164B70A7D'  StaticName='Col_CtrRecoEtud' Name='Col_CtrRecoEtud'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrEmbaucheETF"; value = "<Field DisplayName='Embauche en agence' Type='Boolean' Required='FALSE' ID='08AA08FB-2057-4B89-8D73-B487A05163B8'  StaticName='Col_CtrEmbaucheETF' Name='Col_CtrEmbaucheETF'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_CtrObs"; value = "<Field DisplayName='Observations' Type='Note' Required='FALSE' ID='9DFFE5D2-DE8D-40C3-B226-670FA645EF71' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrObs' Name='Col_CtrObs'  Group='VC' />" }
 
         #Chef chantier
         [pscustomobject]@{ key = "Col_CtrIntAgence"; value = "<Field DisplayName='Intégration agence' Type='Note' Required='FALSE' ID='8F5FD199-F464-45AB-BBE1-D9694BCF470F' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrIntAgence' Name='Col_CtrIntAgence'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_CtrIntPromo"; value = "<Field DisplayName='Intégration promotion' Type='Note' Required='FALSE' ID='78B2139D-3B92-4718-87D1-C54CB5F450D6' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrIntPromo' Name='Col_CtrIntPromo'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_CtrPtPos"; value = "<Field DisplayName='Points positifs année' Type='Note' Required='FALSE' ID='31E01AD6-9D56-4239-944B-E5DC8EEF21D3' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrPtPos' Name='Col_CtrPtPos'  Group='VC' />" }
-        [pscustomobject]@{ key = "Col_CtrlAccPre"; value = "<Field DisplayName='Accueillir - Commentaire' Type='Note' Required='FALSE' ID='E89CA304-51F1-44E1-9A08-E329155B4509' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrlAccPre' Name='Col_CtrlAccPre'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_CtrlAccComment"; value = "<Field DisplayName='Accueillir - Commentaire' Type='Note' Required='FALSE' ID='453DDDBD-CE9D-498E-8ED5-EBCA3C4447FA' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrlAccComment' Name='Col_CtrlAccComment'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_CtrSavFComment"; value = "<Field DisplayName='Savoir-faire - Commentaire' Type='Note' Required='FALSE' ID='8532FC35-3290-4BC7-9ADB-7DB807013DB1' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrSavFComment' Name='Col_CtrSavFComment'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_CtrSupComment"; value = "<Field DisplayName='Superviser - Commentaire' Type='Note' Required='FALSE' ID='69C8BDAB-0A5E-4E10-A061-250C96E549CC' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrSupComment' Name='Col_CtrSupComment'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_CtrProgComment"; value = "<Field DisplayName='Progression - Commentaire' Type='Note' Required='FALSE' ID='6FC80030-52A0-4993-9BCB-8A3DEFCE908C' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_CtrProgComment' Name='Col_CtrProgComment'  Group='VC' />" }
@@ -490,7 +492,7 @@ function FieldsDefinitions() {
         [pscustomobject]@{ key = "Col_User"; value = "<Field Type='User' DisplayName='Utilisateur' Name='Col_User'  StaticName='Col_User' ID='4f299631-f8d7-4fff-84b7-27fa1bc6b31c' Group='VC' Required='false'   />" }
         
 
-       # Aigilleurs List
+        # Aigilleurs List
         # [pscustomobject]@{ key = "Col_Function"; value = "<Field DisplayName='Fonction' Type='Text' Required='FALSE' ID='EA16A241-6647-4C4F-B099-F25D8D4FF0E6'  StaticName='Col_Function' Name='Col_Function'  Group='VC' />" }
         # [pscustomobject]@{ key = "Col_BusinessBu"; value = "<Field DisplayName='Filière métier' Type='Text' Required='FALSE' ID='52381EA9-C769-44C2-A4F8-CFFE4ECC8573'  StaticName='Col_BusinessBu' Name='Col_BusinessBu'  Group='VC' />" }
         # [pscustomobject]@{ key = "Col_TelPro"; value = "<Field DisplayName='Téléphone professionnel' Type='Text' Required='FALSE' ID='E5A7BB29-8579-4943-AF63-BB6C4D92F3ED'  StaticName='Col_TelPro' Name='Col_TelPro'  Group='VC' />" }
@@ -523,8 +525,8 @@ function CreateFields() {
         }
     }
 }
-function CreateLkFields($ctx,$web){
-    $fieldsToCreate=@()
+function CreateLkFields($ctx, $web) {
+    $fieldsToCreate = @()
     $list = GetListByUrl $web "Lists/etf_interview" 
     $fieldsToCreate += InitColumn "Col_Lk_Request" "Fiche AG" "" "Lookup" "false" "   EnforceUniqueValues='FALSE'" $list.Id "Title"
     $list = GetListByUrl $web "Lists/etf_contract" 
@@ -630,9 +632,9 @@ function AttachmentsCT($addParentFields) {
     $ct = "ETF Documents"
     AddContentType $ct "Document"
     $fields = AttachmentFields
-    if($addParentFields){
-        $fields+=ParentFields
-        $fields+=CTParentFields
+    if ($addParentFields) {
+        $fields += ParentFields
+        $fields += CTParentFields
     }
     $fields | ForEach-Object {
         $staticName = $_
@@ -640,7 +642,7 @@ function AttachmentsCT($addParentFields) {
     }
 }
 
-function RootRequestFields(){
+function RootRequestFields() {
     $data = @(
         "Col_FormType"
         "Col_FormTarget"
@@ -691,76 +693,77 @@ function InterviewFields() {
     )
     return $data;
 }
-function StageFields(){
+function StageFields() {
     $data = @(
-        "Col_CtrHiringDate"
-       "Col_CtrMeetDate"
-       "Col_CtrEcole"
-       "Col_CtrDiplome"
-       "Col_DurationM"
-       "Col_CtrDescMission"
-       "Col_CtrDescMission2"
-       "Col_CtrDescMission3"
-       "Col_CtrComp"
-       "Col_CtrTypeCh"
-       "Col_CtrPositionETF"
-       "Col_CtrPositionETFDesc"
-       "Col_CtrMobility"
-       "Col_CtrMobilityReg"
-       "Col_CtrPojectPro"
-       "Col_CtrRecoETF"
-       "Col_CtrObs"
+        "Col_CtrMeetDate"
+        "Col_CtrEcole"
+        "Col_CtrDiplome"
+        "Col_DurationM"
+        "Col_CtrDescMission"
+        "Col_CtrDescMission2"
+        "Col_CtrDescMission3"
+        "Col_CtrComp"
+        "Col_CtrTypeCh"
+        "Col_CtrPositionETF"
+        "Col_CtrPositionETFDesc"
+        "Col_CtrMobility"
+        "Col_CtrMobilityReg"
+        "Col_CtrPojectPro"
+        "Col_CtrRecoETF"
+        "Col_CtrRecoEtud"
+        "Col_CtrEmbaucheETF"
+        "Col_CtrObs"
        
     )
     return $data;
 }
-function ChantierFields(){
+function ChantierFields() {
     $data = @(
-       "Col_CtrHiringDate"
-       "Col_Participants"
-       "Col_CtrDescMission"
-       "Col_CtrIntAgence"
-       "Col_CtrIntPromo"
-       "Col_CtrPtPos"
-       "Col_CtrObs"
-       "Col_CtrlAccPre"
-       "Col_CtrSavFComment"
-       "Col_CtrSupComment"
-       "Col_CtrProgComment"
-       "Col_CtrFormComment"
-       "Col_CtrSecFer"
-       "Col_CtrSecFerDuree"
-       "Col_CtrSecFerAgence"
-       "Col_CtrSecFerMission"
-       "Col_CtrPrev"
-       "Col_CtrPrevDuree"
-       "Col_CtrPrevAgence"
-       "Col_CtrPrevMission"
-       "Col_CtrMat"
-       "Col_CtrMatDuree"
-       "Col_CtrMatAgence"
-       "Col_CtrMatMission"
-       "Col_CtrPointsForts"
-       "Col_CtrAxeProgress"
-       "Col_CtrFinComment"
-       "Col_CtrContractComment"
-       "Col_CtrPrevComment"
-       "Col_CtrCommerceComment"
-       "Col_CtrBilan"
-       "Col_CtrRemarksEvent"
-       "Col_CtrPlusPlu"
-       "Col_CtrMoinsPlu"
-       "Col_CtrFormationETF"
-       "Col_CtrDispoTut"
-       "Col_CtrRessenti"
-       "Col_CtrLienPromo"
-       "Col_CtrPointsPos"
-       "Col_CtrIdeeAm"
+        "Col_CtrHiringDate"
+        "Col_Participants"
+        "Col_CtrDescMission"
+        "Col_CtrIntAgence"
+        "Col_CtrIntPromo"
+        "Col_CtrPtPos"
+        "Col_CtrObs"
+        "Col_CtrlAccComment"
+        "Col_CtrSavFComment"
+        "Col_CtrSupComment"
+        "Col_CtrProgComment"
+        "Col_CtrFormComment"
+        "Col_CtrSecFer"
+        "Col_CtrSecFerDuree"
+        "Col_CtrSecFerAgence"
+        "Col_CtrSecFerMission"
+        "Col_CtrPrev"
+        "Col_CtrPrevDuree"
+        "Col_CtrPrevAgence"
+        "Col_CtrPrevMission"
+        "Col_CtrMat"
+        "Col_CtrMatDuree"
+        "Col_CtrMatAgence"
+        "Col_CtrMatMission"
+        "Col_CtrPointsForts"
+        "Col_CtrAxeProgress"
+        "Col_CtrFinComment"
+        "Col_CtrContractComment"
+        "Col_CtrPrevComment"
+        "Col_CtrCommerceComment"
+        "Col_CtrBilan"
+        "Col_CtrRemarksEvent"
+        "Col_CtrPlusPlu"
+        "Col_CtrMoinsPlu"
+        "Col_CtrFormationETF"
+        "Col_CtrDispoTut"
+        "Col_CtrRessenti"
+        "Col_CtrLienPromo"
+        "Col_CtrPointsPos"
+        "Col_CtrIdeeAm"
     )
     return $data;
 }
-function ConducteurFields(){
-      $data = @(
+function ConducteurFields() {
+    $data = @(
         "Col_CtrHiringDate"
         "Col_CtrMeetDate"
         "Col_Position"
@@ -805,11 +808,11 @@ function ConducteurFields(){
         "Col_CtrBilan3"
         "Col_CtrBilan4"
         
-        )
+    )
     return $data;
 }
-function RootRequestCT(){
-      $ct = "ETF Root Request"
+function RootRequestCT() {
+    $ct = "ETF Root Request"
     AddContentType $ct
     $fields = RootRequestFields
     $fields | ForEach-Object {
@@ -818,8 +821,8 @@ function RootRequestCT(){
     }
     return $fields;
 }
-function interviewCT(){
-      $ct = "ETF Interview" 
+function interviewCT() {
+    $ct = "ETF Interview" 
     AddContentType $ct "ETF Root Request"
     $fields = InterviewFields
     $fields | ForEach-Object {
@@ -828,8 +831,8 @@ function interviewCT(){
     }
     return $fields;
 }
-function stageCT(){
-      $ct = "ETF Stage" 
+function stageCT() {
+    $ct = "ETF Stage" 
     AddContentType $ct "ETF Root Request"
     $fields = StageFields
     $fields | ForEach-Object {
@@ -838,8 +841,8 @@ function stageCT(){
     }
     return $fields;
 }
-function ChantierCT(){
-      $ct = "ETF Chef chantier" 
+function ChantierCT() {
+    $ct = "ETF Chef chantier" 
     AddContentType $ct "ETF Root Request"
     $fields = ChantierFields
     $fields | ForEach-Object {
@@ -864,12 +867,12 @@ function QuartlyInterviewFields() {
     )
     return $data;
 }
-function QuartlyInterviewCT($addParentFields){
-      $ct = "ETF Quartly interview"
+function QuartlyInterviewCT($addParentFields) {
+    $ct = "ETF Quartly interview"
     AddContentType $ct
     $fields = QuartlyInterviewFields
-    if($addParentFields){
-        $fields+=ParentFields
+    if ($addParentFields) {
+        $fields += ParentFields
     }
     $fields | ForEach-Object {
         $staticName = $_
@@ -890,12 +893,12 @@ function RelatedInterviewFields() {
     )
     return $fields;
 }
-function RelatedInterviewCT($addParentFields){
-      $ct = "ETF Related interview"
+function RelatedInterviewCT($addParentFields) {
+    $ct = "ETF Related interview"
     AddContentType $ct
     $fields = RelatedInterviewFields
-    if($addParentFields){
-        $fields+=ParentFields
+    if ($addParentFields) {
+        $fields += ParentFields
     }
     $fields | ForEach-Object {
         $staticName = $_
@@ -916,12 +919,12 @@ function RelatedActionFields() {
     )
     return $fields;
 }
-function RelatedActionCT($addParentFields){
-      $ct = "ETF Related action"
+function RelatedActionCT($addParentFields) {
+    $ct = "ETF Related action"
     AddContentType $ct
     $fields = RelatedActionFields
-    if($addParentFields){
-        $fields+=CTParentFields
+    if ($addParentFields) {
+        $fields += CTParentFields
     }
     $fields | ForEach-Object {
         $staticName = $_
@@ -941,8 +944,8 @@ function TemplateActionFields() {
     )
     return $fields;
 }
-function TemplateActionCT(){
-      $ct = "ETF Template action"
+function TemplateActionCT() {
+    $ct = "ETF Template action"
     AddContentType $ct
     $fields = TemplateActionFields
     $fields | ForEach-Object {
@@ -1015,20 +1018,20 @@ function TemplateNewList($web) {
     AddFieldIndex  $l.Id "Modified"
 
 }
-function ParentFields(){
+function ParentFields() {
     $fields = @(
-      "Col_Lk_Request"
-      "Col_Lk_Contract"
+        "Col_Lk_Request"
+        "Col_Lk_Contract"
     )
     return $fields;
 }
-function CTParentFields(){
+function CTParentFields() {
     $fields = @(
-      "Col_Lk_Contract"
+        "Col_Lk_Contract"
     )
     return $fields;
 }
-function InterviewList($web,$context) {
+function InterviewList($web, $context) {
     $url = "Lists/etf_interview"
     $list = "AG - Carnets de bord"
     $ct = "ETF Interview"
@@ -1036,9 +1039,9 @@ function InterviewList($web,$context) {
     CreateListV2 $web $list $url $listDesc "GenericList"
     $l = GetListByUrl $web "$url"
     AddCTToListV2 $l.Id $ct
-    $viewFields=getViewFields "AG"
+    $viewFields = getViewFields "AG"
     UpdateListView -List $l.Id -Fields $viewFields
-    $viewFields=getViewFields "AGAll"
+    $viewFields = getViewFields "AGAll"
     AddListView2 -ctx $context -List $l.Id -Title "Tableau"  -Fields $viewFields -Query "<OrderBy><FieldRef Name='ID'  Ascending='FALSE'/></OrderBy>"
     AddFieldIndex  $l.Id "Col_RespUser"
     AddFieldIndex  $l.Id "Col_Status"
@@ -1048,19 +1051,19 @@ function InterviewList($web,$context) {
     AddFieldIndex  $l.Id "Col_Editor"
 
 }
-function RelatedInterviewList($web,$addSiteFields) {
+function RelatedInterviewList($web, $addSiteFields) {
     $url = "Lists/etf_relatedinterview"
     $list = "AG - Actions"
     $ct = "ETF Related interview"
     $fields = RelatedInterviewFields 
     if ($addSiteFields) {
-            $fields += ParentFields
+        $fields += ParentFields
     }
-        $l = GetListByUrl $web "$url"
-        CreateListV2 $web $list $url $listDesc "GenericList"
-        $l = GetListByUrl $web "$url"
-        AddCTToListV2 $l.Id $ct
-        UpdateListView -List $l.Id -Fields $fields
+    $l = GetListByUrl $web "$url"
+    CreateListV2 $web $list $url $listDesc "GenericList"
+    $l = GetListByUrl $web "$url"
+    AddCTToListV2 $l.Id $ct
+    UpdateListView -List $l.Id -Fields $fields
     AddFieldIndex  $l.Id "Col_Lk_Request"
     AddFieldIndex  $l.Id "Created"
     AddFieldIndex  $l.Id "Modified"
@@ -1069,32 +1072,32 @@ function RelatedInterviewList($web,$addSiteFields) {
     AddFieldIndex  $l.Id "Editor"
 
 }
-function QuartlyInterviewList($web,$addSiteFields) {
+function QuartlyInterviewList($web, $addSiteFields) {
     $url = "Lists/etf_quartlyinterview"
     $list = "AG - Entretiens trimestiels"
     $ct = "ETF Quartly interview"
     $fields = QuartlyInterviewFields
     if ($addSiteFields) {
-            $fields += ParentFields
+        $fields += ParentFields
     }
-        $l = GetListByUrl $web "$url"
-        CreateListV2 $web $list $url $listDesc "GenericList"
-        $l = GetListByUrl $web "$url"
-        AddCTToListV2 $l.Id $ct
-        $viewFields=getViewFields "QINT"
-        UpdateListView -List $l.Id -Fields $viewFields
-        AddFieldIndex  $l.Id "Col_Lk_Request"
-        AddFieldIndex  $l.Id "Created"
-        AddFieldIndex  $l.Id "Modified"
+    $l = GetListByUrl $web "$url"
+    CreateListV2 $web $list $url $listDesc "GenericList"
+    $l = GetListByUrl $web "$url"
+    AddCTToListV2 $l.Id $ct
+    $viewFields = getViewFields "QINT"
+    UpdateListView -List $l.Id -Fields $viewFields
+    AddFieldIndex  $l.Id "Col_Lk_Request"
+    AddFieldIndex  $l.Id "Created"
+    AddFieldIndex  $l.Id "Modified"
 
 }
-function ContractNewList($web,$context) {
+function ContractNewList($web, $context) {
     $url = "Lists/etf_contract"
     $list = "CT - Contrats"
     CreateListV2 $web $list $url $listDesc "GenericList"
   
     $l = GetListByUrl $web "$url"
-    if($l.id -eq $null){
+    if ($l.id -eq $null) {
         Start-Sleep -Milliseconds 2000
         $l = GetListByUrl $web "$url"
         Start-Sleep -Milliseconds 2000
@@ -1103,17 +1106,21 @@ function ContractNewList($web,$context) {
     AddCTToListV2 $l.Id $ct
     $ct = "ETF Chef chantier"
     AddCTToListV2 $l.Id $ct
-    $viewFields=getViewFields "CTALL"
+    $viewFields = getViewFields "CTALL"
     UpdateListView -List $l.Id -Fields $viewFields
-    $viewFields=getViewFields "CTStage"
+    $viewFields = getViewFields "CTStage"
     AddListView2 -ctx $context -List $l.Id -Title "Stage - Etudiant"  -Fields $viewFields -Query "<Where><Eq><FieldRef Name='Col_FormType'/><Value Type='Text'>Stage - Etudiant</Value></Eq></Where><OrderBy><FieldRef Name='ID'  Ascending='FALSE'/></OrderBy>"
     AddListView2 -ctx $context -List $l.Id -Title "Stage - Tuteur"  -Fields $viewFields -Query "<Where><Eq><FieldRef Name='Col_FormType'/><Value Type='Text'>Stage - Tuteur</Value></Eq></Where><OrderBy><FieldRef Name='ID'  Ascending='FALSE'/></OrderBy>"
     AddListView2 -ctx $context -List $l.Id -Title "Alternance - Etudiant"  -Fields $viewFields -Query "<Where><Eq><FieldRef Name='Col_FormType'/><Value Type='Text'>Alternance - Etudiant</Value></Eq></Where><OrderBy><FieldRef Name='ID'  Ascending='FALSE'/></OrderBy>"
     AddListView2 -ctx $context -List $l.Id -Title "Alternance - Tuteur"  -Fields $viewFields -Query "<Where><Eq><FieldRef Name='Col_FormType'/><Value Type='Text'>Alternance - Tuteur</Value></Eq></Where><OrderBy><FieldRef Name='ID'  Ascending='FALSE'/></OrderBy>"
-    $viewFields=getViewFields "CTChantier"
-    AddListView2 -ctx $context -List $l.Id -Title "Chantier"  -Fields $viewFields -Query "<Where><Eq><FieldRef Name='Col_FormType'/><Value Type='Text'>Chantier</Value></Eq></Where><OrderBy><FieldRef Name='ID'  Ascending='FALSE'/></OrderBy>"
-    AddListView2 -ctx $context -List $l.Id -Title "Chantier"  -Fields $viewFields -Query "<Where><Eq><FieldRef Name='Col_FormType'/><Value Type='Text'>Chantier</Value></Eq></Where><OrderBy><FieldRef Name='ID'  Ascending='FALSE'/></OrderBy>"
-    $viewFields=getViewFields "CTConducteur"
+    $viewFields = getViewFields "CTChantier"
+    AddListView2 -ctx $context -List $l.Id -Title "Chantier - Intégration"  -Fields $viewFields -Query "<Where><Eq><FieldRef Name='Col_FormType'/><Value Type='Text'>Chantier</Value></Eq></Where><OrderBy><FieldRef Name='ID'  Ascending='FALSE'/></OrderBy>"
+    $viewFields = getViewFields "CTChantier"
+    AddListView2 -ctx $context -List $l.Id -Title "Chantier - Tuteur - Graduate"  -Fields $viewFields -Query "<Where><Eq><FieldRef Name='Col_FormType'/><Value Type='Text'>Chantier</Value></Eq></Where><OrderBy><FieldRef Name='ID'  Ascending='FALSE'/></OrderBy>"
+    $viewFields = getViewFields "CTChantier"
+    AddListView2 -ctx $context -List $l.Id -Title "Chantier - RH – Graduate"  -Fields $viewFields -Query "<Where><Eq><FieldRef Name='Col_FormType'/><Value Type='Text'>Chantier</Value></Eq></Where><OrderBy><FieldRef Name='ID'  Ascending='FALSE'/></OrderBy>"
+    
+    $viewFields = getViewFields "CTConducteur"
     AddListView2 -ctx $context -List $l.Id -Title "Conducteur"  -Fields $viewFields -Query "<Where><Eq><FieldRef Name='Col_FormType'/><Value Type='Text'>Conducteur</Value></Eq></Where><OrderBy><FieldRef Name='ID'  Ascending='FALSE'/></OrderBy>"
 
     AddFieldIndex  $l.Id "Col_Status"
@@ -1122,13 +1129,13 @@ function ContractNewList($web,$context) {
     AddFieldIndex  $l.Id "Col_Editor"
 
 }
-function RelatedContractsNewList($web,$addSiteFields) {
+function RelatedContractsNewList($web, $addSiteFields) {
     $url = "Lists/etf_relatedcontract"
     $list = "CT - Actions"
     $ct = "ETF Related action"
     $fields = RelatedActionFields 
     if ($addSiteFields) {
-            $fields += CTParentFields
+        $fields += CTParentFields
     }
     $l = GetListByUrl $web "$url"
     CreateListV2 $web $list $url $listDesc "GenericList"
@@ -1143,111 +1150,116 @@ function RelatedContractsNewList($web,$addSiteFields) {
     AddFieldIndex  $l.Id "Editor"
 
 }
-function getViewFields($target){
-    $r=@()
-switch ($target) {
-    "QINT"{
-        $r=@(
-        "LinkTitle"
-        "Col_DueDate"    
-        "Col_CtrMeetDate"
-        "Col_Status"
-        "Col_Author"
-        "Col_Editor"
-        "Col_Order"
+function getViewFields($target) {
+    $r = @()
+    switch ($target) {
+        "QINT" {
+            $r = @(
+                "LinkTitle"
+                "Col_DueDate"    
+                "Col_CtrMeetDate"
+                "Col_Status"
+                "Col_Author"
+                "Col_Editor"
+                "Col_Order"
         
-        )
-    }
-    "AG" { $r=@(
-        "ID"
-        "LinkTitle"
-        "Col_RespUser"
-        "Col_RespUser2"
-        "Col_FullName"
-        "Col_DirGeneral"
-        "Col_Bu"
-        "Col_Status"
-        "Col_UrlR"
-        "Created"
-		"Col_StartDateT"
-        "Col_DurationM"
-        "Col_StartDate"
-        "Col_EndDate"
-		"Col_Participants"
+            )
+        }
+        "AG" {
+            $r = @(
+                "ID"
+                "LinkTitle"
+                "Col_RespUser"
+                "Col_RespUser2"
+                "Col_FullName"
+                "Col_DirGeneral"
+                "Col_Bu"
+                "Col_Status"
+                "Col_UrlR"
+                "Created"
+                "Col_StartDateT"
+                "Col_DurationM"
+                "Col_StartDate"
+                "Col_EndDate"
+                "Col_Participants"
        
-        "Modified"
-        "Col_Author"
-        "Col_Editor"
-    )  }
-    "AGAll" { 
-        $r=@(
-        "ID"
-        "LinkTitle"
-        "Col_FormType"
-		"Col_UrlR"
-        "Col_Status"
-        "Col_Bu"
-        "Col_DirGeneral"
-        "Col_FullName"
-        "Col_Tel"
-        "Col_Email"
-        "Col_Position"
-        "Col_RespUser"
-        "Col_RespFullName"
-        "Col_RespUserSPId"
-		"Col_StartDateT"
-        "Col_StartDate"
-        "Col_EndDate"
-		"Col_DurationM"
-        "Col_RespUser2"
-        "Col_RespUserSPId2"
-        "Col_RespFullName2"
-        "Col_Participants"
-        "Col_Ecoute"
-        "Col_QualityExchange"
-        "Col_Autonomy"
-        "Col_EvAigComment"
-        "Col_EvFlComment"
-        "Col_BlAigComment"
-        "Col_BlFlComment"
-        "Col_Lesson"
-        "Col_Author"
-        "Col_Editor"
-        "Created"
-        "Modified"
-		"Col_Guid"
-        "Col_RespSignture"
-        "Col_RespSignName"
-        "Col_RespSignDate"
-        "Col_CandSignture"
-        "Col_CandSignName"
-        "Col_CandSignDate"
+                "Modified"
+                "Col_Author"
+                "Col_Editor"
+            )  
+        }
+        "AGAll" { 
+            $r = @(
+                "ID"
+                "LinkTitle"
+                "Col_FormType"
+                "Col_UrlR"
+                "Col_Status"
+                "Col_Bu"
+                "Col_DirGeneral"
+                "Col_FullName"
+                "Col_Tel"
+                "Col_Email"
+                "Col_Position"
+                "Col_RespUser"
+                "Col_RespFullName"
+                "Col_RespUserSPId"
+                "Col_StartDateT"
+                "Col_StartDate"
+                "Col_EndDate"
+                "Col_DurationM"
+                "Col_RespUser2"
+                "Col_RespUserSPId2"
+                "Col_RespFullName2"
+                "Col_Participants"
+                "Col_Ecoute"
+                "Col_QualityExchange"
+                "Col_Autonomy"
+                "Col_EvAigComment"
+                "Col_EvFlComment"
+                "Col_BlAigComment"
+                "Col_BlFlComment"
+                "Col_Lesson"
+                "Col_Author"
+                "Col_Editor"
+                "Created"
+                "Modified"
+                "Col_Guid"
+                "Col_RespSignture"
+                "Col_RespSignName"
+                "Col_RespSignDate"
+                "Col_CandSignture"
+                "Col_CandSignName"
+                "Col_CandSignDate"
        
-    ) }
-    "CTStage" {  
+            ) 
+        }
+        "CTStage" {  
 
-        $r=@(
-       "ID"
-       "LinkTitle"
-       "Col_FormType"
-       "Col_FormTarget"
-	   "Col_UrlR"
-       "Col_RespUser"
-	   "Col_FullName"
-	   "Col_Status"
-	   "Col_StartDate"
-       "Col_EndDate"
-	   "Col_CtrHiringDate"
-       "Col_CtrMeetDate"
-       "Col_CtrDescMission"
-       "Col_Author"
-       "Col_Editor"
-       "Created"
-       "Modified"
-    ) 
-    }
-    "CTChantier"{
-             $r=@(
+            $r = @(
+                "ID"
+                "LinkTitle"
+                "Col_FormType"
+                "Col_UrlR"
+                "Col_Status"
+                "Col_CtrMeetDate"
+                "Col_FullName"
+                "Col_Email"
+                "Col_CtrDiplome"
+                "Col_Position"
+                "Col_RespFullName"
+                "Col_RespPosition"
+                "Col_StartDate"
+                "Col_EndDate"
+                "Col_CtrDescMission"
+                "Col_Author"
+                "Col_Editor"
+                "Created"
+                "Modified"
+            ) 
+        }
+        "CTChantier" {
+            $r = @(
                 "ID"
                 "LinkTitle"
                 "Col_FormType"
@@ -1265,10 +1277,10 @@ switch ($target) {
                 "Col_Editor"
                 "Created"
                 "Modified"
-             )
-    }
-    "CTConducteur"{
-             $r=@(
+            )
+        }
+        "CTConducteur" {
+            $r = @(
                 "ID"
                 "LinkTitle"
                 "Col_FormType"
@@ -1286,30 +1298,32 @@ switch ($target) {
                 "Col_Editor"
                 "Created"
                 "Modified"
-             )
+            )
+        }
+        "CTALL" {  
+            $r = @(
+                "ID"
+                "LinkTitle"
+                "Col_FormType"
+                "Col_Status"
+                "Col_UrlR"
+                "Col_FullName"
+                "Col_Position"
+                "Col_RespFullName"
+                "Col_RespPosition"
+                "Col_CtrMeetDate"
+                "Col_StartDate"
+                "Col_EndDate"
+                "Col_CtrHiringDate"
+                "Col_Author"
+                "Col_Editor"
+                "Created"
+                "Modified"
+            ) 
+        }
+        Default {}
     }
-    "CTALL" {  
-        $r=@(
-        "ID"
-        "LinkTitle"
-        "Col_FormType"
-        "Col_FormTarget"
-        "Col_Status"
-        "Col_UrlR"
-        "Col_RespUser"
-        "Col_FullName"
-        "Col_StartDate"
-        "Col_EndDate"
-        "Col_CtrHiringDate"
-        "Col_CtrMeetDate"
-        "Col_Author"
-        "Col_Editor"
-        "Created"
-        "Modified"
-    ) }
-    Default {}
-}
-return $r;
+    return $r;
 }
 
 function MailTemplateList($web) {
@@ -1404,11 +1418,11 @@ function SetStructureRoot($siteURL) {
     $context.Load($web)
     $context.ExecuteQuery()
 
-     CreateFields
+    CreateFields
     # RootRequestCT
     # InterviewCT
     # stageCT
-    # ChantierCT
+    ChantierCT
     # RelatedInterviewCT $false
     # RelatedActionCT  $false
     # QuartlyInterviewCT $false
@@ -1421,7 +1435,7 @@ function SetStructureRoot($siteURL) {
     #TemplateActionCT
  
     # InterviewList $web $context
-    # ContractNewList $web $context
+    ContractNewList $web $context
     # CreateLkFields  $context $web
     # MailTemplateList $web
     # LinkNewList $web
@@ -1429,7 +1443,7 @@ function SetStructureRoot($siteURL) {
     # BuNewList $web
     # RelatedInterviewCT $true
     # QuartlyInterviewCT $true
-    QuartlyInterviewList $web
+    # QuartlyInterviewList $web
     # RelatedActionCT $true
     # RelatedContractsNewList $web $true
     # RelatedInterviewList $web
@@ -1439,7 +1453,7 @@ function SetStructureRoot($siteURL) {
     # TemplateNewList $web
     # AccessCTNewList $web
     # AccessAGNewList $web
-    #TemplateActionNewList $web
+    # TemplateActionNewList $web
 
 }
 $siteURL = "https://vincic.sharepoint.com/sites/etag-dev4"

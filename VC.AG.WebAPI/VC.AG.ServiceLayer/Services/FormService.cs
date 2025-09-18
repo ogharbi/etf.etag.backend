@@ -31,7 +31,7 @@ using System.Globalization;
 
 namespace VC.AG.ServiceLayer.Services
 {
-    public class FormService(IUnitOfWork uow, IMemoryCache cache, IConfiguration config, ISiteContract siteSvc, IUserContract userSvc,INotifContract notifSvc) : IFormContract
+    public class FormService(IUnitOfWork uow, IMemoryCache cache, IConfiguration config, ISiteContract siteSvc, IUserContract userSvc, INotifContract notifSvc) : IFormContract
     {
         readonly SpoContext spoContext = new(config, cache);
         // readonly JobHelper jobHelper = new(uow, config, cache, siteSvc);
@@ -103,7 +103,7 @@ namespace VC.AG.ServiceLayer.Services
                 var views = await uow.DBRepo.GetListViews(q1);
                 var targetView = views?.FirstOrDefault(a => "Dashboard".Equals(a.Title, StringComparison.OrdinalIgnoreCase));
                 if (targetView == null) targetView = views?.FirstOrDefault();
-                var viewFields = targetView?.Values?["Fields"]  as List<string>;
+                var viewFields = targetView?.Values?["Fields"] as List<string>;
                 var lines = new List<string>();
                 var line = string.Empty;
                 ExcelPackage excel = new ExcelPackage();
@@ -172,7 +172,7 @@ namespace VC.AG.ServiceLayer.Services
                 foreach (var field in fields)
                 {
                     workSheet.Column(index).Width = 20;
-                    if (""+field.Values["Type"] == "DateTime")
+                    if ("" + field.Values["Type"] == "DateTime")
                     {
                         workSheet.Column(index).Style.Numberformat.Format = DateTimeFormatInfo.CurrentInfo.ShortDatePattern;
                         workSheet.Column(index).Style.Numberformat.Format = "dd-MM-yyyy";
@@ -186,7 +186,7 @@ namespace VC.AG.ServiceLayer.Services
                 var fileName = $"AIG_Export_{dtISO}.xlsx";
                 result = new FileModel()
                 {
-                    Name= fileName,
+                    Name = fileName,
                     ContentStream = stream,
                 };
             }
@@ -207,14 +207,10 @@ namespace VC.AG.ServiceLayer.Services
         public async Task<DBItem?> Put(DBUpdate item)
         {
             DBItem? result = null;
-            var wfRequest = await Get(item.ToDBQuery(), item.Site);
-            if (wfRequest != null)
-            {
-                var site = await siteSvc.Get($"{item.Site}") ?? throw new InvalidOperationException($"Unable to find the site : {item.Site}");
-                item.SiteId = site.Id;
-                item.ListId = site.Lists?.GetStringValue2($"{item.ListName}");
-                result = await uow.DBRepo.Put(item);
-            }
+            var site = await siteSvc.Get($"{item.Site}") ?? throw new InvalidOperationException($"Unable to find the site : {item.Site}");
+            item.SiteId = site.Id;
+            item.ListId = site.Lists?.GetStringValue2($"{item.ListName}");
+            result = await uow.DBRepo.Put(item);
             return result;
         }
 
@@ -296,12 +292,12 @@ namespace VC.AG.ServiceLayer.Services
             var rootSite = await siteSvc.Get();
             var dbQuery = new DBQuery()
             {
-                ItemId=$"{notifQuery.Id}",
-                ListName=notifQuery.ListName,
-                Filter=$"<Where><Eq><FieldRef Name='ID'/><Value Type='Number'>{notifQuery.Id}</Value></Eq></Where>"
+                ItemId = $"{notifQuery.Id}",
+                ListName = notifQuery.ListName,
+                Filter = $"<Where><Eq><FieldRef Name='ID'/><Value Type='Number'>{notifQuery.Id}</Value></Eq></Where>"
             };
             var request = await Get(dbQuery);
-          var result= await notifSvc.SendNotifications(rootSite,request, notifQuery.Comment);
+            var result = await notifSvc.SendNotifications(rootSite, request, notifQuery.Comment);
             return result;
         }
 

@@ -9,6 +9,7 @@
     public class ReqCreates
     {
         public ReqCreate[]? Data { get; set; }
+        public int? ID { get; set; }
         public string? Site { get; set; }
         public string? List { get; set; }
     }

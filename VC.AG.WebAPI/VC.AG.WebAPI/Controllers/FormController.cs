@@ -96,9 +96,20 @@ namespace VC.AG.WebAPI.Controllers
             {
                 foreach (var reqCreate in reqCreates.Data)
                 {
+                    DBItem? r = null;
                     var d = reqCreate.ToDBCreate(userSvc);
-                    var r = formSvc.Post(d).Result;
-                    result.Add(r);
+                    if (d.ID != null)
+                    {
+                        var d2 = d.ToDBDUpdate();
+                        d2.Id=d.ID;
+                        r = formSvc.Put(d2).Result;
+                    }
+                    else
+                    {
+                        r = formSvc.Post(d).Result;
+                    }
+                    if (r != null)
+                        result.Add(r);
                 }
             }
             return Ok(result);

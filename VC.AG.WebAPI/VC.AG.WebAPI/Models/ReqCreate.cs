@@ -10,6 +10,7 @@ namespace VC.AG.WebAPI.Models
         public string? Site { get; set; }
         public string? List { get; set; }
         public object? Data { get; set; }
+        public int? ID { get; set; }
         public DBCreate ToDBCreate(IUserContract userSvc)
         {
             dynamic? d1 = JsonConvert.DeserializeObject<dynamic>($"{Data}");
@@ -18,20 +19,22 @@ namespace VC.AG.WebAPI.Models
             if (enabledAuthorLists.Contains(List?.ToLower()))
             {
                 var user = userSvc.GetMe().Result;
-                if (user != null && Data!=null)
+                if (user != null && Data != null)
                 {
-                   
-                        d2.fields.Col_AuthorLookupId = user.SPId;
-                        d2.fields.Col_EditorLookupId = user.SPId;
-                    
+
+                    d2.fields.Col_AuthorLookupId = user.SPId;
+                    d2.fields.Col_EditorLookupId = user.SPId;
+
                 }
             }
             var item = new DBCreate()
             {
                 Site = Site,
                 ListName = List,
-                Data = d2
+                Data = d2,
+                ID = ID
             };
+
             return item;
         }
     }
