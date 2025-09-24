@@ -8,7 +8,7 @@ namespace VC.AG.WebAPI.Models
     {
         public RequestStatus? Status { get; set; }
         public RequestScope? Scope { get; set; }
-        public DashTarget? Mode { get; set; }
+        public DashTarget? DashTarget { get; set; }
         public string? AigField { get; set; }
         //AiguilleurField
         public string? AgField { get; set; }
@@ -50,7 +50,7 @@ namespace VC.AG.WebAPI.Models
                 MaxDate=MaxDate,
                 NextHref = string.IsNullOrEmpty(NextHref) ? null : NextHref[1..],
                 User=user,
-                DashTarget=Mode,
+                DashTarget=DashTarget,
                 OnlyChildren=OnlyChildren
             };
             return q;

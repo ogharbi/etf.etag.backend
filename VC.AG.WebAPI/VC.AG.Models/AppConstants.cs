@@ -191,8 +191,8 @@ namespace VC.AG.Models
         }
         public static class InterviewKeys
         {
-            public const string Aiguilleur = "Col_RespUser";
-            public const string Aiguilleur2 = "Col_RespUser2";
+            public const string Responsible = "Col_RespUser";
+            public const string Responsible2 = "Col_RespUser2";
             public const string StartDate = "Col_StartDate";
             public const string Status = "Col_Status";
             public const string FormType = "Col_FormType";

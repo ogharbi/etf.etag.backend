@@ -166,8 +166,8 @@ namespace VC.AG.Models.Extensions
                     }
                     else
                     {
-                        op = $"<Or><Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Aiguilleur}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>" +
-                            $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Aiguilleur2}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq></Or>";
+                        op = $"<Or><Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Responsible}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>" +
+                            $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Responsible2}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq></Or>";
                         ops.Add(op);
                     }
 
@@ -175,6 +175,8 @@ namespace VC.AG.Models.Extensions
                 case Enums.RequestScope.AllRequests:
                     if (!isAdmin)
                     {
+                        var levels = currentUser?.Access?.Where(a => query.AppTarget == a.AppTarget && !string.IsNullOrEmpty(a.Level)).Select(a => a.Level).ToList();
+                        if (levels == null) levels = [];
                         switch (query.DashTarget)
                         {
                             case DashTarget.QInterview:
@@ -185,14 +187,17 @@ namespace VC.AG.Models.Extensions
                                 ops.Add(op);
                                 break;
                             case DashTarget.Default:
-                                op1 = $"<Or><Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Aiguilleur}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>" +
-                                 $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Aiguilleur2}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq></Or>";
+                                op1 = $"<Or><Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Responsible}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>" +
+                                 $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Responsible2}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq></Or>";
                                 op2 = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
                                 op = $"<Or>{op1}{op2}</Or>";
+                                op = AddLevelsAccess(levels, op);
                                 ops.Add(op);
                                 break;
                             case DashTarget.Contract:
-                                op = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
+                                op = $"<Or><Eq><FieldRef LookupId='TRUE' Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>" +
+                                    $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Responsible}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq></Or>";
+                                op=AddLevelsAccess(levels, op);
                                 ops.Add(op);
                                 break;
                         }
@@ -209,6 +214,21 @@ namespace VC.AG.Models.Extensions
             {
                 op = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
                 ops.Add(op);
+            }
+            static string AddLevelsAccess(List<string?> levels,string op)
+            {
+                if (levels.Count > 0)
+                {
+                    var op2 = $"<In>  <FieldRef Name=\"{AppConstants.InterviewKeys.FormTarget}\" />" +
+                       " <Values>";
+                    foreach (var level in levels)
+                    {
+                        op2 += $"<Value Type=\"Text\">{level}</Value>";
+                    }
+                    op2 += "</Values></In>";
+                    op = $"<Or>{op}{op2}</Or>";
+                }
+                return op;
             }
             static string GetRequestStatus(RequestStatus? status)
             {
