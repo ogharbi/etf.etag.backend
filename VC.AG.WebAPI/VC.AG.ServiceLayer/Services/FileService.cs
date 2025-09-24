@@ -30,8 +30,7 @@ namespace VC.AG.ServiceLayer.Services
                 file.SiteId = site.Id;
                 file.SiteUrl = site.SiteUrl;
                 file.DriveId = site.Drives?.GetStringValue2($"{file.ListName}");
-                var wfRequest = await formSvc.Get(q, delegation);
-                result = wfRequest == null ? null : await uow.FileRepo.Get(file);
+                result = await uow.FileRepo.Get(file);
             }
             return result;
         }
@@ -43,7 +42,6 @@ namespace VC.AG.ServiceLayer.Services
             if (file != null)
             {
                 var q = file.ToDbQuery(site.SiteUrl);
-                await formSvc.Get(q, delegation);
                 file.SiteId = site.Id;
                 file.DriveId = site.Drives?.GetStringValue2($"{file.ListName}");
                 result = await uow.FileRepo.Post(file);

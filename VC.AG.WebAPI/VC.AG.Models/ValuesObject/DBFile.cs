@@ -36,11 +36,12 @@ namespace VC.AG.Models.ValuesObject
         {
             object? pid = null;
             if (ParentId.HasValue) pid = ParentId.Value;
+            
             Values?.TryGetValue(AppKeys.ParentId, out pid);
             var q = new DBQuery()
             {
                 SiteUrl = siteUrl,
-                ListName = ListNameKeys.Interview,
+                ListName = ListName,
                 Filter = $"<Where><Eq><FieldRef Name='ID'/><Value Type='Number'>{pid}</Value></Eq></Where>"
             };
             return q;

@@ -53,6 +53,9 @@ namespace VC.AG.Models
             public const string AppSmtpUser = "App_SmtpUser";
             public const string AppReminderList = "App_ReminderList";
             public const string APPEnv = "APP_Env";
+            public const string VPRessource = "VP_RESSOURCE";
+            public const string VPApiKey = "VP_APIKEY";
+            public const string VPApiKey2 = "VP_APIKEY2";
 
 
             public const string AppCc = "App_Cc";
@@ -93,6 +96,7 @@ namespace VC.AG.Models
             public const string SiteLinks = "etf_link";
             public const string MailTemplate = "etf_mailtemplate";
             public const string Settings = "etf_settings";
+            public const string Organization = "etf_organization";
             public const string Bus = "etf_bu";
             public const string ActionTemplates = "etf_tempaction";
             public const string CTAccess = "etf_ctaccess";
@@ -192,6 +196,8 @@ namespace VC.AG.Models
             public const string StartDate = "Col_StartDate";
             public const string Status = "Col_Status";
             public const string FormType = "Col_FormType";
+            public const string FormTarget= "Col_FormTarget";
+            public const string ReqRoot = "Col_CtrRootReq";
         }
 
         public static class QInterviewKeys

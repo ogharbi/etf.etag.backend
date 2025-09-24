@@ -52,7 +52,7 @@ namespace VC.AG.WebAPI.Models
                 {
                     Content = binaryReader.ReadBytes((int)file.Length),
                     Created = DateTime.Now,
-                    Name = $"VC-{Site}-{Code}-{ParentId}-{name}",
+                    Name = $"ETF-{Site}-{Code}-{ParentId}-{name}",
                     Values = properties,
                     Site = Site,
                     ListName = targetList

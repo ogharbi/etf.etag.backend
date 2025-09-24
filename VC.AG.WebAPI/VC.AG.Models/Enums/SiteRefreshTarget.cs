@@ -12,6 +12,7 @@ namespace VC.AG.Models.Enums
         Basic,
         Access,
         SiteLinks,
-        Translations
+        Translations,
+        Organization
     }
 }

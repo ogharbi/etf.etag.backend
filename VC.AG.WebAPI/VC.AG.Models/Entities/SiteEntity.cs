@@ -16,6 +16,7 @@ namespace VC.AG.Models.Entities
         public Dictionary<string, object>? Sites { get; set; }
         public IEnumerable<SPList>? Schemas { get; set; }
         public IEnumerable<DBItem>? Settings { get; set; }
+        public IEnumerable<DBItem>? Organization { get; set; }
         public IEnumerable<DBItem>? Bus { get; set; }
         public IEnumerable<DBItem>? MailTemplates { get; set; }
 

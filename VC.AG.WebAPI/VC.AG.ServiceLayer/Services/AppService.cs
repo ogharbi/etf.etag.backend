@@ -64,6 +64,9 @@ namespace VC.AG.ServiceLayer.Services
                     case Ressource.AppSettings:
                         result = site.Settings;
                         break;
+                    case Ressource.Organization:
+                        result = site.Organization;
+                        break;
                     case Ressource.Bus:
                         result = site.Bus;
                         break;

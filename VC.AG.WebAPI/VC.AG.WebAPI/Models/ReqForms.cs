@@ -17,6 +17,10 @@ namespace VC.AG.WebAPI.Models
         public DateTime? MaxDate { get; set; }
         public bool? InlineQuery { get; set; }
         public string? FormType { get; set; }
+        public string? FormTarget{ get; set; }
+        public bool? OnlyChildren { get; set; }
+
+        
 
         public FormQuery ToFormQuery(UserEntity? user)
         {
@@ -27,6 +31,7 @@ namespace VC.AG.WebAPI.Models
                 ListName = ListName,
                 Filter = Filter,
                 FormType=FormType,
+                FormTarget= FormTarget,
                 InlineQuery= InlineQuery,
                 Expand = Expand,
                 Select = Select,
@@ -45,7 +50,8 @@ namespace VC.AG.WebAPI.Models
                 MaxDate=MaxDate,
                 NextHref = string.IsNullOrEmpty(NextHref) ? null : NextHref[1..],
                 User=user,
-                DashTarget=Mode
+                DashTarget=Mode,
+                OnlyChildren=OnlyChildren
             };
             return q;
         }

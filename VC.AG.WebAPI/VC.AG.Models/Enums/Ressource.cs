@@ -4,6 +4,7 @@
     {
         None,
         AppSettings,
+        Organization,
         SiteLinks,
         Bus,
         ActionTemplates,

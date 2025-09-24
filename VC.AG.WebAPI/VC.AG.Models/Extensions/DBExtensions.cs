@@ -116,6 +116,21 @@ namespace VC.AG.Models.Extensions
                 op = $"<Eq><FieldRef Name='{InterviewKeys.FormType}'/><Value Type='Text'>{query.FormType}</Value></Eq>";
                 ops.Add(op);
             }
+            if (!string.IsNullOrEmpty(query.FormTarget))
+            {
+                op = $"<Eq><FieldRef Name='{InterviewKeys.FormTarget}'/><Value Type='Text'>{query.FormTarget}</Value></Eq>";
+                ops.Add(op);
+            }
+            if (query.OnlyChildren == true)
+            {
+                op = $"<Neq><FieldRef Name='{InterviewKeys.ReqRoot}'/><Value Type='Boolean'>1</Value></Neq>";
+                ops.Add(op);
+            }
+            else if (query.OnlyChildren.HasValue && query.OnlyChildren == false)
+            {
+                op = $"<Eq><FieldRef Name='{InterviewKeys.ReqRoot}'/><Value Type='Boolean'>1</Value></Eq>";
+                ops.Add(op);
+            }
             if (status != Enums.RequestStatus.None)
             {
                 op = $"<Eq><FieldRef Name='{InterviewKeys.Status}'/><Value Type='Text'>{GetRequestStatus(status)}</Value></Eq>";
