@@ -87,8 +87,9 @@ namespace VC.AG.Models
         {
             public const string Interview = "etf_interview";
             public const string Contract = "etf_contract";
-            public const string QInterview= "etf_quartlyinterview";
-            public const string Actions = "etf_relatedinterview";
+            public const string QInterview = "etf_quartlyinterview";
+            public const string AGActions = "etf_relatedinterview";
+            public const string CTActions = "etf_relatedcontract";
             public const string Comment = "etf_requestcomments";
             public const string AGAttachments = "etf_agattachments";
             public const string CTAttachments = "etf_ctattachments";
@@ -128,7 +129,7 @@ namespace VC.AG.Models
             public const string User = "Col_User";
             public const string UserRole = "Col_UserRole";
             public const string Lk_Request = "Col_Lk_Request";
-            public const string Lk_Contract= "Col_Lk_Contract";
+            public const string Lk_Contract = "Col_Lk_Contract";
 
         }
         public static class TranslationKeys
@@ -196,8 +197,58 @@ namespace VC.AG.Models
             public const string StartDate = "Col_StartDate";
             public const string Status = "Col_Status";
             public const string FormType = "Col_FormType";
-            public const string FormTarget= "Col_FormTarget";
+            public const string FormTarget = "Col_FormTarget";
             public const string ReqRoot = "Col_CtrRootReq";
+        }
+        public static class ContractType
+        {
+            public const string Aiguilleur = "Aiguilleur";
+            public const string StageE = "Stage - Etudiant";
+            public const string StageT = "Stage - Tuteur";
+            public const string AlternanceE = "Alternance - Etudiant";
+            public const string AlternanceT = "Alternance - Tuteur";
+            public const string Chantier1 = "Chantier - Intégration";
+            public const string Chantier2 = "Chantier - Tuteur - Graduate";
+            public const string Chantier3 = "Chantier - RH – Graduate";
+            public const string Conducteur1 = "CT - Bilan d'intégration à 1 mois";
+            public const string Conducteur2 = "CT - Bilan 1ère affectation";
+            public const string Conducteur3 = "CT - Bilan 2nd affectation";
+            public const string Conducteur4 = "CT - Bilan RH 1ère affectation";
+            public const string Conducteur5 = "CT - Bilan RH 2nd affectation";
+        }
+        public  class ContractActionType
+        {
+            public const string None = "None";
+            public const string ObjectifMission = "ObjectifMission";
+            public const string MissionRealisee = "MissionRealisee";
+            public const string AxeProgres = "AxeProgres";
+            public const string Engagement = "Engagement";
+            public const string Rex = "Rex";
+            public const string RexRoot = "RexRoot";
+            public const string StageTutAppreciation = "StageTutAppreciation";
+            public const string StageEtudAppreciation = "StageEtudAppreciation";
+            public const string AlterEtudAppreciation = "AlterEtudAppreciation";
+            public const string AlterTutAppreciation = "AlterTutAppreciation";
+            public const string ChantierAccueillir = "ChantierAccueillir";
+            public const string ChantierSavoirFaire = "ChantierSavoirFaire";
+            public const string ChantierSuperviser = "ChantierSuperviser";
+            public const string ChantierProgression = "ChantierProgression";
+            public const string ChantierFormation = "ChantierFormation";
+            public const string ChantierAppreciation = "ChantierAppreciation";
+            public const string ChantierFinancier = "ChantierFinancier";
+            public const string ChantierContractuel = "ChantierContractuel";
+            public const string ChantierPrevention = "ChantierPrevention";
+            public const string ChantierCommercial = "ChantierCommercial";
+            public const string ConducteurAppreciation = "ConducteurAppreciation";
+            public const string ConducteurFinancier = "ConducteurFinancier";
+            public const string ConducteurContractuel = "ConducteurContractuel";
+            public const string ConducteurPrevention = "ConducteurPrevention";
+            public const string ConducteurCommercial = "ConducteurCommercial";
+            public const string ConducteurAccueillir = "ConducteurAccueillir";
+            public const string ConducteurSavoirFaire = "ConducteurSavoirFaire";
+            public const string ConducteurSuperviser = "ConducteurSuperviser";
+            public const string ConducteurProgression = "ConducteurProgression";
+            public const string ConducteurFormation = "ConducteurFormation";
         }
 
         public static class QInterviewKeys

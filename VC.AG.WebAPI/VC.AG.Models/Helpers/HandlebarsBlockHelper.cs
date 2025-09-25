@@ -209,6 +209,34 @@ namespace VC.AG.Models.Helpers
                 }
 
             });
+            Handlebars.RegisterHelper("String2EqualityBlockHelper", (output, options, context, arguments) =>
+            {
+                try
+                {
+                    if (arguments.Length == 3)
+                    {
+                        Dictionary<string, object> values = (Dictionary<string, object>)context.Value;
+                        var leftName = arguments.At<string>(0);
+                        var rightVal1 = arguments.At<string>(1);
+                        var rightVal2 = arguments.At<string>(2);
+                        var leftVal = "" + leftName; //values.ContainsKey(leftName) ? "" + values[leftName] : string.Empty;
+
+                        if (leftVal.Equals(rightVal1, StringComparison.OrdinalIgnoreCase) ||
+                        leftVal.Equals(rightVal2, StringComparison.OrdinalIgnoreCase)) options.Template(output, context);
+                        else options.Inverse(output, context);
+                    }
+                    else
+                    {
+                        output.WriteSafeString("");
+                    }
+                }
+                catch (Exception)
+                {
+
+                    output.WriteSafeString("");
+                }
+
+            });
             Handlebars.RegisterHelper("StringNullOrEmptyBlockHelper", (output, options, context, arguments) =>
             {
                 try
@@ -483,10 +511,14 @@ namespace VC.AG.Models.Helpers
                         {
                             var leftValue = arguments[0].ToString();
                             var rightValue = arguments[1].ToString();
-                            if (leftValue.Equals(rightValue, StringComparison.OrdinalIgnoreCase))
+                            var yesValues = new string[] { "Yes", "Oui", "true" };
+                            var noValues = new string[] { "No", "Non", "false" };
+                            var targetValues = rightValue == "true" ? yesValues : noValues;
+                            if (targetValues.Any(a => a.Equals(leftValue, StringComparison.OrdinalIgnoreCase)))
                                 output.WriteSafeString("<input type=\"checkbox\" checked=\"checked\" />");
                             else
                                 output.WriteSafeString("<input type=\"checkbox\" />");
+
                         }
                         else
                         {

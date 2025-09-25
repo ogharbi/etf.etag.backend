@@ -14,6 +14,7 @@ using VC.AG.ServiceLayer.Contracts;
 using VC.AG.WebAPI.Models;
 using static VC.AG.Models.AppConstants;
 using Wkhtmltopdf.NetCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace VC.AG.WebAPI.Controllers
 {
@@ -36,8 +37,9 @@ namespace VC.AG.WebAPI.Controllers
         public IActionResult RefreshSite([FromQuery(Name = "t")] SiteRefreshTarget siteRefreshTarget)
         {
             logger.LogInformation($"Get SiteInfo");
+           
             var result = appSvc.RefreshSite(siteRefreshTarget).Result;
-            return result != null ? (IActionResult)Ok(result.GetBasicInfo()):Ok();
+            return result != null ? (IActionResult)Ok(result.GetBasicInfo()) : Ok();
         }
         [HttpGet("ressource")]
         [ProducesResponseType<string>(StatusCodes.Status200OK)]
@@ -103,17 +105,17 @@ namespace VC.AG.WebAPI.Controllers
             var result = appSvc.Delete(d).Result;
             return Ok(result);
         }
-        [HttpGet("pdf/{id}")]
-        public async Task<IActionResult> GetPdf(int id)
+        [HttpGet("pdf/{app}/{id}")]
+        public async Task<IActionResult> GetPdf(AppTarget app, int id)
         {
-            var qp = new DBQuery() { Id = id };
+            var qp = new DBQuery() { AppTarget = app, Id = id };
             var file = await appSvc.GetPdf(generatePdf, qp);
             var stream = file?.Content != null ? new MemoryStream(file.Content) : file?.ContentStream;
             if (stream != null)
                 return new FileStreamResult(stream, "application/pdf");
             else return Ok(null);
         }
-      
+
 
     }
 }

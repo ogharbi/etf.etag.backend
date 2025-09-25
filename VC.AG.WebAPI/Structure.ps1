@@ -1495,13 +1495,13 @@ function SetStructureRoot($siteURL) {
     # AttachmentsCT $true
     # AttachmentsAGNewList $web $true
     # AttachmentsCTNewList $web $true
-    # TemplateNewList $web
+    TemplateNewList $web
     # AccessCTNewList $web
     # AccessAGNewList $web
     # TemplateActionNewList $web
-    stageCT $true
-    ChantierCT $true
-    ConducteurCT $true
+    # stageCT $true
+    # ChantierCT $true
+    # ConducteurCT $true
 
 }
 $siteURL = "https://vincic.sharepoint.com/sites/etag-dev4"

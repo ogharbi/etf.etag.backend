@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using VC.AG.DAO.UnitOfWork;
+using VC.AG.Models;
 using VC.AG.Models.Entities;
 using VC.AG.Models.Enums;
 using VC.AG.Models.Extensions;
@@ -22,16 +23,25 @@ using static VC.AG.Models.AppConstants;
 
 namespace VC.AG.ServiceLayer.Services
 {
-    public class AppService(IUnitOfWork uow, ISiteContract siteSvc,IMemoryCache cache, IConfiguration config) : IAppContract
+    public class AppService(IUnitOfWork uow, ISiteContract siteSvc, IMemoryCache cache, IConfiguration config) : IAppContract
     {
         readonly SpoContext spoContext = new(config, cache);
         public async Task<SiteEntity?> GetSite(string delegation = "", bool force = false)
         {
+            if (force)
+            {
+                if (cache is MemoryCache memoryCache)
+                {
+                    var percentage = 1.0;//100%
+                    memoryCache.Compact(percentage);
+                }
+            }
             var result = await siteSvc.Get(delegation, force) ?? throw new InvalidOperationException($"Unable to find the site : {delegation}");
             return result;
         }
         public async Task<SiteEntity?> RefreshSite(SiteRefreshTarget target, string delegation = "")
         {
+           
             var site = await siteSvc.Refresh(target, delegation);
             return site;
         }
@@ -125,7 +135,7 @@ namespace VC.AG.ServiceLayer.Services
                             ["Template"] = $"{list.Template}",
                             ["RootFolder"] = $"{list.RootFolder}"
                         };
-                        
+
                         r.Values = values;
                         rs.Add(r);
                     }
@@ -178,7 +188,7 @@ namespace VC.AG.ServiceLayer.Services
         }
 
 
-        public async Task<string?> SendReminder(DateTime? startDate,DateTime? endDate)
+        public async Task<string?> SendReminder(DateTime? startDate, DateTime? endDate)
         {
             //var result = await notifSvc.SendReminder(startDate,endDate);
             //return $"{result}";
@@ -189,49 +199,80 @@ namespace VC.AG.ServiceLayer.Services
         {
             FileModel? result = null;
             IDictionary<string, Object> itemPdf = new Dictionary<string, Object>();
-            var qInterviews = new List<dynamic>();
+            var relatedItems = new List<dynamic>();
             var actions = new List<dynamic>();
             var force = false;
-            var site = await siteSvc.Get() ?? throw new InvalidOperationException($"Unable to find the site");
 
-            var dbFile = new DBFile()
+            var site = await siteSvc.Get() ?? throw new InvalidOperationException($"Unable to find the site");
+            var targetList = GetTargetList(qp.AppTarget);
+            var relatedTargetList = GetRelatedTargetList(qp.AppTarget);
+            var actionTargetList = GetActionTargetList(qp.AppTarget);
+            var targetLkField = GetLkTargetField(qp.AppTarget);
+            var dbQuery = new DBQuery()
             {
-                SiteId = site.Id,
-                DriveId = site.Drives?[ListNameKeys.DocTemplates] as string,
-                Name = "Carnet.html"
+                ListName = targetList,
+                Filter = $"<Where><Eq><FieldRef Name='ID'/><Value Type='Number'>{qp.Id}</Value></Eq></Where>"
             };
-            DBFile? file = await uow.FileRepo.Get(dbFile, true);
-            if (file != null && file.ContentStream != null)
+            var mainItem = await GetAll(dbQuery);
+            if (mainItem != null)
             {
-                string htmlCacheKey = $"app-html-template-carnet";
-                cache.TryGetValue(htmlCacheKey, out string? html);
-                if (string.IsNullOrEmpty(html))
+                var values = mainItem.Row?.FirstOrDefault();
+                if (values == null) return null;
+                var formType = values.GetStringValue2(InterviewKeys.FormType);
+                itemPdf["FormType"] = formType;
+                itemPdf["FormTarget"] = values.GetStringValue2(InterviewKeys.FormTarget);
+                itemPdf["DocumentName"] = GetDocumentName(formType);
+                itemPdf["Type_Aiguilleur"] = ContractType.Aiguilleur;
+                itemPdf["Type_StageE"] = ContractType.StageE;
+                itemPdf["Type_StageT"] = ContractType.StageT;
+                itemPdf["Type_Chantier1"] = ContractType.Chantier1;
+                itemPdf["Type_Chantier2"] = ContractType.Chantier2;
+                itemPdf["Type_Chantier3"] = ContractType.Chantier3;
+                itemPdf["Type_Condcuteur1"] = ContractType.Conducteur1;
+                itemPdf["Type_Condcuteur2"] = ContractType.Conducteur2;
+                itemPdf["Type_Condcuteur3"] = ContractType.Conducteur3;
+                itemPdf["Type_Condcuteur4"] = ContractType.Conducteur4;
+                itemPdf["Type_Condcuteur5"] = ContractType.Conducteur5;
+
+                var templateName = GetTemplateName(formType);
+                var dbFile = new DBFile()
                 {
-                    var buffer = file.ContentStream.ReadAllBytes();
-                    html = System.Text.Encoding.UTF8.GetString(buffer, 0, buffer.Length);
-                    cache.Set(htmlCacheKey, html);
-                }
-                IDictionary<string, Object> mValues = new Dictionary<string, Object>();
-                var dbQuery = new DBQuery()
-                {
-                    ListName = ListNameKeys.Interview,
-                    Filter = $"<Where><Eq><FieldRef Name='ID'/><Value Type='Number'>{qp.Id}</Value></Eq></Where>"
+                    SiteId = site.Id,
+                    DriveId = site.Drives?[ListNameKeys.DocTemplates] as string,
+                    Name = templateName
                 };
-                var mainItem = await GetAll(dbQuery);
-                if (mainItem != null)
+                DBFile? file = await uow.FileRepo.Get(dbFile, true);
+                if (file != null && file.ContentStream != null)
                 {
-                    var values = mainItem.Row?.FirstOrDefault();
+                    string htmlCacheKey = $"app-html-template-carnet-{templateName}";
+                    cache.TryGetValue(htmlCacheKey, out string? html);
+                    if (string.IsNullOrEmpty(html))
+                    {
+                        var buffer = file.ContentStream.ReadAllBytes();
+                        html = System.Text.Encoding.UTF8.GetString(buffer, 0, buffer.Length);
+                        //cache.Set(htmlCacheKey, html);
+                    }
+                    IDictionary<string, Object> mValues = new Dictionary<string, Object>();
                     if (values != null)
                     {
                         foreach (KeyValuePair<string, object> it in values)
                         {
-                            if (!itemPdf.ContainsKey(it.Key)) itemPdf.Add(it.Key, it.Value);
+                            //var keybis = $"{it.Key}.";
+                            //if (values.ContainsKey(keybis) && !itemPdf.ContainsKey(keybis))
+                            //{
+                            //    itemPdf.Add(it.Key, values[keybis]);
+                            //}
+                            //else
+                            if (!itemPdf.ContainsKey(it.Key))
+                            {
+                                itemPdf.Add(it.Key, it.Value);
+                            }
                         }
                     }
                     dbQuery = new DBQuery()
                     {
-                        ListName = ListNameKeys.QInterview,
-                        Filter = $"<Where><Eq><FieldRef Name='Col_Lk_Request' LookupId='True'/><Value Type='Lookup'>{qp.Id}</Value></Eq></Where>"
+                        ListName = relatedTargetList,
+                        Filter = $"<Where><Eq><FieldRef Name='{targetLkField}' LookupId='True'/><Value Type='Lookup'>{qp.Id}</Value></Eq></Where>"
                     };
                     var qItems = await GetAll(dbQuery);
 
@@ -243,13 +284,13 @@ namespace VC.AG.ServiceLayer.Services
                         {
                             if (!qValues.ContainsKey(it.Key)) qValues.Add(it.Key, it.Value);
                         }
-                        qInterviews.Add(qValues);
+                        relatedItems.Add(qValues);
                     }
 
                     dbQuery = new DBQuery()
                     {
-                        ListName = ListNameKeys.Actions,
-                        Filter = $"<Where><Eq><FieldRef Name='Col_Lk_Request' LookupId='True'/><Value Type='Lookup'>{qp.Id}</Value></Eq></Where>"
+                        ListName = actionTargetList,
+                        Filter = $"<Where><Eq><FieldRef Name='{targetLkField}' LookupId='True'/><Value Type='Lookup'>{qp.Id}</Value></Eq></Where>"
                     };
                     var aItems = await GetAll(dbQuery);
 
@@ -265,11 +306,13 @@ namespace VC.AG.ServiceLayer.Services
                     var itemPdfGuid = itemPdf.ContainsKey("Col_Guid") ? "" + itemPdf["Col_Guid"] : string.Empty;
                     if (!string.IsNullOrEmpty(itemPdfGuid))
                     {
-                        var subItems = actions.Where(a => "" + a["Col_Guid"] == itemPdfGuid).ToList();
+                        var subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ObjectifMission)).ToList();
                         itemPdf.Add("Objectifs", subItems);
+                        subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.StageEtudAppreciation)).ToList();
+                        itemPdf.Add("StageEtudAppreciation", subItems);
                     }
                     var i = 1;
-                    foreach (var qItem in qInterviews)
+                    foreach (var qItem in relatedItems)
                     {
                         var guid = qItem.ContainsKey("Col_Guid") ? "" + qItem["Col_Guid"] : string.Empty;
                         if (!string.IsNullOrEmpty(guid))
@@ -285,13 +328,133 @@ namespace VC.AG.ServiceLayer.Services
                             i++;
                         }
                     }
-                    itemPdf.Add("QItems", qInterviews.AsEnumerable().OrderBy(x => x["Col_Order."]));
+                    itemPdf.Add("RItems", relatedItems.AsEnumerable().OrderBy(x => x["Col_Order."]));
                     var stream = AppHelper.GetPdfStream(generatePdf, html, itemPdf, Wkhtmltopdf.NetCore.Options.Orientation.Portrait);
                     result = new FileModel() { Title = $"{itemPdf["Title"]}.pdf", ContentStream = stream };
 
                 }
             }
             return result;
+        }
+
+        private string GetActionTargetList(AppTarget? appTarget)
+        {
+            string r = "";
+            switch (appTarget)
+            {
+                case AppTarget.None:
+                    break;
+                case AppTarget.AG:
+                    r = ListNameKeys.AGActions;
+                    break;
+                case AppTarget.CT:
+                    r = ListNameKeys.CTActions;
+                    break;
+                default:
+                    break;
+            }
+            return r;
+        }
+
+        private string GetTargetList(AppTarget? appTarget)
+        {
+            string r = "";
+            switch (appTarget)
+            {
+                case AppTarget.None:
+                    break;
+                case AppTarget.AG:
+                    r = ListNameKeys.Interview;
+                    break;
+                case AppTarget.CT:
+                    r = ListNameKeys.Contract;
+                    break;
+                default:
+                    break;
+            }
+            return r;
+        }
+        private string GetRelatedTargetList(AppTarget? appTarget)
+        {
+            string r = "";
+            switch (appTarget)
+            {
+                case AppTarget.None:
+                    break;
+                case AppTarget.AG:
+                    r = ListNameKeys.QInterview;
+                    break;
+                case AppTarget.CT:
+                    r = ListNameKeys.Contract;
+                    break;
+                default:
+                    break;
+            }
+            return r;
+        }
+        private string GetLkTargetField(AppTarget? appTarget)
+        {
+            string r = "";
+            switch (appTarget)
+            {
+                case AppTarget.None:
+                    break;
+                case AppTarget.AG:
+                    r = AppKeys.Lk_Request;
+                    break;
+                case AppTarget.CT:
+                    r = AppKeys.Lk_Contract;
+                    break;
+                default:
+                    break;
+            }
+            return r;
+        }
+
+        bool EqualsNotNull(string? a, string? b)
+        {
+            return !string.IsNullOrEmpty(a) && !string.IsNullOrEmpty(b) && a.Equals(b, StringComparison.InvariantCultureIgnoreCase);
+        }
+        string GetDocumentName(string formType)
+        {
+            string r = "Bilan";
+            switch (formType)
+            {
+                case ContractType.Aiguilleur: r = "Aiguilleur"; break;
+                case ContractType.StageE: r = "BILAN STAGIAIRE – RH et Etudiant(e)"; break;
+                case ContractType.StageT: r = "BILAN STAGE - Tuteur et Etudiant(e)"; break;
+                case ContractType.AlternanceE: r = "BILAN ALTERNANCE – RH et Etudiant(e)"; break;
+                case ContractType.AlternanceT: r = "BILAN ALTERNANCE - Tuteur et Etudiant(e)"; break;
+                case ContractType.Chantier1: r = ""; break;
+                case ContractType.Chantier2: r = ""; break;
+                case ContractType.Chantier3: r = ""; break;
+                case ContractType.Conducteur1: r = ""; break;
+                case ContractType.Conducteur2: r = ""; break;
+                case ContractType.Conducteur3: r = ""; break;
+                case ContractType.Conducteur4: r = ""; break;
+                case ContractType.Conducteur5: r = ""; break;
+            }
+            return r;
+        }
+        string GetTemplateName(string formType)
+        {
+            string r = "Aiguilleur.html";
+            if (formType.EqualsNotNull(ContractType.StageE) || formType.EqualsNotNull(ContractType.StageE)
+                || formType.EqualsNotNull(ContractType.AlternanceT) || formType.EqualsNotNull(ContractType.AlternanceE))
+            {
+                r = "stage.html";
+            }
+            else if (formType.EqualsNotNull(ContractType.Chantier1) || formType.EqualsNotNull(ContractType.Chantier2)
+                || formType.EqualsNotNull(ContractType.Chantier3))
+            {
+                r = "chantier.html";
+            }
+            else if (formType.EqualsNotNull(ContractType.Conducteur1) || formType.EqualsNotNull(ContractType.Conducteur2)
+                || formType.EqualsNotNull(ContractType.Conducteur2) || formType.EqualsNotNull(ContractType.Conducteur4))
+            {
+                r = "conducteur.html";
+            }
+            return r;
         }
     }
 }
