@@ -471,7 +471,7 @@ function FieldsDefinitions() {
         #Access fields
 
         [pscustomobject]@{ key = "Col_UserRole"; value = "<Field Type='Choice' DisplayName='Rôle utilisateur' ID='8da866a3-d42b-4b22-b044-fcfac1c93ad6' Group='VC' Name='Col_UserRole' StaticName='Col_UserRole'  Required='false' FillInChoice='FALSE'  ><Default>Aiguilleur</Default> <CHOICES><CHOICE>Admin</CHOICE><CHOICE>RH</CHOICE><CHOICE>Aiguilleur</CHOICE><CHOICE>User</CHOICE></CHOICES></Field>" }
-        [pscustomobject]@{ key = "Col_LevelRole"; value = "<Field Type='Choice' DisplayName='Niveau accès' Name='Col_LevelRole'  StaticName='Col_LevelRole' ID='7c884426-31f0-4f5c-98c0-87a3b9181900' Group='VC' Required='false'  FillInChoice='FALSE'  ><Default></Default> <CHOICES><CHOICE></CHOICE><CHOICE>Delegation</CHOICE><CHOICE>Region</CHOICE><CHOICE>BU</CHOICE><CHOICE>MU</CHOICE></CHOICES></Field>" }
+        [pscustomobject]@{ key = "Col_LevelRole"; value = "<Field Type='Text' DisplayName='Niveau accès' Name='Col_LevelRole'  StaticName='Col_LevelRole' ID='7c884426-31f0-4f5c-98c0-87a3b9181900' Group='VC' Required='false'  ></Field>" }
         [pscustomobject]@{ key = "Col_User"; value = "<Field Type='User' DisplayName='Utilisateur' Name='Col_User'  StaticName='Col_User' ID='4f299631-f8d7-4fff-84b7-27fa1bc6b31c' Group='VC' Required='false'   />" }
         
 

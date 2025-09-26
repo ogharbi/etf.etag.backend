@@ -199,6 +199,7 @@ namespace VC.AG.Models
             public const string FormType = "Col_FormType";
             public const string FormTarget = "Col_FormTarget";
             public const string ReqRoot = "Col_CtrRootReq";
+            public const string Direction = "Col_DirGeneral";
         }
         public static class ContractType
         {
@@ -253,8 +254,9 @@ namespace VC.AG.Models
 
         public static class QInterviewKeys
         {
-            public const string AigId = "F_x003a_Aiguilleur_ID";
-            public const string AigId2 = "F_x003a_Aiguilleur2_ID";
+            public const string AigId = "F_x003a_Responsable_x0020_ID";
+            public const string AigId2 = "F_x003a_Responsable2_ID";
+            public const string Direction = "F_x003a_Direction_x0020_g_x00e9_";
             public const string StartDate = "Col_StartDate";
             public const string DueDate = "Col_DueDate";
             public const string Status = "Col_Status";

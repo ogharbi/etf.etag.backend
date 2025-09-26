@@ -184,6 +184,7 @@ namespace VC.AG.Models.Extensions
                               $"<Eq><FieldRef Name='{QInterviewKeys.AigId2}'/><Value Type='Number'>{currentUser?.SPId}</Value></Eq></Or>";
                                 var op2 = $"<Eq><FieldRef Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
                                 op = $"<Or>{op1}{op2}</Or>";
+                                op = AddLevelsAccess(levels, op,true);
                                 ops.Add(op);
                                 break;
                             case DashTarget.Default:
@@ -197,7 +198,7 @@ namespace VC.AG.Models.Extensions
                             case DashTarget.Contract:
                                 op = $"<Or><Eq><FieldRef LookupId='TRUE' Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>" +
                                     $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.InterviewKeys.Responsible}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq></Or>";
-                                op=AddLevelsAccess(levels, op);
+                                op = AddLevelsAccess(levels, op);
                                 ops.Add(op);
                                 break;
                         }
@@ -215,11 +216,12 @@ namespace VC.AG.Models.Extensions
                 op = $"<Eq><FieldRef LookupId='TRUE' Name='{AppConstants.AppKeys.Author}'/><Value Type='Lookup'>{currentUser?.SPId}</Value></Eq>";
                 ops.Add(op);
             }
-            static string AddLevelsAccess(List<string?> levels,string op)
+            static string AddLevelsAccess(List<string?> levels, string op, bool isQuarty = false)
             {
+                var directionField = isQuarty ? AppConstants.QInterviewKeys.Direction: AppConstants.InterviewKeys.Direction ;
                 if (levels.Count > 0)
                 {
-                    var op2 = $"<In>  <FieldRef Name=\"{AppConstants.InterviewKeys.FormTarget}\" />" +
+                    var op2 = $"<In>  <FieldRef Name=\"{directionField}\" />" +
                        " <Values>";
                     foreach (var level in levels)
                     {
