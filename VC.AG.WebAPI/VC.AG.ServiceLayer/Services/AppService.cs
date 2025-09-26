@@ -41,7 +41,7 @@ namespace VC.AG.ServiceLayer.Services
         }
         public async Task<SiteEntity?> RefreshSite(SiteRefreshTarget target, string delegation = "")
         {
-           
+
             var site = await siteSvc.Refresh(target, delegation);
             return site;
         }
@@ -222,17 +222,20 @@ namespace VC.AG.ServiceLayer.Services
                 itemPdf["FormType"] = formType;
                 itemPdf["FormTarget"] = values.GetStringValue2(InterviewKeys.FormTarget);
                 itemPdf["DocumentName"] = GetDocumentName(formType);
+                itemPdf["RespName"] = GetResponsibleName(formType);
                 itemPdf["Type_Aiguilleur"] = ContractType.Aiguilleur;
                 itemPdf["Type_StageE"] = ContractType.StageE;
                 itemPdf["Type_StageT"] = ContractType.StageT;
+                itemPdf["Type_AlternanceE"] = ContractType.AlternanceE;
+                itemPdf["Type_AlternanceT"] = ContractType.AlternanceT;
                 itemPdf["Type_Chantier1"] = ContractType.Chantier1;
                 itemPdf["Type_Chantier2"] = ContractType.Chantier2;
                 itemPdf["Type_Chantier3"] = ContractType.Chantier3;
-                itemPdf["Type_Condcuteur1"] = ContractType.Conducteur1;
-                itemPdf["Type_Condcuteur2"] = ContractType.Conducteur2;
-                itemPdf["Type_Condcuteur3"] = ContractType.Conducteur3;
-                itemPdf["Type_Condcuteur4"] = ContractType.Conducteur4;
-                itemPdf["Type_Condcuteur5"] = ContractType.Conducteur5;
+                itemPdf["Type_Conducteur1"] = ContractType.Conducteur1;
+                itemPdf["Type_Conducteur2"] = ContractType.Conducteur2;
+                itemPdf["Type_Conducteur3"] = ContractType.Conducteur3;
+                itemPdf["Type_Conducteur4"] = ContractType.Conducteur4;
+                itemPdf["Type_Conducteur5"] = ContractType.Conducteur5;
 
                 var templateName = GetTemplateName(formType);
                 var dbFile = new DBFile()
@@ -306,10 +309,7 @@ namespace VC.AG.ServiceLayer.Services
                     var itemPdfGuid = itemPdf.ContainsKey("Col_Guid") ? "" + itemPdf["Col_Guid"] : string.Empty;
                     if (!string.IsNullOrEmpty(itemPdfGuid))
                     {
-                        var subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ObjectifMission)).ToList();
-                        itemPdf.Add("Objectifs", subItems);
-                        subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.StageEtudAppreciation)).ToList();
-                        itemPdf.Add("StageEtudAppreciation", subItems);
+                        AddContractTypesToPdf(actions, itemPdfGuid, itemPdf);
                     }
                     var i = 1;
                     foreach (var qItem in relatedItems)
@@ -335,6 +335,59 @@ namespace VC.AG.ServiceLayer.Services
                 }
             }
             return result;
+        }
+
+        private void AddContractTypesToPdf(List<dynamic> actions, string itemPdfGuid, IDictionary<string, object> itemPdf)
+        {
+            var subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ObjectifMission)).ToList();
+            itemPdf.Add(ContractActionType.ObjectifMission, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.StageEtudAppreciation)).ToList();
+            itemPdf.Add(ContractActionType.StageEtudAppreciation, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.StageTutAppreciation)).ToList();
+            itemPdf.Add(ContractActionType.StageTutAppreciation, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.AlterEtudAppreciation)).ToList();
+            itemPdf.Add(ContractActionType.AlterEtudAppreciation, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.AlterTutAppreciation)).ToList();
+            itemPdf.Add(ContractActionType.AlterTutAppreciation, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ChantierAccueillir)).ToList();
+            itemPdf.Add(ContractActionType.ChantierAccueillir, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ChantierAppreciation)).ToList();
+            itemPdf.Add(ContractActionType.ChantierAppreciation, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ChantierCommercial)).ToList();
+            itemPdf.Add(ContractActionType.ChantierCommercial, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ChantierContractuel)).ToList();
+            itemPdf.Add(ContractActionType.ChantierContractuel, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ChantierFinancier)).ToList();
+            itemPdf.Add(ContractActionType.ChantierFinancier, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ChantierFormation)).ToList();
+            itemPdf.Add(ContractActionType.ChantierFormation, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ChantierPrevention)).ToList();
+            itemPdf.Add(ContractActionType.ChantierPrevention, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ChantierProgression)).ToList();
+            itemPdf.Add(ContractActionType.ChantierProgression, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ChantierSavoirFaire)).ToList();
+            itemPdf.Add(ContractActionType.ChantierSavoirFaire, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ChantierSuperviser)).ToList();
+            itemPdf.Add(ContractActionType.ChantierSuperviser, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ConducteurAccueillir)).ToList();
+            itemPdf.Add(ContractActionType.ConducteurAccueillir, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ConducteurAppreciation)).ToList();
+            itemPdf.Add(ContractActionType.ConducteurAppreciation, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ConducteurCommercial)).ToList();
+            itemPdf.Add(ContractActionType.ConducteurCommercial, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ConducteurFinancier)).ToList();
+            itemPdf.Add(ContractActionType.ConducteurFinancier, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ConducteurFormation)).ToList();
+            itemPdf.Add(ContractActionType.ConducteurFormation, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ConducteurPrevention)).ToList();
+            itemPdf.Add(ContractActionType.ConducteurPrevention, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ConducteurProgression)).ToList();
+            itemPdf.Add(ContractActionType.ConducteurProgression, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ConducteurSavoirFaire)).ToList();
+            itemPdf.Add(ContractActionType.ConducteurSavoirFaire, subItems);
+            subItems = actions.Where(a => EqualsNotNull("" + a["Col_Guid"], itemPdfGuid) && EqualsNotNull("" + a["Title"], ContractActionType.ConducteurSuperviser)).ToList();
+            itemPdf.Add(ContractActionType.ConducteurSuperviser, subItems);
+          
         }
 
         private string GetActionTargetList(AppTarget? appTarget)
@@ -425,21 +478,43 @@ namespace VC.AG.ServiceLayer.Services
                 case ContractType.StageT: r = "BILAN STAGE - Tuteur et Etudiant(e)"; break;
                 case ContractType.AlternanceE: r = "BILAN ALTERNANCE – RH et Etudiant(e)"; break;
                 case ContractType.AlternanceT: r = "BILAN ALTERNANCE - Tuteur et Etudiant(e)"; break;
-                case ContractType.Chantier1: r = ""; break;
-                case ContractType.Chantier2: r = ""; break;
-                case ContractType.Chantier3: r = ""; break;
-                case ContractType.Conducteur1: r = ""; break;
-                case ContractType.Conducteur2: r = ""; break;
-                case ContractType.Conducteur3: r = ""; break;
-                case ContractType.Conducteur4: r = ""; break;
-                case ContractType.Conducteur5: r = ""; break;
+                case ContractType.Chantier1: r = "BILAN D’INTEGRATION \r\nGRADUATE PROGRAM ASPIRANT.E CHEF.FE DE CHANTIER\r\n(RH – Graduate)\r\n"; break;
+                case ContractType.Chantier2: r = "BILAN FINAL \r\n GRADUATE PROGRAM ASPIRANT.E CHEF.FE DE CHANTIER\r\nTuteur - Graduate\r\n"; break;
+                case ContractType.Chantier3: r = "BILAN FINAL\r\nGRADUATE PROGRAM ASPIRANT.E CHEF.FE DE CHANTIER\r\n(RH – Graduate)\r\n"; break;
+                case ContractType.Conducteur1: r = "BILAN D'INTEGRATION A 1 MOIS – GRADUATE PROGRAM CONDUITE DE TRAVAUX\r\n(RH – Graduate)\r\n"; break;
+                case ContractType.Conducteur2: r = "BILAN 1ère AFFECTATION – GRADUATE PROGRAM CONDUITE DE TRAVAUX \r\n(Graduate – Tuteur)\r\n"; break;
+                case ContractType.Conducteur3: r = "BILAN 2nd AFFECTATION – GRADUATE PROGRAM CONDUITE DE TRAVAUX \r\n(Graduate – Tuteur)\r\n"; break;
+                case ContractType.Conducteur4: r = "BILAN AVANCEMENT RH - 1ère AFFECTATION\r\nGRADUATE PROGRAM CONDUITE DE TRAVAUX\r\n(RH – Graduate)\r\n"; break;
+                case ContractType.Conducteur5: r = "BILAN AVANCEMENT RH – 2nd AFFECTATION\r\nGRADUATE PROGRAM CONDUITE DE TRAVAUX\r\n(RH – Graduate)\r\n"; break;
             }
             return r;
         }
+        string GetResponsibleName(string formType)
+        {
+            string r = "Bilan";
+            switch (formType)
+            {
+                case ContractType.Aiguilleur: r = "Signature aiguilleur"; break;
+                case ContractType.StageE: r = "Signature RH"; break;
+                case ContractType.StageT: r = "Signature tuteur"; break;
+                case ContractType.AlternanceE: r = "Signature RH"; break;
+                case ContractType.AlternanceT: r = "Signature tuteur"; break;
+                case ContractType.Chantier1: r = "Signature RH"; break;
+                case ContractType.Chantier2: r = "Signature tuteur"; break;
+                case ContractType.Chantier3: r = "Signature RH"; break;
+                case ContractType.Conducteur1: r = "Signature RH"; break;
+                case ContractType.Conducteur2: r = "Signature tuteur"; break;
+                case ContractType.Conducteur3: r = "Signature tuteur"; break;
+                case ContractType.Conducteur4: r = "Signature RH"; break;
+                case ContractType.Conducteur5: r = "Signature RH"; break;
+            }
+            return r;
+        }
+
         string GetTemplateName(string formType)
         {
             string r = "Aiguilleur.html";
-            if (formType.EqualsNotNull(ContractType.StageE) || formType.EqualsNotNull(ContractType.StageE)
+            if (formType.EqualsNotNull(ContractType.StageE) || formType.EqualsNotNull(ContractType.StageT)
                 || formType.EqualsNotNull(ContractType.AlternanceT) || formType.EqualsNotNull(ContractType.AlternanceE))
             {
                 r = "stage.html";
@@ -450,7 +525,8 @@ namespace VC.AG.ServiceLayer.Services
                 r = "chantier.html";
             }
             else if (formType.EqualsNotNull(ContractType.Conducteur1) || formType.EqualsNotNull(ContractType.Conducteur2)
-                || formType.EqualsNotNull(ContractType.Conducteur2) || formType.EqualsNotNull(ContractType.Conducteur4))
+                || formType.EqualsNotNull(ContractType.Conducteur3) || formType.EqualsNotNull(ContractType.Conducteur4)
+                || formType.EqualsNotNull(ContractType.Conducteur5))
             {
                 r = "conducteur.html";
             }
