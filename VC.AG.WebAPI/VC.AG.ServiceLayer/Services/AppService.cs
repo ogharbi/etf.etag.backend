@@ -90,6 +90,9 @@ namespace VC.AG.ServiceLayer.Services
                     case Ressource.SiteLinks:
                         result = site.SiteLinks;
                         break;
+                    case Ressource.Faq:
+                        result = site.Faq;
+                        break;
                     case Ressource.ContentTypes:
                         var q2 = new DBQuery() { SiteId = site.Id, SiteUrl = site.SiteUrl, ListId = listId, CatchError = true };
                         result = await uow.DBRepo.GetListContentTypes(q2);
@@ -183,6 +186,10 @@ namespace VC.AG.ServiceLayer.Services
             {
                 item = item.ToSiteLink();
             }
+            if (item.ListName.EqualsNotNull(ListNameKeys.Faq))
+            {
+                item = item.ToFAQ();
+            }
             string? result = await uow.DBRepo.PostForm(item);
             return result;
         }
@@ -253,7 +260,7 @@ namespace VC.AG.ServiceLayer.Services
                     {
                         var buffer = file.ContentStream.ReadAllBytes();
                         html = System.Text.Encoding.UTF8.GetString(buffer, 0, buffer.Length);
-                        //cache.Set(htmlCacheKey, html);
+                        cache.Set(htmlCacheKey, html);
                     }
                     IDictionary<string, Object> mValues = new Dictionary<string, Object>();
                     if (values != null)

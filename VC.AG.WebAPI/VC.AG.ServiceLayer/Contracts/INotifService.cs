@@ -15,7 +15,7 @@ namespace VC.AG.ServiceLayer.Contracts
     {
 
         Task<bool> SendReminder(DateTime? startDate, DateTime? endDate);
-        Task<string> SendNotifications(SiteEntity? rootSite,WfRequest? request,string? comment);
+        Task<string> SendNotifications(SiteEntity? rootSite,WfRequest? request, NotifQuery notifQuery);
      
 
 

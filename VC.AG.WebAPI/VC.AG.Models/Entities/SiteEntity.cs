@@ -25,6 +25,7 @@ namespace VC.AG.Models.Entities
         /// </summary>
         /// 
         public IEnumerable<DBItem>? SiteLinks { get; set; }
+        public IEnumerable<DBItem>? Faq { get; set; }
         public IEnumerable<DBItem>? Access { get; set; }
         public IEnumerable<Access>? AccessList { get; set; }
         public IEnumerable<DBItem>? ActionTemplates { get; set; }

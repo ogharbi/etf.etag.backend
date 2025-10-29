@@ -40,14 +40,14 @@ namespace VC.AG.ServiceLayer.Services
         {
             var result = true;
             var rootSite = await siteSvc.Get() ?? throw new InvalidOperationException($"Unable to find the root site");
-            List<MailReminder> items = await jobHelper.GetWfInProgress(rootSite, startDate, endDate);
+            List<MailReminder> items = await jobHelper.GetEntretiensInProgress(rootSite, startDate, endDate);
             var reminderList = $"{config.GetValue<string>(AppSettingsKeys.AppReminderList)}";
             await jobHelper.SendReminder(items, reminderList, rootSite, endDate);
             return result;
         }
-        public async Task<string> SendNotifications(SiteEntity? rootSite, WfRequest? request, string? comment)
+        public async Task<string> SendNotifications(SiteEntity? rootSite, WfRequest? request, NotifQuery notifQuery)
         {
-           var result= await jobHelper.SendNotification(rootSite,request,comment);
+           var result= await jobHelper.SendNotification(rootSite,request, notifQuery);
             return result;
         }
 

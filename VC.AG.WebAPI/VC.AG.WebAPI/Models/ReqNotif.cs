@@ -9,6 +9,7 @@ namespace VC.AG.WebAPI.Models
         public NotifType? Type { get; set; }
         public string? ListName { get; set; }
         public string? Comment { get; set; }
+        public AppTarget? AppTarget { get; set; }
         public NotifQuery ToNotifQuery()
         {
             return new NotifQuery
@@ -16,7 +17,8 @@ namespace VC.AG.WebAPI.Models
                 Id = Id,
                 Type = Type,
                 Comment = Comment,
-                ListName = ListName
+                ListName = ListName,
+                AppTarget= AppTarget
             };
         }
     }

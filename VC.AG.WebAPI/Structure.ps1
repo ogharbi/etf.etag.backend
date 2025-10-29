@@ -324,11 +324,14 @@ function RemoveElementCtFromList($list) {
 function FieldsDefinitions() {
     $data = @(
         #Commun
+        [pscustomobject]@{ key = "Col_FirstName"; value = "<Field DisplayName='Prénom' Type='Text' Required='FALSE' ID='69EA181C-3609-42D6-9CF9-FF925DB931E4'  StaticName='Col_FirstName' Name='Col_FirstName'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_LastName"; value = "<Field DisplayName='Nom' Type='Text' Required='FALSE' ID='ACF603E6-D415-41A0-B151-FEAFE265E974'  StaticName='Col_LastName' Name='Col_LastName'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_FullName"; value = "<Field DisplayName='Nom / prénom' Type='Text' Required='FALSE' ID='C7EC4B3D-1AFB-41CF-8933-23472481316A'  StaticName='Col_FullName' Name='Col_FullName'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_Tel"; value = "<Field DisplayName='Téléphone' Type='Text' Required='FALSE' ID='A24C1AFD-9922-4396-9BF2-541A4FADD62C'  StaticName='Col_Tel' Name='Col_Tel'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_Email"; value = "<Field DisplayName='Email' Type='Text' Required='FALSE' ID='92E47F3C-5E3D-4165-8A1F-797A21108BB3'  StaticName='Col_Email' Name='Col_Email'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_Position"; value = "<Field DisplayName='Poste' Type='Text' Required='FALSE' ID='3AF470B3-BA4B-4698-8228-5B4006DDF8EB'  StaticName='Col_Position' Name='Col_Position'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_Promotion"; value = "<Field DisplayName='Promotion' Type='Text' Required='FALSE' ID='0E6E46DC-9486-4E77-A329-9F62941CBB27'  StaticName='Col_Promotion' Name='Col_Promotion'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_TrimNb"; value = "<Field DisplayName='Nombre Trim.' Type='Number' Required='FALSE' ID='8A7D5B67-D7E3-47DB-A649-F4039CE15D50'  StaticName='Col_TrimNb' Name='Col_TrimNb'  Group='VC' />" }
         
         [pscustomobject]@{ key = "Col_StartDate"; value = "<Field DisplayName='Date de début' Type='DateTime' Required='FALSE' ID='64b112b6-a958-4e3b-9eaf-c18d7a7e89b2'  StaticName='Col_StartDate' Name='Col_StartDate'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_EndDate"; value = "<Field DisplayName='Date de fin' Type='DateTime' Required='FALSE' ID='932d90ef-8c9d-4a05-8f19-762ea276cc65'  StaticName='Col_EndDate' Name='Col_EndDate'  Group='VC' />" }
@@ -338,7 +341,7 @@ function FieldsDefinitions() {
         [pscustomobject]@{ key = "Col_RespUserSPId"; value = "<Field Type='Number' DisplayName='Responsable ID' Name='Col_RespUserSPId'  StaticName='Col_RespUserSPId' ID='94F9245E-0977-4507-ADB7-F267E902F08B' Group='VC' Required='false'   />" }
         [pscustomobject]@{ key = "Col_RespPosition"; value = "<Field DisplayName='Responsable : fonction' Type='Text' Required='FALSE' ID='FC7190E1-B0A0-4916-8B81-879B27EC92EF'  StaticName='Col_RespPosition' Name='Col_RespPosition'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_Bu"; value = "<Field DisplayName='Agence' Type='Text' Required='FALSE' ID='edcd16f9-2ed9-44e5-973f-6e11f941727b'  StaticName='Col_Bu' Name='Col_Bu'  Group='VC' />" }
-        [pscustomobject]@{ key = "Col_DirGeneral"; value = "<Field DisplayName='Direction générale' Type='Text' Required='FALSE' ID='5BD32A58-F985-43FE-B4D7-4B92B62192FE'  StaticName='Col_DirGeneral' Name='Col_DirGeneral'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_DirGeneral"; value = "<Field DisplayName='Direction régionale' Type='Text' Required='FALSE' ID='5BD32A58-F985-43FE-B4D7-4B92B62192FE'  StaticName='Col_DirGeneral' Name='Col_DirGeneral'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_UrlR"; value = "<Field DisplayName='URL' Type='Note' Required='FALSE' ID='605145bc-de13-4e04-9c53-2735332160c6' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_UrlR' Name='Col_UrlR'  Group='VC' RichTextMode='FullHtml' RichText='TRUE' />" }
         [pscustomobject]@{ key = "Col_FormType"; value = "<Field DisplayName='Type de formulaire' Type='Text' Required='FALSE' ID='2FBC8417-20C6-4AF1-9B51-93B6EA483288'  StaticName='Col_FormType' Name='Col_FormType'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_FormTarget"; value = "<Field DisplayName='Périmètre' Type='Text' Required='FALSE' ID='1FFDF589-9340-4B44-BEA0-154B8D41E0E4'  StaticName='Col_FormTarget' Name='Col_FormTarget'  Group='VC' />" }
@@ -474,6 +477,10 @@ function FieldsDefinitions() {
         [pscustomobject]@{ key = "Col_LevelRole"; value = "<Field Type='Text' DisplayName='Niveau accès' Name='Col_LevelRole'  StaticName='Col_LevelRole' ID='7c884426-31f0-4f5c-98c0-87a3b9181900' Group='VC' Required='false'  ></Field>" }
         [pscustomobject]@{ key = "Col_User"; value = "<Field Type='User' DisplayName='Utilisateur' Name='Col_User'  StaticName='Col_User' ID='4f299631-f8d7-4fff-84b7-27fa1bc6b31c' Group='VC' Required='false'   />" }
         
+        # FAQ Fields
+
+        [pscustomobject]@{ key = "Col_FaqDesc"; value = "<Field DisplayName='Réponse' Type='Note' Required='FALSE' ID='DE12ACD5-3B34-4C0D-9594-A53DF2FD07B0' UnlimitedLengthInDocumentLibrary='TRUE' StaticName='Col_FaqDesc' Name='Col_FaqDesc'  Group='VC' />" }
+        
 
         # Aigilleurs List
         # [pscustomobject]@{ key = "Col_Function"; value = "<Field DisplayName='Fonction' Type='Text' Required='FALSE' ID='EA16A241-6647-4C4F-B099-F25D8D4FF0E6'  StaticName='Col_Function' Name='Col_Function'  Group='VC' />" }
@@ -537,7 +544,23 @@ function LinkFields() {
     )
     return $data;
 }
-
+function FaqFields() {
+    $data = @(
+        "Title"
+        "Col_FaqDesc"
+        "Col_Order"
+    )
+    return $data;
+}
+function FaqCT() {
+    $ct = "ETF FAQ"
+    AddContentType $ct
+    $fields = FaqFields 
+    $fields | ForEach-Object {
+        $staticName = $_
+        AddFieldToCT $staticName $ct
+    }
+} 
 function MailTemplateCT() {
     
     $ct = "ETF Mail template"
@@ -621,6 +644,7 @@ function AttachmentFields() {
         "Col_Comment"
         "Col_Author"
         "Col_Editor"
+        "Col_Order"
     )
     return $fields;
 }
@@ -647,6 +671,8 @@ function RootRequestFields() {
         "Col_Bu"
         "Col_DirGeneral"
         "Col_FullName"
+        "Col_FirstName"
+        "Col_LastName"
         "Col_Tel"
         "Col_Email"
         "Col_Position"
@@ -673,9 +699,6 @@ function RootRequestFields() {
 function InterviewFields() {
     $data = @(
         "Col_StartDateT"
-        "Col_RespUser2"
-        "Col_RespUserSPId2"
-        "Col_RespFullName2"
         "Col_DurationM"
         "Col_Participants"
         "Col_Ecoute"
@@ -686,6 +709,7 @@ function InterviewFields() {
         "Col_BlAigComment"
         "Col_BlFlComment"
         "Col_Lesson"
+        "Col_TrimNb"
     )
     return $data;
 }
@@ -1194,7 +1218,6 @@ function getViewFields($target) {
                 "ID"
                 "LinkTitle"
                 "Col_RespUser"
-                "Col_RespUser2"
                 "Col_FullName"
                 "Col_DirGeneral"
                 "Col_Bu"
@@ -1233,9 +1256,6 @@ function getViewFields($target) {
                 "Col_StartDate"
                 "Col_EndDate"
                 "Col_DurationM"
-                "Col_RespUser2"
-                "Col_RespUserSPId2"
-                "Col_RespFullName2"
                 "Col_Participants"
                 "Col_Ecoute"
                 "Col_QualityExchange"
@@ -1408,6 +1428,16 @@ function LinkNewList($web) {
     AddCTToListV2 $l.Id $ct
     UpdateListView -List $l.Id -Fields $fields
 }
+function FaqNewList($web) {
+    $url = "Lists/etf_faq"
+    $list = "App - FAQ"
+    $ct = "ETF FAQ"
+    $fields = FaqFields 
+    CreateListV2 $web $list $url $listDesc "GenericList"
+    $l = GetListByUrl $web "$url"
+    AddCTToListV2 $l.Id $ct
+    UpdateListView -List $l.Id -Fields $fields
+}
 function AccessFields() {
     $fields = @(
         "Col_User"
@@ -1459,10 +1489,9 @@ function SetStructureRoot($siteURL) {
     $web = $context.Web
     $context.Load($web)
     $context.ExecuteQuery()
-
     CreateFields
     # RootRequestCT
-    # InterviewCT
+    InterviewCT
     # stageCT
     # ChantierCT
     # ConducteurCT
@@ -1471,6 +1500,7 @@ function SetStructureRoot($siteURL) {
     # QuartlyInterviewCT $false
     # AttachmentsCT $false
     # LinkCT
+    # FaqCT
     # MailTemplateCT
     # AppSettingsCT
     # OrganizationCT
@@ -1479,10 +1509,12 @@ function SetStructureRoot($siteURL) {
     # TemplateActionCT
  
     # InterviewList $web $context
-    ContractNewList $web $context
+    # ContractNewList $web $context
     # CreateLkFields  $context $web
     # MailTemplateList $web
     # LinkNewList $web
+    # FaqNewList $web
+
     # OrganisationNewList $web
     # AppSettingsNewList $web
     # BuNewList $web
@@ -1495,7 +1527,7 @@ function SetStructureRoot($siteURL) {
     # AttachmentsCT $true
     # AttachmentsAGNewList $web $true
     # AttachmentsCTNewList $web $true
-    TemplateNewList $web
+    # TemplateNewList $web
     # AccessCTNewList $web
     # AccessAGNewList $web
     # TemplateActionNewList $web

@@ -13,6 +13,7 @@ namespace VC.AG.Models.Enums
         Access,
         SiteLinks,
         Translations,
+        Faq,
         Organization
     }
 }

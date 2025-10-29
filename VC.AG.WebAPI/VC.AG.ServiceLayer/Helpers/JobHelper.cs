@@ -31,7 +31,7 @@ namespace VC.AG.ServiceLayer.Helpers
         readonly IConfiguration config = config;
         readonly SpoContext spoContext = new(config, cache);
         readonly GraphContext graphContext = new(config, cache);
-        public async Task<List<MailReminder>> GetWfInProgress(SiteEntity rootSite, DateTime? startDate, DateTime? endDate)
+        public async Task<List<MailReminder>> GetEntretiensInProgress(SiteEntity rootSite, DateTime? startDate, DateTime? endDate)
         {
             List<MailReminder> result = [];
             var site = await siteSvc.Get();
@@ -79,6 +79,8 @@ namespace VC.AG.ServiceLayer.Helpers
                                 var sDate = row.GetDateTimeValue2(QInterviewKeys.StartDate + ".");
                                 var status = row.GetStringValue2(QInterviewKeys.Status);
                                 var user = await userSvc.GetById(aigUserId);
+                                var index = row.GetIntValue2($"{AppKeys.Order}.");
+                                var entretiensCount = row.GetIntValue2(QInterviewKeys.EntretienCount);
                                 if (user != null)
                                 {
                                     var userEmail = user.Email;
@@ -92,6 +94,8 @@ namespace VC.AG.ServiceLayer.Helpers
                                         UserName = userName,
                                         Status = status,
                                         itemId = itemId,
+                                        Index = index,
+                                        EntretiensCount = entretiensCount,
                                         RequestId = row.GetStreamLookupValue2(AppKeys.Lk_Request)?.LookupId
                                     });
                                 }
@@ -116,7 +120,7 @@ namespace VC.AG.ServiceLayer.Helpers
             {
                 try
                 {
-                    var waitingItems = items.Where(a => a.UserEmail.EqualsNotNull(to.Key)).ToList();
+                    var waitingItems = items.Where(a => a.UserEmail.EqualsNotNull(to.Key)).OrderBy(a=>a.DueDate).ToList();
                     var email = $"{to.Key}";
                     var mailTemplate = rootSite?.MailTemplates?.FirstOrDefault(a => MailType.Reminder.ToString().EqualsNotNull(a.Values?.GetStringValue2(AppConstants.AppKeys.Code)));
                     if (mailTemplate != null)
@@ -131,7 +135,7 @@ namespace VC.AG.ServiceLayer.Helpers
                         body = body?.Replace("[EndDate]", endDate?.ToString("dd/MM/yyyy"));
                         await Console.Out.WriteLineAsync($"{to} : {count} items");
                         var summury = new StringBuilder();
-                        UpdateBodyHtml(ref summury, waitingItems, appUrl);
+                        UpdateBodyHtml(ref summury, waitingItems, appUrl, AppTarget.AG);
                         body = body?.Replace("[Details]", summury.ToString());
                         var tos = new List<string>()
                                     {
@@ -162,46 +166,63 @@ namespace VC.AG.ServiceLayer.Helpers
                 var allSites = sitesList != null ? String.Join(',', sitesList) : string.Empty;
             }
         }
-        static void UpdateBodyHtml(ref StringBuilder summury, List<MailReminder>? waitingItems, string appUrl)
+        static void UpdateBodyHtml(ref StringBuilder summury, List<MailReminder>? waitingItems, string appUrl, AppTarget appTarget)
         {
             if (waitingItems != null)
             {
                 summury.Append("<style>#tabDetails {border-collapse: collapse;}#tabDetails th,#tabDetails td { border:1px solid;  }</style>");
+                var firstEnts = waitingItems.Where(a => a.Index == 1).ToList();
+                var lastEnts = waitingItems.Where(a => a.Index == a.EntretiensCount).ToList();
+                var middleEnts = waitingItems.Where(a => !firstEnts.Any(b => b.itemId == a.itemId) && !lastEnts.Any(b => b.itemId == a.itemId)).ToList();
+                UpdateTableDetails(ref summury,"Premiers entretiens à réaliser : auto-évolution + entretien N°1", firstEnts, appUrl, appTarget);
+                UpdateTableDetails(ref summury,"Entretiens trimestiels à réaliser", middleEnts, appUrl, appTarget);
+                UpdateTableDetails(ref summury, "Entretiens finaux à réaliser : entretien final + bilan final", lastEnts, appUrl, appTarget);
+            }
+        }
+        static void UpdateTableDetails(ref StringBuilder summury, string header, List<MailReminder>? waitingItems, string appUrl, AppTarget appTarget)
+        {
+            if (waitingItems.Count > 0)
+            {
+                summury.Append($"<ul><li style=\"text-decoration:underline\">{header}</li></ul>");
                 summury.Append($@"<table id=""tabDetails"">");
                 summury.Append($@"<tr>
-                                                        <th style='padding:5px'>ID Fiche</th>
-                                                        <th style='padding:5px'>Titre</th>
-                                                        <th style='padding:5px'>Statut</th>
-                                                        <th style='padding:5px'>Date prévue</th>
-                                                        <th style='padding:5px'>Date d'entretien</th>
-                                                      </tr>");
+                                <th style='padding:5px'>Fiche ID</th>
+                                <th style='padding:5px'>Titre</th>
+                                <th style='padding:5px'>Statut</th>
+                                <th style='padding:5px'>Date prévue</th>
+                                </tr>");
 
                 foreach (var item in waitingItems)
                 {
-                    var wfUrl = $"{appUrl.TrimEnd('/')}/forms/{item.RequestId}";
+                    var wfUrl = $"{appUrl.TrimEnd('/')}/forms/{item.RequestId}?t={item.Index}&d={appTarget}";
                     summury.Append(@$"<tr>
-                                                            <td style='padding:5px'>{item.RequestId}</td>
-                                                            <td style='padding:5px'><a href=""{wfUrl}"">{item.Title}</a></td>
-                                                            <td style='padding:5px'>{item.Status}</td>
-                                                            <td style='padding:5px'>{item.DueDate?.ToString("dd/MM/yyyy")}</td>
-                                                            <td style='padding:5px'>{item.StartDate?.ToString("dd/MM/yyyy")}</td>
-                                                        </tr>");
+                                        <td style='padding:5px'>{item.RequestId}</td>
+                                        <td style='padding:5px'><a href=""{wfUrl}"">{item.Title}</a></td>
+                                        <td style='padding:5px'>{item.Status}</td>
+                                        <td style='padding:5px'>{item.DueDate?.ToString("dd/MM/yyyy")}</td>
+                                    </tr>");
 
                 }
                 summury.Append("</table>");
             }
         }
-        public async Task<string> SendNotification(SiteEntity? rootSite, WfRequest? request, string? comment)
+        public async Task<string> SendNotification(SiteEntity? rootSite, WfRequest? request, NotifQuery notifQuery)
         {
             var result = string.Empty;
-            var email = request?.Values?.GetStringValue2("Col_AgUser.email");
-            var mailTemplate = rootSite?.MailTemplates?.FirstOrDefault(a => MailType.Information.ToString().EqualsNotNull(a.Values?.GetStringValue2(AppConstants.AppKeys.Code)));
+            var email = "";// request?.Values?.GetStringValue2(InterviewKeys.Responsible);
+            var mailTemplate = rootSite?.MailTemplates?.FirstOrDefault(a => notifQuery.Type.ToString().EqualsNotNull(a.Values?.GetStringValue2(AppConstants.AppKeys.Code)));
+            switch (notifQuery.Type)
+            {
+                case NotifType.AskForAction: email = request.Values?.GetUserValue4(InterviewKeys.Responsible)?.Email; break;
+                case NotifType.Assign: email = request.Values?.GetUserValue4(InterviewKeys.Responsible)?.Email; break;
+            }
             if (mailTemplate != null && !string.IsNullOrEmpty(email))
             {
                 var subject = mailTemplate.Values?.GetStringValue2(MailTemplateKeys.Subject);
                 var body = mailTemplate.Values?.GetStringValue2(MailTemplateKeys.Body);
-                subject = UpdateHtml(subject, request, comment);
-                body = UpdateHtml(body, request, comment);
+                var comment = notifQuery.Comment;
+                subject = UpdateHtml(notifQuery.AppTarget, subject, request, comment);
+                body = UpdateHtml(notifQuery.AppTarget, body, request, comment);
 
                 var summury = new StringBuilder();
                 var tos = new List<string>()
@@ -218,11 +239,11 @@ namespace VC.AG.ServiceLayer.Helpers
             }
             return result;
         }
-        string? UpdateHtml(string? body, WfRequest? request, string? comment)
+        string? UpdateHtml(AppTarget? target, string? body, WfRequest? request, string? comment)
         {
             var appUrl = $"{config.GetValue<string>(AppSettingsKeys.AppUrl)}";
-            var appLink = $"<a href=\"{appUrl}\">{appUrl}</a>";
-            var itemLink = $"<a href=\"{appUrl}/forms/{request?.Id}\">Fiche ${request?.Id}</a>";
+            var appLink = $"<a href=\"{appUrl}?d={target}\">{appUrl}</a>";
+            var itemLink = $"<a href=\"{appUrl}/forms/{request?.Id}?d={target}\">Fiche aiguilleur N° : {request.Id}</a>";
             body = body?.Replace("[AppLink]", appLink);
             body = body?.Replace("[ItemLink]", itemLink);
             body = body?.Replace("[ID]", request?.Id);

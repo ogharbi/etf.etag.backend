@@ -12,6 +12,7 @@
         ContentTypes,
         Fields,
         Views,
-        View
+        View,
+        Faq
     }
 }

@@ -13,5 +13,6 @@ namespace VC.AG.Models.ValuesObject
         public NotifType? Type { get; set; }
         public string? ListName { get; set; }
         public string? Comment { get; set; }
+        public AppTarget? AppTarget { get; set; }
     }
 }

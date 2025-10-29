@@ -255,7 +255,7 @@ namespace VC.AG.DAO.Respository
                 var siteUrl = $"{query.SiteUrl}";
                 var ctx = spoContext.GetClientContext(siteUrl);
                 var fields = ctx.Web.Lists.GetById(new Guid($"{query.ListId}")).Fields;
-                ctx.Load(fields, view => view.Include(a => a.Id, a => a.StaticName, a => a.Title, a => a.TypeAsString));
+                ctx.Load(fields, view => view.Include(a => a.Id, a => a.StaticName, a => a.Title, a => a.SchemaXml, a => a.TitleResource, a => a.TypeAsString));
                 await ctx.ExecuteQueryAsync();
                 foreach (var field in fields)
                 {

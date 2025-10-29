@@ -8,7 +8,7 @@ using VC.AG.ServiceLayer.Services;
 Console.WriteLine("Hello, World!");
 IConfiguration config = new ConfigurationBuilder()
 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-.AddEnvironmentVariables().AddUserSecrets("6b304ef7-4ec7-4950-a8d8-9a3911deb456")
+.AddEnvironmentVariables().AddUserSecrets("b164e22c-af5a-45f2-99c7-ef156126118b")
 .Build();
 
 IMemoryCache cache = new MemoryCache(new MemoryCacheOptions());

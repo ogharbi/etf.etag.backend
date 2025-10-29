@@ -18,6 +18,8 @@ namespace VC.AG.Models.ValuesObject
         public string? UserEmail { get; set; }
         public string? UserName{ get; set; }
         public int? UserId { get; set; }
+        public int? Index { get; set; }
+        public int? EntretiensCount { get; set; }
         public string? Status { get; set; }
         public string? Summury { get; set; }
         public DateTime? Date { get; set; }

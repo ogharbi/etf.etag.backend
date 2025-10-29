@@ -30,6 +30,8 @@ namespace VC.AG.ServiceLayer.Helpers
             site.ActionTemplates = await uow.DBRepo.GetAll(q);
             q = new DBQuery() { SiteId = site.Id, ListId = site.Lists?.GetStringValue2(ListNameKeys.SiteLinks), Expand = fields, Select = SettingsKeys.SelectFields, CatchError = true };
             site.SiteLinks = await uow.DBRepo.GetAll(q);
+            q = new DBQuery() { SiteId = site.Id, ListId = site.Lists?.GetStringValue2(ListNameKeys.Faq), Expand = fields, Select = SettingsKeys.SelectFields, CatchError = true };
+            site.Faq = await uow.DBRepo.GetAll(q);
             q = new DBQuery() { SiteId = site.Id, ListId = site.Lists?.GetStringValue2(ListNameKeys.CTAccess), Expand = fields, Select = AccessKeys.SelectFields, CatchError = true };
             var ctAccess = await uow.DBRepo.GetAll(q);
             var ctAccessList = GetAccessList(ctAccess, AppTarget.CT);
@@ -52,6 +54,10 @@ namespace VC.AG.ServiceLayer.Helpers
                 case SiteRefreshTarget.SiteLinks:
                     q = new DBQuery() { SiteId = site.Id, ListId = site.Lists?.GetStringValue2(ListNameKeys.SiteLinks), Expand = fields, Select = SiteLinkKeys.SelectFields, CatchError = true };
                     site.SiteLinks = await uow.DBRepo.GetAll(q);
+                    break;
+                case SiteRefreshTarget.Faq:
+                    q = new DBQuery() { SiteId = site.Id, ListId = site.Lists?.GetStringValue2(ListNameKeys.Faq), Expand = fields, Select = SiteLinkKeys.SelectFields, CatchError = true };
+                    site.Faq = await uow.DBRepo.GetAll(q);
                     break;
                 case SiteRefreshTarget.Organization:
                     q = new DBQuery() { SiteId = site.Id, ListId = site.Lists?.GetStringValue2(ListNameKeys.Organization), Expand = fields, Select = AccessKeys.SelectFields, CatchError = true };

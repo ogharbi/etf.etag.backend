@@ -95,6 +95,7 @@ namespace VC.AG.Models
             public const string CTAttachments = "etf_ctattachments";
             public const string DocTemplates = "etf_templates";
             public const string SiteLinks = "etf_link";
+            public const string Faq = "etf_faq";
             public const string MailTemplate = "etf_mailtemplate";
             public const string Settings = "etf_settings";
             public const string Organization = "etf_organization";
@@ -121,6 +122,7 @@ namespace VC.AG.Models
             public const string Editor = "Col_Editor";
             public const string Code = "Col_E_Code";
             public const string Comment = "Col_Comment";
+            public const string Order = "Col_Order";
             public const string ParentCode = "Col_E_ParentCode";
             public const string Locale = "Col_E_Locale";
             public const string Name = "Col_E_Name";
@@ -170,6 +172,12 @@ namespace VC.AG.Models
             public const string NewTab = "Col_NewTab";
             public const string Order = "Col_Order";
             public const string SelectFields = $"Title,{LinkUrl},{LinkTarget},{NewTab},{Order}";
+
+        }
+        public static class FaqKeys
+        {
+            public const string Response = "Col_FaqDesc";
+            public const string Order = "Col_Order";
 
         }
         public static class AccessKeys
@@ -260,6 +268,8 @@ namespace VC.AG.Models
             public const string StartDate = "Col_StartDate";
             public const string DueDate = "Col_DueDate";
             public const string Status = "Col_Status";
+            public const string EntretienCount = "F_x003a_Nombre_x0020_Trim_x002e_";
+
 
         }
 

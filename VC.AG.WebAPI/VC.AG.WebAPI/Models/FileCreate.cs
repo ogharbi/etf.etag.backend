@@ -16,6 +16,7 @@ namespace VC.AG.WebAPI.Models
         public string? ParentId { get; set; }
         public string? Code { get; set; }
         public string? Comment { get; set; }
+        public string? Order { get; set; }
       
         public DBFile? ToDBFile(IFormFile? file, IUserContract userSvc)
         {
@@ -28,16 +29,20 @@ namespace VC.AG.WebAPI.Models
                 var name = file.FileName.Replace("'", "").Replace("+", "-");
                 var targetList = AppTarget == AG.Models.Enums.AppTarget.CT ? ListNameKeys.CTAttachments : ListNameKeys.AGAttachments;
                 var lkField = AppTarget == AG.Models.Enums.AppTarget.CT ? AppKeys.Lk_Contract: AppKeys.Lk_Request;
-
+                decimal.TryParse(Order, out decimal ItemOrder);
                 var properties = new Dictionary<string, object>
                         {
-                            { "Title", string.Format("ETF-{0}", name) },
+                            { "Title", string.Format("{0}", name) },
                             { AppConstants.AppKeys.ParentId, $"{ParentId}" },
                             { AppKeys.Code, $"{Code}" },
                             { AppConstants.AppKeys.Comment, $"{Comment}" },
                             { $"{lkField}LookupId", $"{ParentId}" },
 
                         };
+                if (ItemOrder > 0)
+                {
+                    properties.Add(AppConstants.AppKeys.Order, ItemOrder);
+                }
                 var enabledAuthorLists = new string[] { AppConstants.ListNameKeys.Interview, AppConstants.ListNameKeys.Contract, AppConstants.ListNameKeys.AGAttachments, AppConstants.ListNameKeys.CTAttachments, AppConstants.ListNameKeys.Comment };
                 if (enabledAuthorLists.Contains(targetList?.ToLower()))
                 {

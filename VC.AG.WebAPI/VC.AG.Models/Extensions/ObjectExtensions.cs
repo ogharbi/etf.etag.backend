@@ -47,6 +47,19 @@ namespace VC.AG.Models.Extensions
             }
             return form;
         }
+        public static DBFormData ToFAQ(this DBFormData form)
+        {
+            Faq? item = JsonConvert.DeserializeObject<Faq>($"{form.Data}");
+            if (form.Values == null) form.Values = [];
+            if (item != null)
+            {
+                form.Values["Title"] = $"{item.Title}";
+                form.Values[FaqKeys.Response] = $"{item.Response}";
+                if (item.Order != null)
+                    form.Values[FaqKeys.Order] = item.Order;
+            }
+            return form;
+        }
         public static byte[] ReadAllBytes(this Stream instream)
         {
             using var memoryStream = new MemoryStream();
