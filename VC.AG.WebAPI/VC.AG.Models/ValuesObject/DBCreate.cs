@@ -10,6 +10,7 @@ namespace VC.AG.Models.ValuesObject
         public string? ListId { get; set; }
         public dynamic? Data { get; set; }
         public int? ID{ get; set; }
+        public bool? Delete{ get; set; }
 
         public DBUpdate ToDBDUpdate()
         {

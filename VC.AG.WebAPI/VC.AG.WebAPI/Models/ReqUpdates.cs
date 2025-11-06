@@ -10,6 +10,7 @@
     {
         public ReqCreate[]? Data { get; set; }
         public int? ID { get; set; }
+        public bool? Delete{ get; set; }
         public string? Site { get; set; }
         public string? List { get; set; }
     }

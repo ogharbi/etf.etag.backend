@@ -101,8 +101,16 @@ namespace VC.AG.WebAPI.Controllers
                     if (d.ID != null)
                     {
                         var d2 = d.ToDBDUpdate();
-                        d2.Id=d.ID;
-                        r = formSvc.Put(d2).Result;
+                        d2.Id = d.ID;
+                        if (d.Delete == true)
+                        {
+                            var r2 = formSvc.Delete(d2).Result;
+                        }
+                        else
+                        {
+                            r = formSvc.Put(d2).Result;
+                        }
+
                     }
                     else
                     {

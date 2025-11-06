@@ -37,8 +37,10 @@ namespace VC.AG.ServiceLayer.Services
         public async Task<bool> SendInterviewsToStartReminder()
         {
             var result = true;
-            var startDate = new DateTime(2025, 11, 15);//DateTime.Now;
-            var endDate = startDate.AddDays(30);
+            //Keep now becaause we check notif date empty also
+            var baseDate = DateTime.UtcNow;
+            var startDate = baseDate; // new DateTime(2025, 11, 15);//
+            var endDate = startDate.AddDays(15);
             var rootSite = await siteSvc.Get() ?? throw new InvalidOperationException($"Unable to find the root site");
             List<MailReminder> items = await jobHelper.GetInterviewsToStart(rootSite, startDate, endDate);
             var reminderList = $"{config.GetValue<string>(AppSettingsKeys.AppReminderList)}";
@@ -48,8 +50,10 @@ namespace VC.AG.ServiceLayer.Services
         public async Task<bool> SendQInterviewsToStartReminder()
         {
             var result = true;
-            var startDate = new DateTime(2025, 11, 06);//DateTime.Now;
-            var endDate = startDate.AddDays(30);
+            //Keep now becaause we check notif date empty also
+            var baseDate = DateTime.UtcNow;
+            var startDate = baseDate; // new DateTime(2025, 11, 15);//
+            var endDate = startDate.AddDays(15);
             var rootSite = await siteSvc.Get() ?? throw new InvalidOperationException($"Unable to find the root site");
             List<MailReminder> items = await jobHelper.GetQInterviewsToStart(rootSite, startDate, endDate);
             var reminderList = $"{config.GetValue<string>(AppSettingsKeys.AppReminderList)}";
@@ -59,8 +63,7 @@ namespace VC.AG.ServiceLayer.Services
         public async Task<bool> SendQInterviewsNotStartReminder()
         {
             var result = true;
-
-            var endDate = new DateTime(2025, 11, 14);//DateTime.Now;
+            var endDate = DateTime.Now;// new DateTime(2025, 11, 14);//
             var startDate = endDate.AddMonths(-1);
             var rootSite = await siteSvc.Get() ?? throw new InvalidOperationException($"Unable to find the root site");
             List<MailReminder> items = await jobHelper.GetQInterviewsNotStarted(rootSite, startDate, endDate);

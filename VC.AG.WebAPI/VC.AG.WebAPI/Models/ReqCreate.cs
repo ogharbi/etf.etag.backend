@@ -11,6 +11,7 @@ namespace VC.AG.WebAPI.Models
         public string? List { get; set; }
         public object? Data { get; set; }
         public int? ID { get; set; }
+        public bool? Delete { get; set; }
         public DBCreate ToDBCreate(IUserContract userSvc)
         {
             dynamic? d1 = JsonConvert.DeserializeObject<dynamic>($"{Data}");
@@ -32,7 +33,8 @@ namespace VC.AG.WebAPI.Models
                 Site = Site,
                 ListName = List,
                 Data = d2,
-                ID = ID
+                ID = ID,
+                Delete = Delete
             };
 
             return item;

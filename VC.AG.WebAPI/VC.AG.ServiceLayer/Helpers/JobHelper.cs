@@ -290,7 +290,7 @@ namespace VC.AG.ServiceLayer.Helpers
                         var body = mailTemplate.Values?.GetStringValue2(MailTemplateKeys.Body);
                         var appUrl = $"{config.GetValue<string>(AppSettingsKeys.AppUrl)}";
                         var appLink = $"<a href=\"{appUrl}\">{appUrl}</a>";
-                        var itemLink = $"<a href=\"{appUrl}/forms/{item.RequestId}?d={AppTarget.AG}\">{item.Values["Title"]}</a>";
+                        var itemLink = $"<a href=\"{appUrl}/forms/{item.RequestId}?d={AppTarget.AG}\">Fiche aiguilleur N° : {item.RequestId}</a>";
                         subject = subject?.Replace("[AppLink]", appLink);
                         body = "" + body?.Replace("[AppLink]", appLink);
                         body = "" + body?.Replace("[ItemLink]", itemLink);
