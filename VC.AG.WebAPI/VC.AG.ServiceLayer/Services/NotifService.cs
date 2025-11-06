@@ -29,12 +29,45 @@ using System.Security.Claims;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 namespace VC.AG.ServiceLayer.Services
 {
-    public class NotifService(IUnitOfWork uow, IConfiguration config, IMemoryCache cache, IUserContract userSvc,ISiteContract siteSvc) : INotifContract
+    public class NotifService(IUnitOfWork uow, IConfiguration config, IMemoryCache cache, IUserContract userSvc, ISiteContract siteSvc, IAppContract appSvc) : INotifContract
     {
-       readonly JobHelper jobHelper = new(uow, config, cache,userSvc, siteSvc);
+        readonly JobHelper jobHelper = new(uow, config, cache, userSvc, siteSvc, appSvc);
         readonly GraphContext graphContext = new(config, cache);
 
-      
+        public async Task<bool> SendInterviewsToStartReminder()
+        {
+            var result = true;
+            var startDate = new DateTime(2025, 11, 15);//DateTime.Now;
+            var endDate = startDate.AddDays(30);
+            var rootSite = await siteSvc.Get() ?? throw new InvalidOperationException($"Unable to find the root site");
+            List<MailReminder> items = await jobHelper.GetInterviewsToStart(rootSite, startDate, endDate);
+            var reminderList = $"{config.GetValue<string>(AppSettingsKeys.AppReminderList)}";
+            await jobHelper.SendReminder(items, rootSite, MailType.InterviewToStartReminder, endDate);
+            return result;
+        }
+        public async Task<bool> SendQInterviewsToStartReminder()
+        {
+            var result = true;
+            var startDate = new DateTime(2025, 11, 06);//DateTime.Now;
+            var endDate = startDate.AddDays(30);
+            var rootSite = await siteSvc.Get() ?? throw new InvalidOperationException($"Unable to find the root site");
+            List<MailReminder> items = await jobHelper.GetQInterviewsToStart(rootSite, startDate, endDate);
+            var reminderList = $"{config.GetValue<string>(AppSettingsKeys.AppReminderList)}";
+            await jobHelper.SendReminder(items, rootSite, MailType.QInterviewToStartReminder, endDate);
+            return result;
+        }
+        public async Task<bool> SendQInterviewsNotStartReminder()
+        {
+            var result = true;
+
+            var endDate = new DateTime(2025, 11, 14);//DateTime.Now;
+            var startDate = endDate.AddMonths(-1);
+            var rootSite = await siteSvc.Get() ?? throw new InvalidOperationException($"Unable to find the root site");
+            List<MailReminder> items = await jobHelper.GetQInterviewsNotStarted(rootSite, startDate, endDate);
+            var reminderList = $"{config.GetValue<string>(AppSettingsKeys.AppReminderList)}";
+            await jobHelper.SendReminder(items, rootSite, MailType.QInterviewNotStartedReminder, startDate);
+            return result;
+        }
 
         public async Task<bool> SendReminder(DateTime? startDate, DateTime? endDate)
         {
@@ -42,12 +75,13 @@ namespace VC.AG.ServiceLayer.Services
             var rootSite = await siteSvc.Get() ?? throw new InvalidOperationException($"Unable to find the root site");
             List<MailReminder> items = await jobHelper.GetEntretiensInProgress(rootSite, startDate, endDate);
             var reminderList = $"{config.GetValue<string>(AppSettingsKeys.AppReminderList)}";
-            await jobHelper.SendReminder(items, reminderList, rootSite, endDate);
+            //await jobHelper.SendReminder(items, reminderList, rootSite, endDate);
             return result;
         }
-        public async Task<string> SendNotifications(SiteEntity? rootSite, WfRequest? request, NotifQuery notifQuery)
+
+        public async Task<string> NotifyUser(SiteEntity? rootSite, WfRequest? request, NotifQuery notifQuery)
         {
-           var result= await jobHelper.SendNotification(rootSite,request, notifQuery);
+            var result = await jobHelper.NotifyUser(rootSite, request, notifQuery);
             return result;
         }
 

@@ -18,19 +18,315 @@ using VC.AG.ServiceLayer.Contracts;
 using static VC.AG.Models.AppConstants;
 using VC.AG.Models.Extensions;
 using Azure.Core;
+using Microsoft.Graph;
+using Microsoft.SharePoint.Client;
+using System.Dynamic;
+using Microsoft.SharePoint.News.DataModel;
 
 namespace VC.AG.ServiceLayer.Helpers
 {
-    public class JobHelper(IUnitOfWork uow, IConfiguration config, IMemoryCache cache, IUserContract userSvc, ISiteContract siteSvc)
+    public class JobHelper(IUnitOfWork uow, IConfiguration config, IMemoryCache cache, IUserContract userSvc, ISiteContract siteSvc, IAppContract appSvc)
     {
         private const string title = "Title";
 
         readonly IUnitOfWork uow = uow;
+        readonly IAppContract appSvc = appSvc;
         readonly ISiteContract siteSvc = siteSvc;
         readonly IUserContract userSvc = userSvc;
         readonly IConfiguration config = config;
         readonly SpoContext spoContext = new(config, cache);
         readonly GraphContext graphContext = new(config, cache);
+        public async Task<List<MailReminder>> GetInterviewsToStart(SiteEntity rootSite, DateTime? startDate, DateTime? endDate)
+        {
+            List<MailReminder> result = [];
+            var site = await siteSvc.Get();
+            if (site != null)
+            {
+                var ops = new List<string>();
+
+                if (startDate.HasValue)
+                {
+                    ops.Add($"<Gt><FieldRef Name='{InterviewKeys.StartDateT}'/><Value IncludeTimeValue='FALSE' Type='DateTime'>{startDate.Value.ToString("s").Split('T')[0]}T00:00:00Z</Value></Gt>");
+                }
+                if (endDate.HasValue)
+                {
+                    ops.Add($"<Lt><FieldRef Name='{InterviewKeys.StartDateT}'/><Value IncludeTimeValue='FALSE' Type='DateTime'>{endDate.Value.ToString("s").Split('T')[0]}T23:59:00Z</Value></Lt>");
+                }
+                ops.Add($"<IsNull><FieldRef Name='{InterviewKeys.NotifDate}'/></IsNull>");
+
+                ops.Add($"<Or>" +
+                    $"<Eq><FieldRef Name='{InterviewKeys.Status}'/><Value Type='Text'>{RequestStatusStr.NotStarted}</Value></Eq>" +
+                    $"<IsNull><FieldRef Name='{InterviewKeys.Status}'/></IsNull>" +
+                    $"</Or>");
+                var filterOps = AppHelper.BuildQuery(ops, "And");
+                string v = @$"<Where>{filterOps}</Where><OrderBy><FieldRef Name='{InterviewKeys.StartDateT}' Ascending='False' /></OrderBy>";
+                var q = new DBQuery()
+                {
+                    SiteUrl = site?.SiteUrl,
+                    ListId = $"{site?.Lists?[ListNameKeys.Interview.ToLower()]}",
+                    Filter = v,
+                    Top = 1000
+                };
+                var resultRequests = await uow.DBRepo.GetStream(q, true);
+
+                if (resultRequests != null && resultRequests.Row != null)
+                {
+                    foreach (var row in resultRequests.Row)
+                    {
+                        var itemId = row.GetIntValue2("ID");
+                        try
+                        {
+                            var aigUser = row.GetStreamUserValue2(InterviewKeys.Responsible);
+                            if (aigUser != null)
+                            {
+                                var title = row.GetStringValue2("Title");
+                                var dueDate = row.GetDateTimeValue2(QInterviewKeys.DueDate + ".");
+                                var sDateTutorat = row.GetDateTimeValue2(QInterviewKeys.StartDate + ".");
+                                var status = row.GetStringValue2(QInterviewKeys.Status);
+                                var user = await userSvc.GetById(aigUser.Id);
+                                if (user != null)
+                                {
+                                    var userEmail = user.Email;
+                                    var userName = user.DisplayName;
+                                    result.Add(new MailReminder()
+                                    {
+                                        Title = title,
+                                        DueDate = dueDate,
+                                        StartDate = sDateTutorat,
+                                        UserEmail = $"{userEmail}".ToLower(),
+                                        UserName = userName,
+                                        Status = status,
+                                        itemId = itemId,
+                                        RequestId = itemId,
+                                        Values = row
+                                    });
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                    }
+                }
+            }
+            //.AsEnumerable().OrderBy(x => x["Col_Order."]));
+            return result;
+        }
+        public async Task<List<MailReminder>> GetQInterviewsToStart(SiteEntity rootSite, DateTime? startDate, DateTime? endDate)
+        {
+            List<MailReminder> result = [];
+            var site = await siteSvc.Get();
+            if (site != null)
+            {
+                var ops = new List<string>();
+
+                if (startDate.HasValue)
+                {
+                    ops.Add($"<Gt><FieldRef Name='{QInterviewKeys.DueDate}'/><Value IncludeTimeValue='FALSE' Type='DateTime'>{startDate.Value.ToString("s").Split('T')[0]}T00:00:00Z</Value></Gt>");
+                }
+                if (endDate.HasValue)
+                {
+                    ops.Add($"<Lt><FieldRef Name='{QInterviewKeys.DueDate}'/><Value IncludeTimeValue='FALSE' Type='DateTime'>{endDate.Value.ToString("s").Split('T')[0]}T23:59:00Z</Value></Lt>");
+                }
+                ops.Add($"<IsNull><FieldRef Name='{InterviewKeys.NotifDate}'/></IsNull>");
+
+                ops.Add($"<Or>" +
+                    $"<Eq><FieldRef Name='{QInterviewKeys.Status}'/><Value Type='Text'>{RequestStatusStr.NotStarted}</Value></Eq>" +
+                    $"<IsNull><FieldRef Name='{QInterviewKeys.Status}'/></IsNull>" +
+                    $"</Or>");
+                var filterOps = AppHelper.BuildQuery(ops, "And");
+                string v = @$"<Where>{filterOps}</Where><OrderBy><FieldRef Name='{QInterviewKeys.DueDate}' Ascending='False' /></OrderBy>";
+                var q = new DBQuery()
+                {
+                    SiteUrl = site?.SiteUrl,
+                    ListId = $"{site?.Lists?[ListNameKeys.QInterview.ToLower()]}",
+                    Filter = v,
+                    Top = 1000
+                };
+                var resultRequests = await uow.DBRepo.GetStream(q, true);
+
+                if (resultRequests != null && resultRequests.Row != null)
+                {
+                    foreach (var row in resultRequests.Row)
+                    {
+                        var itemId = row.GetIntValue2("ID");
+                        try
+                        {
+                            var aigUser = row.GetIntValue2(QInterviewKeys.AigId);
+                            if (aigUser != null)
+                            {
+                                var title = row.GetStringValue2("Title");
+                                var dueDate = row.GetDateTimeValue2(QInterviewKeys.DueDate + ".");
+                                var sDate = row.GetDateTimeValue2(QInterviewKeys.StartDate + ".");
+                                var status = row.GetStringValue2(QInterviewKeys.Status);
+                                var user = await userSvc.GetById(aigUser);
+                                if (user != null)
+                                {
+                                    var userEmail = user.Email;
+                                    var userName = user.DisplayName;
+                                    result.Add(new MailReminder()
+                                    {
+                                        Title = title,
+                                        DueDate = dueDate,
+                                        StartDate = sDate,
+                                        UserEmail = $"{userEmail}".ToLower(),
+                                        UserName = userName,
+                                        Status = status,
+                                        itemId = itemId,
+                                        RequestId = row.GetStreamLookupValue2(AppKeys.Lk_Request)?.LookupId,
+                                        Values = row
+                                    });
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                    }
+                }
+            }
+            //.AsEnumerable().OrderBy(x => x["Col_Order."]));
+            return result;
+        }
+        public async Task<List<MailReminder>> GetQInterviewsNotStarted(SiteEntity rootSite, DateTime? startDate, DateTime? endDate)
+        {
+            List<MailReminder> result = [];
+            var site = await siteSvc.Get();
+            if (site != null)
+            {
+                var ops = new List<string>();
+
+                if (startDate.HasValue)
+                {
+                    ops.Add($"<Gt><FieldRef Name='{QInterviewKeys.DueDate}'/><Value IncludeTimeValue='FALSE' Type='DateTime'>{startDate.Value.ToString("s").Split('T')[0]}T00:00:00Z</Value></Gt>");
+                }
+                if (endDate.HasValue)
+                {
+                    ops.Add($"<Lt><FieldRef Name='{QInterviewKeys.DueDate}'/><Value IncludeTimeValue='FALSE' Type='DateTime'>{endDate.Value.ToString("s").Split('T')[0]}T23:59:00Z</Value></Lt>");
+                }
+
+                ops.Add($"<Or>" +
+                    $"<Eq><FieldRef Name='{QInterviewKeys.Status}'/><Value Type='Text'>{RequestStatusStr.NotStarted}</Value></Eq>" +
+                    $"<IsNull><FieldRef Name='{QInterviewKeys.Status}'/></IsNull>" +
+                    $"</Or>");
+                var filterOps = AppHelper.BuildQuery(ops, "And");
+                string v = @$"<Where>{filterOps}</Where><OrderBy><FieldRef Name='{QInterviewKeys.DueDate}' Ascending='False' /></OrderBy>";
+                var q = new DBQuery()
+                {
+                    SiteUrl = site?.SiteUrl,
+                    ListId = $"{site?.Lists?[ListNameKeys.QInterview.ToLower()]}",
+                    Filter = v,
+                    Top = 1000
+                };
+                var resultRequests = await uow.DBRepo.GetStream(q, true);
+
+                if (resultRequests != null && resultRequests.Row != null)
+                {
+                    foreach (var row in resultRequests.Row)
+                    {
+                        var itemId = row.GetIntValue2("ID");
+                        try
+                        {
+                            var aigUser = row.GetIntValue2(QInterviewKeys.AigId);
+                            if (aigUser != null)
+                            {
+                                var title = row.GetStringValue2("Title");
+                                var dueDate = row.GetDateTimeValue2(QInterviewKeys.DueDate + ".");
+                                var notifDate = row.GetDateTimeValue2(QInterviewKeys.NotifDate + ".");
+                                if (notifDate == null || notifDate.GetValueOrDefault().Date < dueDate.GetValueOrDefault().Date) notifDate = dueDate;
+                                var sDate = row.GetDateTimeValue2(QInterviewKeys.StartDate + ".");
+                                var status = row.GetStringValue2(QInterviewKeys.Status);
+                                var user = await userSvc.GetById(aigUser);
+                                double daysDiff =Math.Floor(Math.Abs((endDate.Value - notifDate.Value).TotalDays));
+                                bool isFullWeek = daysDiff % 7 == 0;
+                                if (user != null && isFullWeek)
+                                {
+                                    var userEmail = user.Email;
+                                    var userName = user.DisplayName;
+                                    result.Add(new MailReminder()
+                                    {
+                                        Title = title,
+                                        DueDate = dueDate,
+                                        StartDate = sDate,
+                                        NotifDate = notifDate,
+                                        UserEmail = $"{userEmail}".ToLower(),
+                                        UserName = userName,
+                                        Status = status,
+                                        itemId = itemId,
+                                        RequestId = row.GetStreamLookupValue2(AppKeys.Lk_Request)?.LookupId,
+                                        Values = row
+                                    });
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                    }
+                }
+            }
+            //.AsEnumerable().OrderBy(x => x["Col_Order."]));
+            return result;
+        }
+
+        public async Task<string> SendReminder(List<MailReminder> items, SiteEntity rootSite, MailType mailType, DateTime? endDate)
+        {
+            var result = string.Empty;
+            var allowedReminder = items;
+            var distinctTos = items.Select(a => $"{a.UserEmail}".ToLower()).ToList();
+            var mailTemplate = rootSite?.MailTemplates?.FirstOrDefault(a => mailType.ToString().EqualsNotNull(a.Values?.GetStringValue2(AppConstants.AppKeys.Code)));
+            if (mailTemplate != null)
+            {
+                foreach (var item in items)
+                {
+                    try
+                    {
+                        var email = $"{item.UserEmail}";
+
+                        var subject = mailTemplate.Values?.GetStringValue2(MailTemplateKeys.Subject);
+                        var body = mailTemplate.Values?.GetStringValue2(MailTemplateKeys.Body);
+                        var appUrl = $"{config.GetValue<string>(AppSettingsKeys.AppUrl)}";
+                        var appLink = $"<a href=\"{appUrl}\">{appUrl}</a>";
+                        var itemLink = $"<a href=\"{appUrl}/forms/{item.RequestId}?d={AppTarget.AG}\">{item.Values["Title"]}</a>";
+                        subject = subject?.Replace("[AppLink]", appLink);
+                        body = "" + body?.Replace("[AppLink]", appLink);
+                        body = "" + body?.Replace("[ItemLink]", itemLink);
+                        body = "" + body?.Replace("[EndDate]", endDate?.ToString("dd/MM/yyyy"));
+                        subject = CompileText(subject, item);
+                        body = CompileText(body, item);
+                        var summury = new StringBuilder();
+                        var tos = new List<string>()
+                                    {
+                                      email
+                                    };
+                        var mailObject = new MailObject()
+                        {
+                            MailTo = tos,
+                            Subject = subject,
+                            Body = body
+                        };
+                        var itemId = item.itemId.GetValueOrDefault();
+                        string targetList = "";
+                        switch (mailType)
+                        {
+                            case MailType.InterviewToStartReminder: targetList = ListNameKeys.Interview; break;
+                            case MailType.QInterviewToStartReminder: targetList = ListNameKeys.QInterview; break;
+                            case MailType.QInterviewNotStartedReminder: targetList = ListNameKeys.QInterview; break;
+                        }
+                        await SendNotification(rootSite, mailObject, targetList, itemId, config, graphContext);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+            }
+            return result;
+        }
         public async Task<List<MailReminder>> GetEntretiensInProgress(SiteEntity rootSite, DateTime? startDate, DateTime? endDate)
         {
             List<MailReminder> result = [];
@@ -41,11 +337,11 @@ namespace VC.AG.ServiceLayer.Helpers
 
                 if (startDate.HasValue)
                 {
-                    ops.Add($"<Gt><FieldRef Name='{QInterviewKeys.DueDate}'/><Value IncludeTimeValue='TRUE' Type='DateTime'>{startDate.Value.ToString("s")}</Value></Gt>");
+                    ops.Add($"<Gt><FieldRef Name='{QInterviewKeys.DueDate}'/><Value IncludeTimeValue='FALSE' Type='DateTime'>{startDate.Value.ToString("s")}</Value></Gt>");
                 }
                 if (endDate.HasValue)
                 {
-                    ops.Add($"<Lt><FieldRef Name='{QInterviewKeys.DueDate}'/><Value IncludeTimeValue='TRUE' Type='DateTime'>{endDate.Value.ToString("s")}</Value></Lt>");
+                    ops.Add($"<Lt><FieldRef Name='{QInterviewKeys.DueDate}'/><Value IncludeTimeValue='FALSE' Type='DateTime'>{endDate.Value.ToString("s")}</Value></Lt>");
                 }
                 ops.Add($"<Or>" +
                     $"<Eq><FieldRef Name='{InterviewKeys.Status}'/><Value Type='Text'>{RequestStatusStr.NotStarted}</Value></Eq>" +
@@ -111,59 +407,61 @@ namespace VC.AG.ServiceLayer.Helpers
             //.AsEnumerable().OrderBy(x => x["Col_Order."]));
             return result;
         }
-        public async Task<string> SendReminder(List<MailReminder> items, string reminderList, SiteEntity rootSite, DateTime? endDate)
+
+        static string CompileText(string body, MailReminder reminder)
         {
-            var result = string.Empty;
-            var allowedReminder = items;
-            var distinctTos = allowedReminder.GroupBy(a => a.UserEmail).ToList();
-            foreach (var to in distinctTos)
+            var values = reminder.Values;
+            if (values != null)
             {
-                try
+                foreach (KeyValuePair<string, object> item in values)
                 {
-                    var waitingItems = items.Where(a => a.UserEmail.EqualsNotNull(to.Key)).OrderBy(a=>a.DueDate).ToList();
-                    var email = $"{to.Key}";
-                    var mailTemplate = rootSite?.MailTemplates?.FirstOrDefault(a => MailType.Reminder.ToString().EqualsNotNull(a.Values?.GetStringValue2(AppConstants.AppKeys.Code)));
-                    if (mailTemplate != null)
+                    try
                     {
-                        var subject = mailTemplate.Values?.GetStringValue2(MailTemplateKeys.Subject);
-                        var body = mailTemplate.Values?.GetStringValue2(MailTemplateKeys.Body);
-                        var appUrl = $"{config.GetValue<string>(AppSettingsKeys.AppUrl)}";
-                        var appLink = $"<a href=\"{appUrl}\">{appUrl}</a>";
-                        var count = waitingItems?.Count;
-                        subject = subject?.Replace("[AppLink]", appLink).Replace("[NB]", $"{count}");
-                        body = body?.Replace("[AppLink]", appLink).Replace("[NB]", $"{count}");
-                        body = body?.Replace("[EndDate]", endDate?.ToString("dd/MM/yyyy"));
-                        await Console.Out.WriteLineAsync($"{to} : {count} items");
-                        var summury = new StringBuilder();
-                        UpdateBodyHtml(ref summury, waitingItems, appUrl, AppTarget.AG);
-                        body = body?.Replace("[Details]", summury.ToString());
-                        var tos = new List<string>()
-                                    {
-                                      email
-                                    };
-                        var mailObject = new MailObject()
-                        {
-                            MailTo = tos,
-                            Subject = subject,
-                            Body = body
-                        };
-                        await SendNotifications(mailObject, reminderList, email, waitingItems, config, graphContext);
+                        var value = item.Value;
+                        body = body.Replace($"[{item.Key}]", "" + value);
                     }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+
                 }
             }
-            return result;
+            body = body.Replace("00:00", "");
+            return body;
         }
-        private async Task SendNotifications(MailObject mailObject, string reminderList, string email, List<MailReminder>? waitingItems, IConfiguration config, GraphContext graphContext)
+        static void UpdateInterviewBodyHtml(ref StringBuilder summury, List<MailReminder>? waitingItems, string appUrl, AppTarget appTarget)
         {
-            if (!string.IsNullOrEmpty(reminderList) || reminderList.Contains(email, StringComparison.CurrentCultureIgnoreCase))
+            if (waitingItems != null)
             {
-                var sendResult = await mailObject.Send(config, graphContext);
-                var sitesList = waitingItems?.GroupBy(a => a.Site).Select(a => a.FirstOrDefault()?.Site).ToList();
-                var allSites = sitesList != null ? String.Join(',', sitesList) : string.Empty;
+                summury.Append("<style>#tabDetails {border-collapse: collapse;}#tabDetails th,#tabDetails td { border:1px solid;  }</style>");
+                UpdateInterviewTableDetails(ref summury, waitingItems, appUrl, appTarget);
+            }
+        }
+        static void UpdateInterviewTableDetails(ref StringBuilder summury, List<MailReminder>? waitingItems, string appUrl, AppTarget appTarget)
+        {
+            if (waitingItems.Count > 0)
+            {
+                summury.Append($@"<table id=""tabDetails"">");
+                summury.Append($@"<tr>
+                                <th style='padding:5px'>Fiche ID</th>
+                                <th style='padding:5px'>Titre</th>
+                                <th style='padding:5px'>Statut</th>
+                                <th style='padding:5px'>Date prévue</th>
+                                </tr>");
+
+                foreach (var item in waitingItems)
+                {
+                    var wfUrl = $"{appUrl.TrimEnd('/')}/forms/{item.RequestId}?t={item.Index}&d={appTarget}";
+                    summury.Append(@$"<tr>
+                                        <td style='padding:5px'>{item.RequestId}</td>
+                                        <td style='padding:5px'><a href=""{wfUrl}"">{item.Title}</a></td>
+                                        <td style='padding:5px'>{item.Status}</td>
+                                        <td style='padding:5px'>{item.DueDate?.ToString("dd/MM/yyyy")}</td>
+                                    </tr>");
+
+                }
+                summury.Append("</table>");
             }
         }
         static void UpdateBodyHtml(ref StringBuilder summury, List<MailReminder>? waitingItems, string appUrl, AppTarget appTarget)
@@ -174,9 +472,9 @@ namespace VC.AG.ServiceLayer.Helpers
                 var firstEnts = waitingItems.Where(a => a.Index == 1).ToList();
                 var lastEnts = waitingItems.Where(a => a.Index == a.EntretiensCount).ToList();
                 var middleEnts = waitingItems.Where(a => !firstEnts.Any(b => b.itemId == a.itemId) && !lastEnts.Any(b => b.itemId == a.itemId)).ToList();
-                UpdateTableDetails(ref summury,"Premiers entretiens à réaliser : auto-évolution + entretien N°1", firstEnts, appUrl, appTarget);
-                UpdateTableDetails(ref summury,"Entretiens trimestiels à réaliser", middleEnts, appUrl, appTarget);
-                UpdateTableDetails(ref summury, "Entretiens finaux à réaliser : entretien final + bilan final", lastEnts, appUrl, appTarget);
+                UpdateTableDetails(ref summury, "Premiers entretiens à réaliser : Auto-évaluation + 1er entretien", firstEnts, appUrl, appTarget);
+                UpdateTableDetails(ref summury, "Entretiens trimestiels à réaliser", middleEnts, appUrl, appTarget);
+                UpdateTableDetails(ref summury, "Entretiens finaux à réaliser : Entretien final + bilan final", lastEnts, appUrl, appTarget);
             }
         }
         static void UpdateTableDetails(ref StringBuilder summury, string header, List<MailReminder>? waitingItems, string appUrl, AppTarget appTarget)
@@ -206,7 +504,33 @@ namespace VC.AG.ServiceLayer.Helpers
                 summury.Append("</table>");
             }
         }
-        public async Task<string> SendNotification(SiteEntity? rootSite, WfRequest? request, NotifQuery notifQuery)
+        private async Task SendNotification(SiteEntity? rootSite, MailObject mailObject, string targetList, int itemId, IConfiguration config, GraphContext graphContext)
+        {
+
+            dynamic data = new ExpandoObject();
+            var localDate=DateTime.Now;
+            // Convert to UTC and set time to 00:00:00
+            DateTime utcMidnight = new DateTime(
+                localDate.Year,
+                localDate.Month,
+                localDate.Day,
+                0, 0, 0,
+                DateTimeKind.Utc
+            );
+
+            data.fields = new { Col_NotifDate = utcMidnight.ToString("s") };
+            var d = new DBUpdate()
+            {
+                Id = itemId,
+                ListName = targetList,
+                SiteId = rootSite.Id,
+                Data = data
+            };
+            var r = appSvc.Put(d).Result;
+            var sendResult = await mailObject.Send(config, graphContext);
+
+        }
+        public async Task<string> NotifyUser(SiteEntity? rootSite, WfRequest? request, NotifQuery notifQuery)
         {
             var result = string.Empty;
             var email = "";// request?.Values?.GetStringValue2(InterviewKeys.Responsible);

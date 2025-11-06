@@ -335,6 +335,7 @@ function FieldsDefinitions() {
         
         [pscustomobject]@{ key = "Col_StartDate"; value = "<Field DisplayName='Date de début' Type='DateTime' Required='FALSE' ID='64b112b6-a958-4e3b-9eaf-c18d7a7e89b2'  StaticName='Col_StartDate' Name='Col_StartDate'  Group='VC' />" }
         [pscustomobject]@{ key = "Col_EndDate"; value = "<Field DisplayName='Date de fin' Type='DateTime' Required='FALSE' ID='932d90ef-8c9d-4a05-8f19-762ea276cc65'  StaticName='Col_EndDate' Name='Col_EndDate'  Group='VC' />" }
+        [pscustomobject]@{ key = "Col_NotifDate"; value = "<Field DisplayName='Date de notification' Type='DateTime' Required='FALSE' ID='F683743D-3819-43E2-8EE9-A02092CA52C5'  StaticName='Col_NotifDate' Name='Col_NotifDate'  Group='VC' />" }
         
         [pscustomobject]@{ key = "Col_RespUser"; value = "<Field Type='User' DisplayName='Responsable' Name='Col_RespUser'  StaticName='Col_RespUser' ID='E4C06628-0860-4962-B138-8FF8109A5541' Group='VC' Required='false'   />" }
         [pscustomobject]@{ key = "Col_RespFullName"; value = "<Field DisplayName='Responsable : nom complet' Type='Text' Required='FALSE' ID='3C3E4066-9D24-47AC-9982-BF021AB7A81E'  StaticName='Col_RespFullName' Name='Col_RespFullName'  Group='VC' />" }
@@ -682,6 +683,7 @@ function RootRequestFields() {
         "Col_RespUserSPId"
         "Col_StartDate"
         "Col_EndDate"
+        "Col_NotifDate"
         "Col_Guid"
         "Col_Author"
         "Col_Editor"
@@ -891,6 +893,7 @@ function QuartlyInterviewFields() {
         "Col_Success"
         "Col_SoftSkills"
         "Col_CompSec"
+        "Col_NotifDate"
         "Col_Guid"
         "Col_Order"
         "Col_Author"
@@ -1490,14 +1493,14 @@ function SetStructureRoot($siteURL) {
     $context.Load($web)
     $context.ExecuteQuery()
     CreateFields
-    # RootRequestCT
-    InterviewCT
+    RootRequestCT
+    # InterviewCT
     # stageCT
     # ChantierCT
     # ConducteurCT
     # RelatedInterviewCT $false
     # RelatedActionCT  $false
-    # QuartlyInterviewCT $false
+    QuartlyInterviewCT $false
     # AttachmentsCT $false
     # LinkCT
     # FaqCT

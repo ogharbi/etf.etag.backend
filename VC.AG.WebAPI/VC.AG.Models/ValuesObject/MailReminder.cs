@@ -25,6 +25,7 @@ namespace VC.AG.Models.ValuesObject
         public DateTime? Date { get; set; }
         public DateTime? DueDate { get; set; }
         public DateTime? StartDate { get; set; }
+        public DateTime? NotifDate { get; set; }
         public Dictionary<string,object>? Values { get; set; }
     }
 }

@@ -203,11 +203,13 @@ namespace VC.AG.Models
             public const string Responsible = "Col_RespUser";
             public const string Responsible2 = "Col_RespUser2";
             public const string StartDate = "Col_StartDate";
+            public const string StartDateT= "Col_StartDateT";
             public const string Status = "Col_Status";
             public const string FormType = "Col_FormType";
             public const string FormTarget = "Col_FormTarget";
             public const string ReqRoot = "Col_CtrRootReq";
             public const string Direction = "Col_DirGeneral";
+            public const string NotifDate = "Col_NotifDate";
         }
         public static class ContractType
         {
@@ -264,11 +266,13 @@ namespace VC.AG.Models
         {
             public const string AigId = "F_x003a_Responsable_x0020_ID";
             public const string AigId2 = "F_x003a_Responsable2_ID";
-            public const string Direction = "F_x003a_Direction_x0020_g_x00e9_";
+            public const string Direction = "F_x003a_Direction_x0020_r_x00e9_";
             public const string StartDate = "Col_StartDate";
             public const string DueDate = "Col_DueDate";
             public const string Status = "Col_Status";
             public const string EntretienCount = "F_x003a_Nombre_x0020_Trim_x002e_";
+            public const string NotifDate = "Col_NotifDate";
+
 
 
         }

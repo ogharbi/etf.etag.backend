@@ -13,9 +13,11 @@ namespace VC.AG.ServiceLayer.Contracts
 {
     public interface INotifContract
     {
-
+        Task<bool> SendInterviewsToStartReminder();
+        Task<bool> SendQInterviewsToStartReminder();
+        Task<bool> SendQInterviewsNotStartReminder();
         Task<bool> SendReminder(DateTime? startDate, DateTime? endDate);
-        Task<string> SendNotifications(SiteEntity? rootSite,WfRequest? request, NotifQuery notifQuery);
+        Task<string> NotifyUser(SiteEntity? rootSite,WfRequest? request, NotifQuery notifQuery);
      
 
 

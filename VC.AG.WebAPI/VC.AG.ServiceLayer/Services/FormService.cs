@@ -297,7 +297,7 @@ namespace VC.AG.ServiceLayer.Services
                 Filter = $"<Where><Eq><FieldRef Name='ID'/><Value Type='Number'>{notifQuery.Id}</Value></Eq></Where>"
             };
             var request = await Get(dbQuery);
-            var result = await notifSvc.SendNotifications(rootSite, request, notifQuery);
+            var result = await notifSvc.NotifyUser(rootSite, request, notifQuery);
             return result;
         }
 

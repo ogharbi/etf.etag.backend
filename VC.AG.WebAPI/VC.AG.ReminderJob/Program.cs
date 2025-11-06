@@ -15,7 +15,9 @@ IMemoryCache cache = new MemoryCache(new MemoryCacheOptions());
 IUnitOfWork uow = new UnitOfWork(config,cache);
 ISiteContract siteSvc = new SiteService(uow, cache, null);
 IUserContract userSvc = new UserService(uow, cache, siteSvc, null);
-INotifContract notifSvc = new NotifService(uow, config, cache, userSvc, siteSvc);
+IAppContract appSvc = new AppService(uow, siteSvc, cache, config);
+INotifContract notifSvc = new NotifService(uow, config, cache, userSvc, siteSvc,appSvc);
 
-var e = DateTime.Now.AddMonths(12);
-await notifSvc.SendReminder(null, e);
+//await notifSvc.SendInterviewsToStartReminder();
+//await notifSvc.SendQInterviewsToStartReminder();
+await notifSvc.SendQInterviewsNotStartReminder();
