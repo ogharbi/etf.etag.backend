@@ -18,6 +18,7 @@ IUserContract userSvc = new UserService(uow, cache, siteSvc, null);
 IAppContract appSvc = new AppService(uow, siteSvc, cache, config);
 INotifContract notifSvc = new NotifService(uow, config, cache, userSvc, siteSvc,appSvc);
 
-//await notifSvc.SendInterviewsToStartReminder();
-//await notifSvc.SendQInterviewsToStartReminder();
+await notifSvc.SendInterviewsToStartReminder();
+await notifSvc.SendInterviewsNotStartedReminder();
+await notifSvc.SendQInterviewsToStartReminder();
 await notifSvc.SendQInterviewsNotStartReminder();

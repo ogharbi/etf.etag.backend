@@ -14,6 +14,7 @@ namespace VC.AG.ServiceLayer.Contracts
     public interface INotifContract
     {
         Task<bool> SendInterviewsToStartReminder();
+        Task<bool> SendInterviewsNotStartedReminder();
         Task<bool> SendQInterviewsToStartReminder();
         Task<bool> SendQInterviewsNotStartReminder();
         Task<bool> SendReminder(DateTime? startDate, DateTime? endDate);

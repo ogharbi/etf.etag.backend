@@ -38,22 +38,35 @@ namespace VC.AG.ServiceLayer.Services
         {
             var result = true;
             //Keep now becaause we check notif date empty also
-            var baseDate = DateTime.UtcNow;
+            var baseDate = DateTime.UtcNow.AddDays(15);
             var startDate = baseDate; // new DateTime(2025, 11, 15);//
-            var endDate = startDate.AddDays(15);
+            var endDate = startDate;
             var rootSite = await siteSvc.Get() ?? throw new InvalidOperationException($"Unable to find the root site");
             List<MailReminder> items = await jobHelper.GetInterviewsToStart(rootSite, startDate, endDate);
             var reminderList = $"{config.GetValue<string>(AppSettingsKeys.AppReminderList)}";
             await jobHelper.SendReminder(items, rootSite, MailType.InterviewToStartReminder, endDate);
             return result;
         }
+        public async Task<bool> SendInterviewsNotStartedReminder()
+        {
+            var result = true;
+            //Keep now becaause we check notif date empty also
+            var baseDate = DateTime.UtcNow.AddDays(-15);
+            var endDate = baseDate;// new DateTime(2025, 11, 14);
+            var startDate = endDate;
+            var rootSite = await siteSvc.Get() ?? throw new InvalidOperationException($"Unable to find the root site");
+            List<MailReminder> items = await jobHelper.GetInterviewsNotStarted(rootSite, startDate, endDate);
+            var reminderList = $"{config.GetValue<string>(AppSettingsKeys.AppReminderList)}";
+            await jobHelper.SendReminder(items, rootSite, MailType.InterviewNotStartedReminder, endDate);
+            return result;
+        }
         public async Task<bool> SendQInterviewsToStartReminder()
         {
             var result = true;
             //Keep now becaause we check notif date empty also
-            var baseDate = DateTime.UtcNow;
-            var startDate = baseDate; // new DateTime(2025, 11, 15);//
-            var endDate = startDate.AddDays(15);
+            var baseDate = DateTime.UtcNow.AddDays(15);
+            var startDate = baseDate; // new DateTime(2025, 11, 15);
+            var endDate = startDate;
             var rootSite = await siteSvc.Get() ?? throw new InvalidOperationException($"Unable to find the root site");
             List<MailReminder> items = await jobHelper.GetQInterviewsToStart(rootSite, startDate, endDate);
             var reminderList = $"{config.GetValue<string>(AppSettingsKeys.AppReminderList)}";
@@ -63,7 +76,9 @@ namespace VC.AG.ServiceLayer.Services
         public async Task<bool> SendQInterviewsNotStartReminder()
         {
             var result = true;
-            var endDate = DateTime.Now;// new DateTime(2025, 11, 14);//
+            var baseDate = DateTime.UtcNow;
+            var endDate = baseDate;
+            // Every week jusqu'a 1 mois
             var startDate = endDate.AddMonths(-1);
             var rootSite = await siteSvc.Get() ?? throw new InvalidOperationException($"Unable to find the root site");
             List<MailReminder> items = await jobHelper.GetQInterviewsNotStarted(rootSite, startDate, endDate);

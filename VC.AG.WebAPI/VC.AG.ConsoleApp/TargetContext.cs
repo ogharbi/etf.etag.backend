@@ -20,6 +20,7 @@ namespace VC.AG.ConsoleApp
         ClientContext ctx;
         SpoContext spoContext;
         readonly ISiteContract siteSvc;
+        readonly IAppContract apppSvc;
         readonly IUserContract userSvc;
         readonly INotifContract notifSvc;
         readonly IAppContract appSvc;
@@ -45,8 +46,9 @@ namespace VC.AG.ConsoleApp
             ctx = spoContext.GetClientContext(url);
             siteSvc = new SiteService(uow, cache, null);
             userSvc = new UserService(uow, cache, siteSvc, null);
-            notifSvc = new NotifService(uow, config, cache, userSvc, siteSvc);
-            formSvc = new FormService(uow, cache, config, siteSvc, userSvc);
+            appSvc = new AppService(uow, siteSvc, cache, config);
+            notifSvc = new NotifService(uow, config, cache, userSvc, siteSvc,appSvc);
+            formSvc = new FormService(uow, cache, config, siteSvc, userSvc,null);
             appSvc = new AppService(uow, siteSvc, cache, config);
             delegation = subsite;
 

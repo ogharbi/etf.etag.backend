@@ -46,13 +46,90 @@ namespace VC.AG.ServiceLayer.Helpers
 
                 if (startDate.HasValue)
                 {
-                    ops.Add($"<Gt><FieldRef Name='{InterviewKeys.StartDateT}'/><Value IncludeTimeValue='FALSE' Type='DateTime'>{startDate.Value.ToString("s").Split('T')[0]}T00:00:00Z</Value></Gt>");
+                    ops.Add($"<Gt><FieldRef Name='{InterviewKeys.StartDateT}'/><Value IncludeTimeValue='TRUE' Type='DateTime'>{startDate.Value.ToString("s").Split('T')[0]}T00:00:00Z</Value></Gt>");
                 }
                 if (endDate.HasValue)
                 {
-                    ops.Add($"<Lt><FieldRef Name='{InterviewKeys.StartDateT}'/><Value IncludeTimeValue='FALSE' Type='DateTime'>{endDate.Value.ToString("s").Split('T')[0]}T23:59:00Z</Value></Lt>");
+                    ops.Add($"<Lt><FieldRef Name='{InterviewKeys.StartDateT}'/><Value IncludeTimeValue='TRUE' Type='DateTime'>{endDate.Value.ToString("s").Split('T')[0]}T23:59:00Z</Value></Lt>");
                 }
-                ops.Add($"<IsNull><FieldRef Name='{InterviewKeys.NotifDate}'/></IsNull>");
+                //ops.Add($"<IsNull><FieldRef Name='{InterviewKeys.NotifDate}'/></IsNull>");
+
+                ops.Add($"<Or>" +
+                    $"<Eq><FieldRef Name='{InterviewKeys.Status}'/><Value Type='Text'>{RequestStatusStr.NotStarted}</Value></Eq>" +
+                    $"<IsNull><FieldRef Name='{InterviewKeys.Status}'/></IsNull>" +
+                    $"</Or>");
+                var filterOps = AppHelper.BuildQuery(ops, "And");
+                string v = @$"<Where>{filterOps}</Where><OrderBy><FieldRef Name='{InterviewKeys.StartDateT}' Ascending='False' /></OrderBy>";
+                var q = new DBQuery()
+                {
+                    SiteUrl = site?.SiteUrl,
+                    ListId = $"{site?.Lists?[ListNameKeys.Interview.ToLower()]}",
+                    Filter = v,
+                    Top = 1000
+                };
+                var resultRequests = await uow.DBRepo.GetStream(q, true);
+
+                if (resultRequests != null && resultRequests.Row != null)
+                {
+                    foreach (var row in resultRequests.Row)
+                    {
+                        var itemId = row.GetIntValue2("ID");
+                        try
+                        {
+                            var aigUser = row.GetStreamUserValue2(InterviewKeys.Responsible);
+                            if (aigUser != null)
+                            {
+                                var title = row.GetStringValue2("Title");
+                                var dueDate = row.GetDateTimeValue2(QInterviewKeys.DueDate + ".");
+                                var sDateTutorat = row.GetDateTimeValue2(QInterviewKeys.StartDate + ".");
+                                var status = row.GetStringValue2(QInterviewKeys.Status);
+                                var user = await userSvc.GetById(aigUser.Id);
+                                if (user != null)
+                                {
+                                    var userEmail = user.Email;
+                                    var userName = user.DisplayName;
+                                    result.Add(new MailReminder()
+                                    {
+                                        Title = title,
+                                        DueDate = dueDate,
+                                        StartDate = sDateTutorat,
+                                        UserEmail = $"{userEmail}".ToLower(),
+                                        UserName = userName,
+                                        Status = status,
+                                        itemId = itemId,
+                                        RequestId = itemId,
+                                        Values = row
+                                    });
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                    }
+                }
+            }
+            //.AsEnumerable().OrderBy(x => x["Col_Order."]));
+            return result;
+        }
+        public async Task<List<MailReminder>> GetInterviewsNotStarted(SiteEntity rootSite, DateTime? startDate, DateTime? endDate)
+        {
+            List<MailReminder> result = [];
+            var site = await siteSvc.Get();
+            if (site != null)
+            {
+                var ops = new List<string>();
+
+                if (startDate.HasValue)
+                {
+                    ops.Add($"<Gt><FieldRef Name='{InterviewKeys.StartDateT}'/><Value IncludeTimeValue='TRUE' Type='DateTime'>{startDate.Value.ToString("s").Split('T')[0]}T00:00:00Z</Value></Gt>");
+                }
+                if (endDate.HasValue)
+                {
+                    ops.Add($"<Lt><FieldRef Name='{InterviewKeys.StartDateT}'/><Value IncludeTimeValue='TRUE' Type='DateTime'>{endDate.Value.ToString("s").Split('T')[0]}T23:59:00Z</Value></Lt>");
+                }
+               // ops.Add($"<IsNull><FieldRef Name='{InterviewKeys.NotifDate}'/></IsNull>");
 
                 ops.Add($"<Or>" +
                     $"<Eq><FieldRef Name='{InterviewKeys.Status}'/><Value Type='Text'>{RequestStatusStr.NotStarted}</Value></Eq>" +
@@ -123,13 +200,13 @@ namespace VC.AG.ServiceLayer.Helpers
 
                 if (startDate.HasValue)
                 {
-                    ops.Add($"<Gt><FieldRef Name='{QInterviewKeys.DueDate}'/><Value IncludeTimeValue='FALSE' Type='DateTime'>{startDate.Value.ToString("s").Split('T')[0]}T00:00:00Z</Value></Gt>");
+                    ops.Add($"<Gt><FieldRef Name='{QInterviewKeys.DueDate}'/><Value IncludeTimeValue='TRUE' Type='DateTime'>{startDate.Value.ToString("s").Split('T')[0]}T00:00:00Z</Value></Gt>");
                 }
                 if (endDate.HasValue)
                 {
-                    ops.Add($"<Lt><FieldRef Name='{QInterviewKeys.DueDate}'/><Value IncludeTimeValue='FALSE' Type='DateTime'>{endDate.Value.ToString("s").Split('T')[0]}T23:59:00Z</Value></Lt>");
+                    ops.Add($"<Lt><FieldRef Name='{QInterviewKeys.DueDate}'/><Value IncludeTimeValue='TRUE' Type='DateTime'>{endDate.Value.ToString("s").Split('T')[0]}T23:59:00Z</Value></Lt>");
                 }
-                ops.Add($"<IsNull><FieldRef Name='{InterviewKeys.NotifDate}'/></IsNull>");
+                //ops.Add($"<IsNull><FieldRef Name='{InterviewKeys.NotifDate}'/></IsNull>");
 
                 ops.Add($"<Or>" +
                     $"<Eq><FieldRef Name='{QInterviewKeys.Status}'/><Value Type='Text'>{RequestStatusStr.NotStarted}</Value></Eq>" +
@@ -200,11 +277,11 @@ namespace VC.AG.ServiceLayer.Helpers
 
                 if (startDate.HasValue)
                 {
-                    ops.Add($"<Gt><FieldRef Name='{QInterviewKeys.DueDate}'/><Value IncludeTimeValue='FALSE' Type='DateTime'>{startDate.Value.ToString("s").Split('T')[0]}T00:00:00Z</Value></Gt>");
+                    ops.Add($"<Gt><FieldRef Name='{QInterviewKeys.DueDate}'/><Value IncludeTimeValue='TRUE' Type='DateTime'>{startDate.Value.ToString("s").Split('T')[0]}T00:00:00Z</Value></Gt>");
                 }
                 if (endDate.HasValue)
                 {
-                    ops.Add($"<Lt><FieldRef Name='{QInterviewKeys.DueDate}'/><Value IncludeTimeValue='FALSE' Type='DateTime'>{endDate.Value.ToString("s").Split('T')[0]}T23:59:00Z</Value></Lt>");
+                    ops.Add($"<Lt><FieldRef Name='{QInterviewKeys.DueDate}'/><Value IncludeTimeValue='TRUE' Type='DateTime'>{endDate.Value.ToString("s").Split('T')[0]}T23:59:00Z</Value></Lt>");
                 }
 
                 ops.Add($"<Or>" +
@@ -337,11 +414,11 @@ namespace VC.AG.ServiceLayer.Helpers
 
                 if (startDate.HasValue)
                 {
-                    ops.Add($"<Gt><FieldRef Name='{QInterviewKeys.DueDate}'/><Value IncludeTimeValue='FALSE' Type='DateTime'>{startDate.Value.ToString("s")}</Value></Gt>");
+                    ops.Add($"<Gt><FieldRef Name='{QInterviewKeys.DueDate}'/><Value IncludeTimeValue='TRUE' Type='DateTime'>{startDate.Value.ToString("s")}</Value></Gt>");
                 }
                 if (endDate.HasValue)
                 {
-                    ops.Add($"<Lt><FieldRef Name='{QInterviewKeys.DueDate}'/><Value IncludeTimeValue='FALSE' Type='DateTime'>{endDate.Value.ToString("s")}</Value></Lt>");
+                    ops.Add($"<Lt><FieldRef Name='{QInterviewKeys.DueDate}'/><Value IncludeTimeValue='TRUE' Type='DateTime'>{endDate.Value.ToString("s")}</Value></Lt>");
                 }
                 ops.Add($"<Or>" +
                     $"<Eq><FieldRef Name='{InterviewKeys.Status}'/><Value Type='Text'>{RequestStatusStr.NotStarted}</Value></Eq>" +

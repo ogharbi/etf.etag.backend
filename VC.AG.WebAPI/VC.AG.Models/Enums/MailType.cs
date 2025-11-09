@@ -11,8 +11,9 @@ namespace VC.AG.Models.Enums
         None = 0,
         Information = 2,
         InterviewToStartReminder = 3,
-        QInterviewToStartReminder = 4,
-        QInterviewNotStartedReminder = 5,
-        Reminder = 6
+        InterviewNotStartedReminder = 4,
+        QInterviewToStartReminder = 5,
+        QInterviewNotStartedReminder = 6,
+        Reminder = 7
     }
 }
